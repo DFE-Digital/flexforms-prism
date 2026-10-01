@@ -8,6 +8,15 @@ application is saved, submitted or deleted. The event goes to the Service Bus to
 (`v1/internal/prism`, app role `Prism.Read`), flattens the response into typed answer facts and writes a new
 generation with a revision-aware compare-and-swap.
 
+## Documentation
+
+| Document | For |
+| --- | --- |
+| [docs/prism-contract-v1.md](docs/prism-contract-v1.md) | The event, the internal API and the SQL views consumers read |
+| [docs/export-policy.md](docs/export-policy.md) | Classifying which fields may be exported |
+| [docs/runbook.md](docs/runbook.md) | Operating Prism: telemetry, backfills, incidents, upgrades and rollout |
+| [docs/azure-setup.md](docs/azure-setup.md) | The Azure resources, roles and app settings Prism needs |
+
 ## Repository layout
 
 | Path | Purpose |
@@ -90,7 +99,8 @@ messages all end in the same state.
 failures with Polly, and caches template versions in memory. It reads the `ExternalApplicationsApiClient`
 configuration section.
 
-Metrics are published on the `GovUK.Dfe.FlexForms.Prism` meter.
+Metrics are published on the `GovUK.Dfe.FlexForms.Prism` meter. The Functions host exports them to Application
+Insights with OpenTelemetry when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set; the runbook lists them.
 
 ## Database
 
@@ -125,6 +135,7 @@ Deployments apply migrations with a self-contained bundle (`prism-migrations` CI
 | `ReconciliationFunction` | 02:00 UTC daily | Records a reconciliation operation for every tenant |
 | `GenerationCleanupFunction` | 03:30 UTC daily | Deletes unreferenced superseded generations past retention |
 | `CreateBackfill`, `CreateReconciliation`, `GetBackfill`, `CancelBackfill` | HTTP, `/api/admin/...` | Control plane |
+| `GetExportPolicy`, `ChangeExportPolicy` | HTTP, `/api/admin/tenants/{tenantId}/templates/{templateId}/export-policy` | Field classification; a change starts a tenant backfill |
 
 The projection function completes a message on success or skip. It dead-letters permanent failures straight
 away, with the failure reason as the dead-letter reason. Transient failures are abandoned, so Service Bus
@@ -149,6 +160,8 @@ POST /api/admin/backfill            { "tenantId": "<optional>", "modifiedSince":
 POST /api/admin/reconciliation      { "tenantId": "<optional>" }
 GET  /api/admin/backfill/{operationId}
 POST /api/admin/backfill/{operationId}/cancel
+GET  /api/admin/tenants/{tenantId}/templates/{templateId}/export-policy
+PUT  /api/admin/tenants/{tenantId}/templates/{templateId}/export-policy   { "decisions": [ ... ] }
 ```
 
 ### Configuration
@@ -160,6 +173,9 @@ POST /api/admin/backfill/{operationId}/cancel
 - `ExternalApplicationsApiClient`: base URL and client credentials for the internal FlexForms endpoints.
 - `Prism:ServiceBusTransport` (`AmqpWebSockets` by default), `Prism:Backfill:PageSize`,
   `Prism:Backfill:TimeBudget`, `Prism:Cleanup:RetentionDays`, `Prism:Cleanup:MaxGenerationsPerRun`.
+- `APPLICATIONINSIGHTS_CONNECTION_STRING`: logs and, through OpenTelemetry, metrics.
+
+[docs/azure-setup.md](docs/azure-setup.md) has the full list of app settings for a deployed environment.
 
 ### Run locally
 

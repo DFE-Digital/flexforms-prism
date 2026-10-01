@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Functions.ControlPlane;
 using GovUK.Dfe.FlexForms.Prism.Source;
@@ -7,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using static GovUK.Dfe.FlexForms.Prism.Functions.Functions.AdminResponses;
 
 namespace GovUK.Dfe.FlexForms.Prism.Functions.Functions;
 
@@ -19,11 +18,6 @@ public sealed record CreateOperationRequest(Guid? TenantId, DateTime? ModifiedSi
 public sealed partial class AdminApi(IAdminAuthenticator authenticator, OperationService operations, ISourceClient source, ILogger<AdminApi> logger)
 {
     private const string BasePath = "/api/admin/backfill";
-
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new JsonStringEnumConverter() },
-    };
 
     [Function("CreateBackfill")]
     public Task<IActionResult> CreateBackfill(
@@ -83,18 +77,10 @@ public sealed partial class AdminApi(IAdminAuthenticator authenticator, Operatio
             return rejected;
         }
 
-        CreateOperationRequest? body;
-        try
+        var (body, invalid) = await ReadAsync<CreateOperationRequest>(request, cancellationToken);
+        if (invalid is not null)
         {
-            body = await request.ReadFromJsonAsync<CreateOperationRequest>(JsonOptions, cancellationToken);
-        }
-        catch (JsonException)
-        {
-            return Problem(StatusCodes.Status400BadRequest, "The request body is not valid JSON.");
-        }
-        catch (InvalidOperationException)
-        {
-            return Problem(StatusCodes.Status415UnsupportedMediaType, "Send the request body as application/json.");
+            return invalid;
         }
 
         if (body is null)
@@ -125,18 +111,6 @@ public sealed partial class AdminApi(IAdminAuthenticator authenticator, Operatio
         request.HttpContext.Response.Headers.Location = $"{BasePath}/{operation.OperationId}";
         return result;
     }
-
-    private static IActionResult? Rejected(AdminAuthResult auth) => auth.Status switch
-    {
-        AdminAuthStatus.Authorized => null,
-        AdminAuthStatus.Forbidden => new StatusCodeResult(StatusCodes.Status403Forbidden),
-        _ => new UnauthorizedResult(),
-    };
-
-    private static JsonResult Json(object value, int statusCode) => new(value, JsonOptions) { StatusCode = statusCode };
-
-    private static JsonResult Problem(int statusCode, string detail) =>
-        Json(new ProblemDetails { Status = statusCode, Detail = detail }, statusCode);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Prism admin audit: {Action} by {Principal} on operation {OperationId} (tenant {TenantId}): {Result}")]
     private partial void LogAudit(string action, string principal, Guid operationId, Guid? tenantId, string result);

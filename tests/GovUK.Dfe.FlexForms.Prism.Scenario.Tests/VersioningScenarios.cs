@@ -2,6 +2,7 @@ using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Tests;
 using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
+using GovUK.Dfe.FlexForms.Prism.Functions.ControlPlane;
 
 namespace GovUK.Dfe.FlexForms.Prism.Scenario.Tests;
 
@@ -76,5 +77,22 @@ public sealed class VersioningScenarios(SqlServerFixture sql) : ScenarioBase(sql
         Assert.Equal(1, state.SourceRevision);
         Assert.Equal(2, state.ExportPolicyVersion);
         Assert.Equal(ExportStatus.Allowed, (await Prism.CatalogAsync()).Single(c => c.FieldId == "secret").ExportStatus);
+    }
+
+    [Fact]
+    public async Task Denying_a_field_removes_its_facts_after_the_backfill()
+    {
+        var app = Guid.NewGuid();
+        await Prism.DeliverAsync(Source.Save(app, Named("Ada")));
+
+        var change = await Prism.ChangePolicyAsync(new ExportDecisionRequest(null, "name", ExportDecision.Denied, "Personal data"));
+        await Prism.RunOperationAsync(OperationKind.Backfill);
+
+        Assert.Equal(ApplyStatus.Applied, change.Status);
+        var facts = await Prism.CurrentFactsAsync(app);
+        Assert.DoesNotContain(facts, f => f.FieldId == "name");
+        Assert.Contains(facts, f => f.FieldId == "pupils");
+        Assert.Equal(change.PolicyVersion, (await Prism.StateAsync(app))!.ExportPolicyVersion);
+        Assert.Equal(ExportStatus.Denied, (await Prism.CatalogAsync()).Single(c => c.FieldId == "name").ExportStatus);
     }
 }

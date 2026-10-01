@@ -1,6 +1,7 @@
 using Azure.Core;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using GovUK.Dfe.FlexForms.Prism.Data;
 using GovUK.Dfe.FlexForms.Prism.Functions.ControlPlane;
 using GovUK.Dfe.FlexForms.Prism.Functions.Messaging;
@@ -9,11 +10,14 @@ using GovUK.Dfe.FlexForms.Prism.Source;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 
 namespace GovUK.Dfe.FlexForms.Prism.Functions;
 
 public static class PrismFunctionsServiceCollectionExtensions
 {
+    private const string ApplicationInsightsConnectionString = "APPLICATIONINSIGHTS_CONNECTION_STRING";
+
     /// <summary>
     /// Registers everything the Prism functions need. The SQL connection string is <c>ConnectionStrings:Prism</c>;
     /// use <c>Authentication=Active Directory Default</c> for managed identity. Service Bus uses the same
@@ -27,6 +31,7 @@ public static class PrismFunctionsServiceCollectionExtensions
 
         services.AddOptions<PrismFunctionsOptions>().Bind(configuration.GetSection(PrismFunctionsOptions.SectionName));
         services.AddMetrics();
+        AddMetricsExport(services, configuration);
 
         services.AddPrismData(connectionString);
         services.AddPrismSource(configuration);
@@ -38,7 +43,24 @@ public static class PrismFunctionsServiceCollectionExtensions
         services.AddSingleton<ControlPlaneMetrics>();
         services.AddScoped<OperationService>();
         services.AddScoped<OperationProcessor>();
+        services.AddScoped<ExportPolicyService>();
         return services;
+    }
+
+    /// <summary>
+    /// The classic Application Insights SDK ignores <see cref="System.Diagnostics.Metrics"/> meters, so the Prism
+    /// meter is exported with OpenTelemetry. The metrics land in the <c>customMetrics</c> table.
+    /// </summary>
+    private static void AddMetricsExport(IServiceCollection services, IConfiguration configuration)
+    {
+        if (configuration[ApplicationInsightsConnectionString] is not { Length: > 0 } connectionString)
+        {
+            return;
+        }
+
+        services.AddOpenTelemetry().WithMetrics(metrics => metrics
+            .AddMeter(PrismMetrics.MeterName)
+            .AddAzureMonitorMetricExporter(options => options.ConnectionString = connectionString));
     }
 
     private static ServiceBusClient CreateServiceBusClient(IConfiguration configuration, PrismFunctionsOptions options)

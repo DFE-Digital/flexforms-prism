@@ -102,6 +102,13 @@ internal sealed class ScenarioHarness
         await db.SaveChangesAsync();
     }
 
+    /// <summary>Changes the policy the way the admin endpoint does.</summary>
+    public async Task<ApplyResult> ChangePolicyAsync(params ExportDecisionRequest[] decisions)
+    {
+        await using var db = sql.CreateContext();
+        return await new ExportPolicyService(db, TimeProvider.System).ApplyAsync(TenantId, Source.TemplateId, decisions, "scenario", default);
+    }
+
     public async Task ClearPolicyAsync()
     {
         await using var db = sql.CreateContext();
