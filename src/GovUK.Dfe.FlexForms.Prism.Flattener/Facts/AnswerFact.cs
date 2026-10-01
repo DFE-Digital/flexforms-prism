@@ -5,7 +5,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Flattener.Facts;
 /// </summary>
 /// <param name="LogicalKeyHash">SHA-256 of the canonical logical key; unique within a generation.</param>
 /// <param name="FieldId">Template field identifier.</param>
-/// <param name="ParentFieldId">Collection field that contains this answer, if any.</param>
+/// <param name="ParentFieldId">Collection field that contains this answer, or empty for top-level answers.</param>
 /// <param name="OccurrencePath">Canonical ancestry of collection items, or empty for top-level answers.</param>
 /// <param name="ItemId">Identifier of the innermost collection item, if any.</param>
 /// <param name="ItemOrdinal">Display position of the innermost collection item; not part of identity.</param>
@@ -23,7 +23,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Flattener.Facts;
 public sealed record AnswerFact(
     byte[] LogicalKeyHash,
     string FieldId,
-    string? ParentFieldId,
+    string ParentFieldId,
     string OccurrencePath,
     string? ItemId,
     int? ItemOrdinal,

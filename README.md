@@ -48,6 +48,23 @@ dotnet test GovUK.Dfe.FlexForms.Prism.slnx
 
 Package versions are managed centrally in `Directory.Packages.props`. Warnings are treated as errors.
 
+## Flattening
+
+`GovUK.Dfe.FlexForms.Prism.Flattener` turns a template version and a response body into typed answer facts.
+It follows the web front end's `FormTemplate` model and the response format written by `TransformToResponseJson`:
+
+- Top-level fields become facts directly. Multi-collection items sit under `{collectionFieldId}/{itemId}`, and
+  derived collection items are read from `{fieldId}_status_{itemId}` and `{fieldId}_data_{itemId}`.
+- Stored values are HTML-decoded. Dates, numbers and booleans go to typed columns, and checkbox codes,
+  autocomplete properties and upload files each get their own `nested_path`.
+- Only fields with an explicit Allowed decision in the export policy produce facts; a nested field also needs
+  its collection to be allowed.
+- Generations are compared by a canonical hash of the facts, so property order in the source JSON never matters.
+
+The Transfer template and response in `tests/GovUK.Dfe.FlexForms.Prism.Flattener.Tests/Fixtures/transfer` have
+golden outputs. If flattening output changes on purpose, regenerate them with `UPDATE_GOLDEN=1 dotnet test`,
+review the diff, and bump `PrismVersions.ProjectorVersion`.
+
 ## Database
 
 The Prism database lives in schema `prism` and is owned by EF Core migrations in

@@ -38,6 +38,7 @@ internal static class PrismViews
         LEFT JOIN prism.field_catalog c
             ON c.tenant_id = g.tenant_id
            AND c.template_version_id = g.template_version_id
+           AND c.parent_field_id = f.parent_field_id
            AND c.field_id = f.field_id
            AND c.contract_version = g.contract_version
         """;

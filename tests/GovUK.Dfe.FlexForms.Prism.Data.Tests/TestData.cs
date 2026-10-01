@@ -13,7 +13,7 @@ internal static class TestData
     public static AnswerFact Fact(string fieldId, string value, string occurrencePath = "") => new(
         SHA256.HashData(Encoding.UTF8.GetBytes($"{fieldId}|{occurrencePath}|")),
         fieldId,
-        ParentFieldId: null,
+        ParentFieldId: string.Empty,
         occurrencePath,
         ItemId: null,
         ItemOrdinal: null,

@@ -60,11 +60,11 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                 {
                     tenant_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template_version_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    parent_field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     contract_version = table.Column<int>(type: "int", nullable: false),
                     template_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template_version_number = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    parent_field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     flow_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     flow_mode = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
                     task_group_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
@@ -87,7 +87,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_field_catalog", x => new { x.tenant_id, x.template_version_id, x.field_id, x.contract_version });
+                    table.PrimaryKey("PK_field_catalog", x => new { x.tenant_id, x.template_version_id, x.parent_field_id, x.field_id, x.contract_version });
                 });
 
             migrationBuilder.CreateTable(
@@ -97,6 +97,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                 {
                     tenant_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    parent_field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     decision = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     policy_version = table.Column<int>(type: "int", nullable: false),
@@ -106,7 +107,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_field_export_policy", x => new { x.tenant_id, x.template_id, x.field_id });
+                    table.PrimaryKey("PK_field_export_policy", x => new { x.tenant_id, x.template_id, x.parent_field_id, x.field_id });
                 });
 
             migrationBuilder.CreateTable(
@@ -164,7 +165,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     application_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     logical_key_hash = table.Column<byte[]>(type: "binary(32)", fixedLength: true, maxLength: 32, nullable: false),
                     field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    parent_field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    parent_field_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     occurrence_path = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     item_id = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     item_ordinal = table.Column<int>(type: "int", nullable: true),

@@ -1,0 +1,4881 @@
+{
+  "templateId": "form-001",
+  "templateName": "Transfer Applications",
+  "description": "A dynamic form for Transfer Applications",
+  "taskGroups": [
+    {
+      "groupId": "trust-academies-joining-group",
+      "groupName": "About the trust that academies are joining",
+      "groupOrder": 1,
+      "groupStatus": "Incomplete",
+      "tasks": [
+        {
+          "taskId": "incoming-trust-details",
+          "taskName": "Trust details",
+          "caption": null,
+          "taskOrder": 1,
+          "taskStatus": "Incomplete",
+          "pages": null,
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": {
+            "mode": "multiCollectionFlow",
+            "title": null,
+            "description": null,
+            "flows": [
+              {
+                "flowId": "detailsOfIncomingTrust",
+                "title": "",
+                "description": "",
+                "fieldId": "detailsOfIncomingTrust",
+                "addButtonLabel": "Add a trust",
+                "minItems": 1,
+                "maxItems": 1,
+                "itemKind": "Trust",
+                "itemKindPlural": null,
+                "itemTitleBinding": "incomingTrustsSearch-field-flow.name",
+                "summaryColumns": [
+                  {
+                    "label": "Trust",
+                    "field": "incomingTrustsSearch-field-flow"
+                  },
+                  {
+                    "label": "What is the type of trust?",
+                    "field": "incomingTrustTypeOfTrust"
+                  },
+                  {
+                    "label": "Accounting officer\u0027s details",
+                    "field": "incomingTrustAccountingOfficerFullName"
+                  },
+                  {
+                    "label": "Head of finance\u0027s details",
+                    "field": "incomingTrustChiefFinancialOfficerFullName"
+                  },
+                  {
+                    "label": "Chair of trustees\u0027 details",
+                    "field": "incomingTrustChairOfTrusteeFullName"
+                  },
+                  {
+                    "label": "Details of main contact",
+                    "field": "incomingTrustMainContactFullName"
+                  },
+                  {
+                    "label": "Board resolution",
+                    "field": "incomingTrustUploadBoardResolution"
+                  }
+                ],
+                "addItemMessage": "The trust that academies are joining has been added",
+                "updateItemMessage": "The trust has been updated",
+                "deleteItemMessage": "The trust has been removed",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "incomingTrustSearch-page",
+                    "slug": "incoming-trust-search",
+                    "title": "Find a trust",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustsSearch-field-flow",
+                        "type": "complexField",
+                        "label": {
+                          "value": "Trusts",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Start typing to search for Trusts...",
+                        "tooltip": "Enter at least 3 characters to search by name, UKPRN, or Companies House number",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": ".{3,}",
+                            "message": "You must enter 3 characters or more to search for a trust",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter 3 characters or more to search for a trust",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": {
+                          "id": "TrustComplexField",
+                          "dropdownDisplay": null,
+                          "confirmationDisplay": null
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "incomingTrustTypeOfTrust-page",
+                    "slug": "incoming-trust-type-of-trust",
+                    "title": "What is the type of trust?",
+                    "description": "",
+                    "pageOrder": 2,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustTypeOfTrust",
+                        "type": "radios",
+                        "label": {
+                          "value": "What is the type of trust?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select if it is a single academy trust or a multi academy trust",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Single academy trust",
+                            "label": "Single academy trust"
+                          },
+                          {
+                            "value": "Multi-academy trust",
+                            "label": "Multi-academy trust"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "incomingTrustAccountingOfficerDetails-page",
+                    "slug": "incoming-trust-accounting-officer-details",
+                    "title": "Accounting officer\u0027s details",
+                    "description": "",
+                    "pageOrder": 3,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustAccountingOfficerFullName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Full name",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the full name",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustAccountingOfficerPhoneNumber",
+                        "type": "text",
+                        "label": {
+                          "value": "Phone number",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 3,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": "^(?:0|\\\u002B?44)\\s?(\\d\\s?){9,10}$",
+                            "message": "Enter a phone number, like 01632 960 001, 07700 900 982 or \u002B44 808 157 0192",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a UK phone number",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustAccountingOfficerEmailAddress",
+                        "type": "email",
+                        "label": {
+                          "value": "Email address",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "We\u0027ll only use it to contact them about this application",
+                        "required": null,
+                        "order": 4,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter an email address",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "incomingTrustChiefFinancialOfficerDetails-page",
+                    "slug": "incoming-trust-chief-financial-officer-details",
+                    "title": "Head of finance\u0027s details",
+                    "description": "",
+                    "pageOrder": 4,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustChiefFinancialOfficerFullName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Full name",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the full name",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustChiefFinancialOfficerPhoneNumber",
+                        "type": "text",
+                        "label": {
+                          "value": "Phone number",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 3,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": "^(?:0|\\\u002B?44)\\s?(\\d\\s?){9,10}$",
+                            "message": "Enter a phone number, like 01632 960 001, 07700 900 982 or \u002B44 808 157 0192",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a UK phone number",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustChiefFinancialOfficerEmailAddress",
+                        "type": "email",
+                        "label": {
+                          "value": "Email address",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "We\u0027ll only use it to contact them about this application",
+                        "required": null,
+                        "order": 4,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter an email address",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "incomingTrustChairOfTrusteeDetails-page",
+                    "slug": "incoming-trust-chair-of-trustee-details",
+                    "title": "Chair of trustees\u0027 details",
+                    "description": "",
+                    "pageOrder": 5,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustChairOfTrusteeFullName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Full name",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the full name",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustChairOfTrusteePhoneNumber",
+                        "type": "text",
+                        "label": {
+                          "value": "Phone number",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 3,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": "^(?:0|\\\u002B?44)\\s?(\\d\\s?){9,10}$",
+                            "message": "Enter a phone number, like 01632 960 001, 07700 900 982 or \u002B44 808 157 0192",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a UK phone number",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustChairOfTrusteeEmailAddress",
+                        "type": "email",
+                        "label": {
+                          "value": "Email address",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "We\u0027ll only use it to contact them about this application",
+                        "required": null,
+                        "order": 4,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter an email address",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "incomingTrustMainContactDetails-page",
+                    "slug": "incoming-trust-main-contact-details",
+                    "title": "Details of main contact",
+                    "description": "",
+                    "pageOrder": 6,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustMainContactFullName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Full name",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the full name",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustMainContactRole",
+                        "type": "text",
+                        "label": {
+                          "value": "Role",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": false,
+                        "order": 2,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the role",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustMainContactPhoneNumber",
+                        "type": "text",
+                        "label": {
+                          "value": "Phone number",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 3,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": "^(?:0|\\\u002B?44)\\s?(\\d\\s?){9,10}$",
+                            "message": "Enter a phone number, like 01632 960 001, 07700 900 982 or \u002B44 808 157 0192",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a UK phone number",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "incomingTrustMainContactEmailAddress",
+                        "type": "email",
+                        "label": {
+                          "value": "Email address",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "We\u0027ll only use it to contact them about this application",
+                        "required": null,
+                        "order": 4,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter an email address",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "incomingTrustUploadBoardResolution-page",
+                    "slug": "incoming-trust-upload-board-resolution",
+                    "title": "Board resolution",
+                    "description": "",
+                    "pageOrder": 7,
+                    "fields": [
+                      {
+                        "fieldId": "incomingTrustUploadBoardResolution",
+                        "type": "complexField",
+                        "label": {
+                          "value": "Board resolution",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "This is a placeholder",
+                        "tooltip": "This is the minutes from the meeting where the trust\u0027s board confirmed its decision to apply to transfer academies from one trust to another.",
+                        "required": null,
+                        "order": 6,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Select a file",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": {
+                          "id": "UploadDocumentsComplexField",
+                          "dropdownDisplay": null,
+                          "confirmationDisplay": null
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              }
+            ],
+            "derivedFlows": null
+          },
+          "visibleInTaskList": true
+        },
+        {
+          "taskId": "reason-and-benefits-trust",
+          "taskName": "Reason and benefits",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? Reason and benefits}",
+          "taskOrder": 3,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "reason-and-benefits-trust-strategic-needs",
+              "slug": "reason-and-benefits-trust-strategic-needs",
+              "title": "What are the strategic needs of the trust?",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "reasonAndBenefitsTrustStrategicNeeds",
+                  "type": "character-count",
+                  "label": {
+                    "value": "What are the strategic needs of the trust?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter the strategic needs of the trust.",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "reason-and-benefits-trust-developmental-needs",
+              "slug": "reason-and-benefits-trust-developmental-needs",
+              "title": "How will the transfer benefit or maintain the trust?",
+              "description": "",
+              "pageOrder": 2,
+              "fields": [
+                {
+                  "fieldId": "reasonAndBenefitsTrustDevelopmentalNeeds",
+                  "type": "character-count",
+                  "label": {
+                    "value": "How will the transfer benefit or maintain the trust?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "For example, any leadership benefits or plans to use central services from the transferring academies",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter how the transfer will benefit or maintain the trust",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "reason-and-benefits-trust-academies-trusts-worked-together",
+              "slug": "reason-and-benefits-trust-academies-trusts-worked-together",
+              "title": "Have the transferring academies and the trusts worked together in the past?",
+              "description": "",
+              "pageOrder": 3,
+              "fields": [
+                {
+                  "fieldId": "reasonAndBenefitsTrustAcademiesTrustsWorkedTogether",
+                  "type": "radios",
+                  "label": {
+                    "value": "Have the transferring academies and the trusts worked together in the past?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": null,
+                  "required": null,
+                  "order": 3,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if the transferring academies and the trusts have worked together in the past",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "reason-and-benefits-trust-how-have-academies-trusts-worked-together",
+              "slug": "reason-and-benefits-trust-how-have-academies-trusts-worked-together",
+              "title": "How have they worked together in the past?",
+              "description": "",
+              "pageOrder": 4,
+              "fields": [
+                {
+                  "fieldId": "reasonAndBenefitsTrustHowHaveAcademiesTrustsWorkedTogether",
+                  "type": "character-count",
+                  "label": {
+                    "value": "How have they worked together in the past?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter how they have worked together in the past",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        },
+        {
+          "taskId": "high-quality-and-inclusive-education",
+          "taskName": "High-quality and inclusive education",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? High-quality and inclusive education}",
+          "taskOrder": 4,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "high-quality-and-inclusive-education-quality",
+              "slug": "high-quality-and-inclusive-education-quality",
+              "title": "How does the trust provide high quality and inclusive education in their existing academies?",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "highQualityAndInclusiveEducationQuality",
+                  "type": "character-count",
+                  "label": {
+                    "value": "How does the trust provide high quality and inclusive education in their existing academies?",
+                    "isVisible": true,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "We consider the quality of a trust by looking at evidence across the 5 pillars of trust quality. High quality and inclusive education is one of those 5 pillars.\n\n Read more in Assessing trust quality, section 2 of [Commissioning high quality trusts (opens in new tab)](https://www.gov.uk/government/publications/commissioning-high-quality-trusts)",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter how the trust provides high quality and inclusive education in their existing academies",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "high-quality-and-inclusive-education-impact",
+              "slug": "high-quality-and-inclusive-education-impact",
+              "title": "Summarise how the transfer will impact the educational standards of the trust and transferring academies",
+              "description": "",
+              "pageOrder": 2,
+              "fields": [
+                {
+                  "fieldId": "highQualityAndInclusiveEducationImpact",
+                  "type": "character-count",
+                  "label": {
+                    "value": "Summarise how the transfer will impact the educational standards of the trust and transferring academies",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "Include benefits and risks",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter a summary of how the transfer will impact the educational standards of the trust and transferring academies",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        },
+        {
+          "taskId": "school-improvement",
+          "taskName": "School improvement",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? School improvement}",
+          "taskOrder": 5,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "school-improvement-model",
+              "slug": "school-improvement-model",
+              "title": "Trust\u0027s proposed school improvement model and action plan",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "schoolImprovementModel",
+                  "type": "complexField",
+                  "label": {
+                    "value": "Trust\u0027s proposed school improvement model and action plan",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "This is a placeholder",
+                  "tooltip": "Include any changes to the trust\u0027s strategy to improve and maintain the performance of schools that are already part of the trust, as well as those that join.\n\nFor example:\n- use of school improvement leadership from the transferring academy \n- evidence showing how the trust has improved similar academies",
+                  "required": null,
+                  "order": 6,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select a file",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": {
+                    "id": "UploadDocumentsComplexField",
+                    "dropdownDisplay": null,
+                    "confirmationDisplay": null
+                  },
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        },
+        {
+          "taskId": "finance-and-operations",
+          "taskName": "Finance and operations",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? Finance and operations}",
+          "taskOrder": 6,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "finance-and-operations-have-growth-plan-next-3-years",
+              "slug": "finance-and-operations-have-growth-plan-next-3-years",
+              "title": "Does the trust have growth plans over the next 3 years?",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsHaveGrowthPlanNext3Years",
+                  "type": "radios",
+                  "label": {
+                    "value": "Does the trust have growth plans over the next 3 years? ",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "This includes plans to increase number of academies and pupil capacity",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if the trust has growth plans over the next 3 years ",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "finance-and-operations-upload-growth-plan-next-3-years",
+              "slug": "finance-and-operations-upload-growth-plan-next-3-years",
+              "title": "Trust\u0027s growth plans for the next 3 years",
+              "description": "",
+              "pageOrder": 2,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsUploadGrowthPlanNext3Years",
+                  "type": "complexField",
+                  "label": {
+                    "value": "Trust\u0027s growth plans for the next 3 years",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "This is a placeholder",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select a file",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": {
+                    "id": "UploadDocumentsComplexField",
+                    "dropdownDisplay": null,
+                    "confirmationDisplay": null
+                  },
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "finance-and-operations-policy-on-charges-made-to-its-academies",
+              "slug": "finance-and-operations-policy-on-charges-made-to-its-academies",
+              "title": "Will the trust change how it charges academies for central services because of the transfer?",
+              "description": "",
+              "pageOrder": 3,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsPolicyOnChargesMadeToItsAcademies",
+                  "type": "radios",
+                  "label": {
+                    "value": "Will the trust change how it charges academies for central services because of the transfer?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "This includes changes to top slice or GAG pooling",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if the trust will change how it charges academies for central services because of the transfer",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "finance-and-operations-how-will-policy-on-charges-made-to-its-academies",
+              "slug": "finance-and-operations-how-will-policy-on-charges-made-to-its-academies",
+              "title": "How will the trust charge its academies for central services after the transfer?",
+              "description": "",
+              "pageOrder": 4,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsHowWillPolicyOnChargesMadeToItsAcademies",
+                  "type": "character-count",
+                  "label": {
+                    "value": "How will the trust charge its academies for central services after the transfer?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter how the trust will charge its academies for central services after the transfer",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "finance-and-operations-have-sap-academies",
+              "slug": "finance-and-operations-have-sap-academies",
+              "title": "Does the trust have special and alternative provision academies?",
+              "description": "",
+              "pageOrder": 5,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsHaveSAPAcademies",
+                  "type": "radios",
+                  "label": {
+                    "value": "Does the trust have special and alternative provision academies?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if the trust has special and alternative provision academies",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "finance-and-operations-local-authority-agreements",
+              "slug": "finance-and-operations-local-authority-agreements",
+              "title": "Are there agreements with a local authority or other bodies regarding the provision of high needs places funding?",
+              "description": "",
+              "pageOrder": 6,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsLocalAuthorityAgreements",
+                  "type": "radios",
+                  "label": {
+                    "value": "Are there agreements with a local authority or other bodies regarding the provision of high needs places funding?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": "",
+                      "message": "Select yes if there are agreements with a local authority or other bodies regarding the provision of high needs places funding",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "finance-and-operations-summarise-the-agreements",
+              "slug": "finance-and-operations-summarise-the-agreements",
+              "title": "Summarise the agreements and if there is a need for those places in the future",
+              "description": "",
+              "pageOrder": 7,
+              "fields": [
+                {
+                  "fieldId": "financeAndOperationsSummariseTheAgreements",
+                  "type": "character-count",
+                  "label": {
+                    "value": "Summarise the agreements and if there is a need for those places in the future",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter a summary of the agreements and if there is a need for those places in the future",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        },
+        {
+          "taskId": "leadership-and-work-force",
+          "taskName": "Leadership and work force",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? Leadership and work force}",
+          "taskOrder": 7,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "leadership-and-work-force-will-the-leadership-central-team-change",
+              "slug": "leadership-and-work-force-will-the-leadership-central-team-change",
+              "title": "Will the leadership or central services team change because of the transfer?",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "leadershipAndWorkForceWillTheLeadershipCentralTeamChange",
+                  "type": "radios",
+                  "label": {
+                    "value": "Will the leadership or central services team change because of the transfer?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": null,
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": "",
+                      "message": "Select yes if the leadership or central services team will change because of the transfer",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "leadership-and-work-force-how-will-the-leadership-central-team-change",
+              "slug": "leadership-and-work-force-how-will-the-leadership-central-team-change",
+              "title": "Summarise how the leadership or central services team will change because of the transfer",
+              "description": "",
+              "pageOrder": 2,
+              "fields": [
+                {
+                  "fieldId": "leadershipAndWorkForceHowWillTheLeadershipCentralTeamChange",
+                  "type": "character-count",
+                  "label": {
+                    "value": "Summarise how the leadership or central services team will change because of the transfer",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter a summary of how the leadership or central services team will change because of the transfer",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        },
+        {
+          "taskId": "members",
+          "taskName": "Members",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? Members}",
+          "taskOrder": 8,
+          "taskStatus": "Incomplete",
+          "pages": null,
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": {
+            "mode": "multiCollectionFlow",
+            "title": null,
+            "description": null,
+            "flows": [
+              {
+                "flowId": "membersAfterTransfer",
+                "title": "Members after the transfer",
+                "description": "The trust must have 3 or more members and should have 5 or more members. Members must not be employees of the trust.",
+                "fieldId": "membersAfterTransfer",
+                "addButtonLabel": "Add a member",
+                "minItems": 3,
+                "maxItems": 50,
+                "itemKind": "Member",
+                "itemKindPlural": null,
+                "itemTitleBinding": "memberName",
+                "summaryColumns": [
+                  {
+                    "label": "Name",
+                    "field": "memberName"
+                  },
+                  {
+                    "label": "Is the member existing or new?",
+                    "field": "existingMember"
+                  },
+                  {
+                    "label": "Summarise the member\u0027s professional background and skills",
+                    "field": "pastRoles"
+                  },
+                  {
+                    "label": "Will the member also have any of these roles?",
+                    "field": "additionalRoles"
+                  }
+                ],
+                "addItemMessage": "{memberName} has been added to {flowTitle}",
+                "updateItemMessage": "{memberName} has been updated",
+                "deleteItemMessage": "{memberName} has been removed from {flowTitle}",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "memberName-page",
+                    "slug": "member-name",
+                    "title": "Full name of the member",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "memberName",
+                        "type": "text",
+                        "label": {
+                          "value": "Name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Enter the full name of the member",
+                            "condition": null
+                          },
+                          {
+                            "type": "maxLength",
+                            "rule": 100,
+                            "message": "Full name must be 100 characters or less",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "existingMember-page",
+                    "slug": "existing-member",
+                    "title": "Is the member existing or new?",
+                    "description": "",
+                    "pageOrder": 2,
+                    "fields": [
+                      {
+                        "fieldId": "existingMember",
+                        "type": "radios",
+                        "label": {
+                          "value": "Is the member existing or new?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select if the member is existing or new",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Existing",
+                            "label": "Existing"
+                          },
+                          {
+                            "value": "New",
+                            "label": "New"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "pastRoles-page",
+                    "slug": "member-past-roles",
+                    "title": "Summarise the member\u0027s professional background and skills",
+                    "description": "",
+                    "pageOrder": 3,
+                    "fields": [
+                      {
+                        "fieldId": "pastRoles",
+                        "type": "character-count",
+                        "label": {
+                          "value": "Summarise the member\u0027s professional background and skills",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": "Include any qualifications",
+                        "required": null,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "maxLength",
+                            "rule": 2000,
+                            "message": "You must enter 2000 characters or less",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a summary of the member\u0027s professional background and skills",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "additionalRoles-page",
+                    "slug": "additionalRoles-member",
+                    "title": "Will the member also have any of these roles?",
+                    "description": "",
+                    "pageOrder": 4,
+                    "fields": [
+                      {
+                        "fieldId": "additionalRoles",
+                        "type": "radios",
+                        "label": {
+                          "value": "Will the member also have any of these roles?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": "The majority of members should not also be trustees",
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select if the member will also be a trustee, part of a local governing body or none of these",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Trustee",
+                            "label": "Trustee"
+                          },
+                          {
+                            "value": "Part of a local governing body",
+                            "label": "Part of a local governing body"
+                          },
+                          {
+                            "value": "None of these",
+                            "label": "None of these"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              },
+              {
+                "flowId": "membersLeaving",
+                "title": "Existing members who will be leaving",
+                "description": "",
+                "fieldId": "membersLeaving",
+                "addButtonLabel": "Add a person",
+                "minItems": 0,
+                "maxItems": 20,
+                "itemKind": "Member",
+                "itemKindPlural": null,
+                "itemTitleBinding": "memberLeavingName",
+                "summaryColumns": [
+                  {
+                    "label": "Name",
+                    "field": "memberLeavingName"
+                  }
+                ],
+                "addItemMessage": "{memberLeavingName} has been added to {flowTitle}",
+                "updateItemMessage": "{memberLeavingName} has been updated",
+                "deleteItemMessage": "{memberLeavingName} has been removed from {flowTitle}",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "leaving-member-name",
+                    "slug": "leaving-member-name",
+                    "title": "Full name of the member who will be leaving",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "memberLeavingName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name of the member who will be leaving",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Enter the full name of the member who will be leaving",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              }
+            ],
+            "derivedFlows": null
+          },
+          "visibleInTaskList": true
+        },
+        {
+          "taskId": "trustees-task",
+          "taskName": "Trustees",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? Trustees}",
+          "taskOrder": 9,
+          "taskStatus": "Incomplete",
+          "pages": null,
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": {
+            "mode": "multiCollectionFlow",
+            "title": null,
+            "description": null,
+            "flows": [
+              {
+                "flowId": "trusteesAfterTransfer",
+                "title": "Trustees after the transfer",
+                "description": "Trustees must have the right skills, knowledge and experience. All trusts should have at least 2 places for parents, carers or other individuals with parental responsibilities in their governance structure. These places are either at board level or 2 places on each local governing body.",
+                "fieldId": "trusteesAfterTransfer",
+                "addButtonLabel": "Add a trustee",
+                "minItems": 3,
+                "maxItems": 50,
+                "itemKind": "Trustee",
+                "itemKindPlural": null,
+                "itemTitleBinding": "trusteeName",
+                "summaryColumns": [
+                  {
+                    "label": "Name",
+                    "field": "trusteeName"
+                  },
+                  {
+                    "label": "Is the trustee existing or new?",
+                    "field": "existingTrustee"
+                  },
+                  {
+                    "label": "Summarise the trustee\u0027s professional background and skills",
+                    "field": "trusteePastRoles"
+                  },
+                  {
+                    "label": "What will this person\u0027s role and responsibilities be as a trustee?",
+                    "field": "trusteeFutureRoles"
+                  },
+                  {
+                    "label": "Will the trustee also be a member of the local governing body?",
+                    "field": "trusteeLocalGoverningBody"
+                  }
+                ],
+                "addItemMessage": "{trusteeName} has been added to {flowTitle}",
+                "updateItemMessage": "{trusteeName} has been updated",
+                "deleteItemMessage": "{trusteeName} has been removed from {flowTitle}",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "trusteeName-page",
+                    "slug": "trustee-name",
+                    "title": "Full name of the trustee",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "trusteeName",
+                        "type": "text",
+                        "label": {
+                          "value": "Name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Enter the full name of the trustee",
+                            "condition": null
+                          },
+                          {
+                            "type": "maxLength",
+                            "rule": 100,
+                            "message": "Full name must be 100 characters or less",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "existingTrustee-page",
+                    "slug": "existing-trustee",
+                    "title": "Is the trustee existing or new?",
+                    "description": "",
+                    "pageOrder": 2,
+                    "fields": [
+                      {
+                        "fieldId": "existingTrustee",
+                        "type": "radios",
+                        "label": {
+                          "value": "Is the trustee existing or new?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select if the trustee is existing or new",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Existing",
+                            "label": "Existing"
+                          },
+                          {
+                            "value": "New",
+                            "label": "New"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "trusteePastRoles-page",
+                    "slug": "trustee-past-roles",
+                    "title": "Summarise the trustee\u0027s professional background and skills",
+                    "description": "",
+                    "pageOrder": 3,
+                    "fields": [
+                      {
+                        "fieldId": "trusteePastRoles",
+                        "type": "character-count",
+                        "label": {
+                          "value": "Summarise the trustee\u0027s professional background and skills",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": "Include any qualifications",
+                        "required": null,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "maxLength",
+                            "rule": 2000,
+                            "message": "You must enter 2000 characters or less",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a summary of the trustee\u0027s professional background and skills",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "trusteeFutureRoles-page",
+                    "slug": "trustee-future-roles",
+                    "title": "What will this person\u0027s role and responsibilities be as a trustee?",
+                    "description": "",
+                    "pageOrder": 4,
+                    "fields": [
+                      {
+                        "fieldId": "trusteeFutureRoles",
+                        "type": "character-count",
+                        "label": {
+                          "value": "What will this person\u0027s role and responsibilities be as a trustee?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": "Include the skills and experience they will bring to the board. For example, chair of a committee, senior executive leader or parent.",
+                        "required": null,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "maxLength",
+                            "rule": 2000,
+                            "message": "You must enter 2000 characters or less",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter what this person\u0027s role and responsibilities will be as a trustee",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "trusteeLocalGoverningBody-page",
+                    "slug": "trustee-local-governing-body",
+                    "title": "Will the trustee also be a member of the local governing body?",
+                    "description": "",
+                    "pageOrder": 5,
+                    "fields": [
+                      {
+                        "fieldId": "trusteeLocalGoverningBody",
+                        "type": "radios",
+                        "label": {
+                          "value": "Will the trustee also be a member of the local governing body?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": "",
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select yes if the trustee will also be a member of the local governing board",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Yes",
+                            "label": "Yes"
+                          },
+                          {
+                            "value": "No",
+                            "label": "No"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              },
+              {
+                "flowId": "trusteesLeaving",
+                "title": "Existing trustees who will be leaving",
+                "description": "",
+                "fieldId": "trusteesLeaving",
+                "addButtonLabel": "Add a person",
+                "minItems": 0,
+                "maxItems": 20,
+                "itemKind": "Trustee",
+                "itemKindPlural": null,
+                "itemTitleBinding": "trusteeLeavingName",
+                "summaryColumns": [
+                  {
+                    "label": "Name",
+                    "field": "trusteeLeavingName"
+                  }
+                ],
+                "addItemMessage": "{trusteeLeavingName} has been added to {flowTitle}",
+                "updateItemMessage": "{trusteeLeavingName} has been updated",
+                "deleteItemMessage": "{trusteeLeavingName} has been removed from  {flowTitle}",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "leaving-trustee-name",
+                    "slug": "leaving-trustee-name",
+                    "title": "Full name of the trustee who will be leaving",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "trusteeLeavingName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name of the trustee who will be leaving",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Enter the full name of the trustee who will be leaving",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              }
+            ],
+            "derivedFlows": null
+          },
+          "visibleInTaskList": true
+        },
+        {
+          "taskId": "governance-structure",
+          "taskName": "Governance Structure",
+          "caption": "{detailsOfIncomingTrust.incomingTrustsSearch-field-flow.name ?? Governance Structure}",
+          "taskOrder": 10,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "governance-team-confirmation",
+              "slug": "governance-team-confirmation",
+              "title": "Has the trust appointed all the roles in its governance structure?",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "governanceTeamConfirmation",
+                  "type": "radios",
+                  "label": {
+                    "value": "Has the trust appointed all the roles in its governance structure?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "This includes members, trustees and governance professionals",
+                  "required": null,
+                  "order": 3,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": "",
+                      "message": "Select yes if the trust has appointed all the roles in its governance structure",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "governance-team-explanation",
+              "slug": "governance-team-explanation",
+              "title": "Tell us about the trust\u0027s plans to fill gaps in skills and expertise",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "governanceTeamExplanation",
+                  "type": "character-count",
+                  "label": {
+                    "value": "Tell us about the trust\u0027s plans to fill gaps in skills and expertise",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter the trust\u0027s plans to fill gaps in skills and expertise",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "governance-structure-after-the-transfer",
+              "slug": "governance-structure-after-the-transfer",
+              "title": "Proposed governance structure after the transfer",
+              "description": "",
+              "pageOrder": 3,
+              "fields": [
+                {
+                  "fieldId": "governanceStructureAfterTheTransferPploadDocuments",
+                  "type": "complexField",
+                  "label": {
+                    "value": "Proposed governance structure after the transfer",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "This is a placeholder",
+                  "tooltip": "Upload an A4 diagram of the organisation chart and other information.\n\nThe diagram should provide the structure and role of members, trustees, committees, any sub committees and any local governing bodies.\n\nAlso include any formal scheme of delegation and any information about how a proposed multi-academy trust structure will work in practice. In particular, how it will hold the chief executive officer or executive principals to account.",
+                  "required": null,
+                  "order": 6,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select a file",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": {
+                    "id": "UploadDocumentsComplexField",
+                    "dropdownDisplay": null,
+                    "confirmationDisplay": null
+                  },
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        }
+      ]
+    },
+    {
+      "groupId": "transferring-academies-group",
+      "groupName": "About transferring academies",
+      "groupOrder": 2,
+      "groupStatus": "Incomplete",
+      "tasks": [
+        {
+          "taskId": "details-of-academies",
+          "taskName": "Details of academies",
+          "caption": null,
+          "taskOrder": 1,
+          "taskStatus": "Incomplete",
+          "pages": null,
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": {
+            "mode": "multiCollectionFlow",
+            "title": null,
+            "description": null,
+            "flows": [
+              {
+                "flowId": "detailsOfAcademies",
+                "title": "",
+                "description": "",
+                "fieldId": "detailsOfAcademies",
+                "addButtonLabel": "Add an academy",
+                "minItems": 1,
+                "maxItems": 50,
+                "itemKind": "Academy",
+                "itemKindPlural": "Academies",
+                "itemTitleBinding": "academiesSearch.name",
+                "summaryColumns": [
+                  {
+                    "label": "Academy name",
+                    "field": "academiesSearch"
+                  },
+                  {
+                    "label": "Proposed transfer date",
+                    "field": "proposedTransferDate"
+                  },
+                  {
+                    "label": "Operating based on funding agreement",
+                    "field": "academyFunding"
+                  },
+                  {
+                    "label": "Operating differently explanation",
+                    "field": "academyOperatingDifferently"
+                  },
+                  {
+                    "label": "Diocesan consent",
+                    "field": "detailsOfAcademiesDiocesanConsent"
+                  },
+                  {
+                    "label": "Upload diocesan consent",
+                    "field": "detailsOfAcademiesUploadConsent"
+                  }
+                ],
+                "addItemMessage": "{academiesSearch.name} has been added",
+                "updateItemMessage": "{academiesSearch.name} has been updated",
+                "deleteItemMessage": "{academiesSearch.name} has been removed",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "academiesSearch",
+                    "slug": "academies-search",
+                    "title": "Find an academy",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "academiesSearch",
+                        "type": "complexField",
+                        "label": {
+                          "value": "Academies",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Start typing to search for academies...",
+                        "tooltip": "Enter at least 3 characters to search by name or UKPRN",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": ".{3,}",
+                            "message": "You must enter 3 characters or more to search for an academy",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter 3 characters or more to search for an academy",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": {
+                          "id": "EstablishmentComplexField",
+                          "dropdownDisplay": null,
+                          "confirmationDisplay": null
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "proposedTransferDate-page",
+                    "slug": "proposed-transfer-date",
+                    "title": "What is the proposed transfer date?",
+                    "description": "",
+                    "pageOrder": 2,
+                    "fields": [
+                      {
+                        "fieldId": "proposedTransferDate",
+                        "type": "date",
+                        "label": {
+                          "value": "What is the proposed transfer date?",
+                          "isVisible": false,
+                          "validationLabelValue": "Proposed transfer date"
+                        },
+                        "placeholder": "",
+                        "tooltip": "For example, 27 3 2026",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the proposed transfer date",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "academyFunding-page",
+                    "slug": "academy-funding",
+                    "title": "Is the academy operating based on its funding agreement?",
+                    "description": "",
+                    "pageOrder": 3,
+                    "fields": [
+                      {
+                        "fieldId": "academyFunding",
+                        "type": "radios",
+                        "label": {
+                          "value": "Is the academy operating based on its funding agreement?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select yes if the academy is operating based on its funding agreement",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Yes",
+                            "label": "Yes"
+                          },
+                          {
+                            "value": "No",
+                            "label": "No, there are organisational changes"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "academyOperatingDifferently-page",
+                    "slug": "academy-operating-differently",
+                    "title": "How is the academy operating differently to its funding agreement?",
+                    "description": "",
+                    "pageOrder": 4,
+                    "fields": [
+                      {
+                        "fieldId": "academyOperatingDifferently",
+                        "type": "character-count",
+                        "label": {
+                          "value": "How is the academy operating differently to its funding agreement?",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "Tell us if the academy has submitted an application to [make a significant change (opens in new tab)](https://www.gov.uk/government/publications/making-significant-changes-to-an-existing-academy).",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "maxLength",
+                            "rule": 2000,
+                            "message": "You must enter 2000 characters or less",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter how the academy is operating differently to its funding agreement",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "detailsOfAcademiesDiocesanConsent-page",
+                    "slug": "details-of-academies-diocesan-consent",
+                    "title": "Does diocesan consent need to be provided?",
+                    "description": "",
+                    "pageOrder": 5,
+                    "fields": [
+                      {
+                        "fieldId": "detailsOfAcademiesDiocesanConsent",
+                        "type": "radios",
+                        "label": {
+                          "value": "Does diocesan consent need to be provided?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select yes if diocesan consent needs to be provided",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Yes",
+                            "label": "Yes"
+                          },
+                          {
+                            "value": "No",
+                            "label": "No"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "detailsOfAcademiesUploadConsent-page",
+                    "slug": "details-of-academies-upload-consent",
+                    "title": "Diocesan consent",
+                    "description": "",
+                    "pageOrder": 6,
+                    "fields": [
+                      {
+                        "fieldId": "detailsOfAcademiesUploadConsent",
+                        "type": "complexField",
+                        "label": {
+                          "value": "Diocesan consent",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Select a file",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": {
+                          "id": "UploadDocumentsComplexField",
+                          "dropdownDisplay": null,
+                          "confirmationDisplay": null
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              }
+            ],
+            "derivedFlows": null
+          },
+          "visibleInTaskList": true
+        },
+        {
+          "taskId": "reason-and-benefits-academies",
+          "taskName": "Reason and benefits",
+          "caption": null,
+          "taskOrder": 2,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "reason-and-benefits-academies-strategic-needs",
+              "slug": "reason-and-benefits-academies-strategic-needs",
+              "title": "What are the strategic needs of the transferring academies and their local areas?",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "reasonAndBenefitsAcademiesStrategicNeeds",
+                  "type": "character-count",
+                  "label": {
+                    "value": "What are the strategic needs of the transferring academies and their local areas?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "Include any diocesan plans",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter the strategic needs of the transferring academies and their local areas",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "reason-and-benefits-academies-maintain-improve",
+              "slug": "reason-and-benefits-academies-maintain-improve",
+              "title": "How will the transfer benefit the transferring academies?",
+              "description": "",
+              "pageOrder": 2,
+              "fields": [
+                {
+                  "fieldId": "reasonAndBenefitsAcademiesMaintainImprove",
+                  "type": "character-count",
+                  "label": {
+                    "value": "How will the transfer benefit the transferring academies?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "For example, any leadership benefits or benefits from the planned growth of the trust\u0027s central services team",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 2000,
+                      "message": "You must enter 2000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter how the transfer will benefit the transferring academies",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        },
+        {
+          "taskId": "risks",
+          "taskName": "Risks",
+          "caption": null,
+          "taskOrder": 3,
+          "taskStatus": "Incomplete",
+          "pages": [
+            {
+              "pageId": "risks-due-diligence",
+              "slug": "risks-due-diligence",
+              "title": "Summarise the due diligence activities being carried out on the transferring academies",
+              "description": "",
+              "pageOrder": 1,
+              "fields": [
+                {
+                  "fieldId": "risksDueDiligence",
+                  "type": "character-count",
+                  "label": {
+                    "value": "Summarise the due diligence activities being carried out on the transferring academies",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "The process should be completed in 2 stages. \n\nMore about [due diligence in academies and maintained schools (opens in new tab)](https://www.gov.uk/government/publications/due-diligence-in-academies-and-maintained-schools)",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 4000,
+                      "message": "You must enter 4000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter a summary of the due diligence activities being carried out on the transferring academies",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-pupil-numbers",
+              "slug": "risks-pupil-numbers",
+              "title": "Are pupil numbers in any transferring academy expected to drop below 85% of the school capacity?",
+              "description": "",
+              "pageOrder": 2,
+              "fields": [
+                {
+                  "fieldId": "risksPupilNumbers",
+                  "type": "radios",
+                  "label": {
+                    "value": "Are pupil numbers in any transferring academy expected to drop below 85% of the school capacity?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "You can use figures from the local authority planning data",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if any transferring academy\u0027s pupils numbers are expected to drop below 85% of the school capacity",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": false,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-upload-pupil-numbers",
+              "slug": "risks-upload-pupil-numbers",
+              "title": "Forecast of pupil numbers and action plan",
+              "description": "",
+              "pageOrder": 3,
+              "fields": [
+                {
+                  "fieldId": "risksUploadPupilNumbers",
+                  "type": "complexField",
+                  "label": {
+                    "value": "Forecast of pupil numbers and action plan",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "This is a placeholder",
+                  "tooltip": "Include: \n- a 3 year forecast \n- plans to improve pupil numbers or plans to keep the academy financially stable without improving pupil numbers",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select a file",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": {
+                    "id": "UploadDocumentsComplexField",
+                    "dropdownDisplay": null,
+                    "confirmationDisplay": null
+                  },
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-transfer-type",
+              "slug": "risks-transfer-type",
+              "title": "What type of transfer is this?",
+              "description": "",
+              "pageOrder": 4,
+              "fields": [
+                {
+                  "fieldId": "risksTransferType",
+                  "type": "radios",
+                  "label": {
+                    "value": "What type of transfer is this?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select the type of transfer this is",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "MATs that want to add an academy or academies from a different MAT",
+                      "label": "MATs that want to add an academy or academies from a different MAT"
+                    },
+                    {
+                      "value": "MATs that want to add an academy or academies from SATs",
+                      "label": "MATs that want to add an academy or academies from SATs"
+                    },
+                    {
+                      "value": "MATs merging or consolidating, where all the academies from one trust are transferring to another trust",
+                      "label": "MATs merging or consolidating, where all the academies from one trust are transferring to another trust "
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": false,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-financial-deficit",
+              "slug": "risks-financial-deficit",
+              "title": "Does any transferring academy have an in-year deficit or overall deficit?",
+              "description": "",
+              "pageOrder": 5,
+              "fields": [
+                {
+                  "fieldId": "risksFinancialDeficit",
+                  "type": "radios",
+                  "label": {
+                    "value": "Does any transferring academy have an in-year deficit or overall deficit?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if any transferring academies have an in-year deficit or overall deficit",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": false,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-financial-forecast",
+              "slug": "risks-financial-forecast",
+              "title": "Financial forecast and action plan",
+              "description": "",
+              "pageOrder": 6,
+              "fields": [
+                {
+                  "fieldId": "risksFinancialForecast",
+                  "type": "complexField",
+                  "label": {
+                    "value": "Financial forecast and action plan",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "This is a placeholder",
+                  "tooltip": "Include:\n- a 3 year forecast\n- plans to bring the academy into surplus",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select a file",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": {
+                    "id": "UploadDocumentsComplexField",
+                    "dropdownDisplay": null,
+                    "confirmationDisplay": null
+                  },
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": false,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-finances-pooled",
+              "slug": "risks-finances-pooled",
+              "title": "Are any transferring academy\u0027s finances currently pooled?",
+              "description": "",
+              "pageOrder": 7,
+              "fields": [
+                {
+                  "fieldId": "risksFinancesPooled",
+                  "type": "radios",
+                  "label": {
+                    "value": "Are any transferring academy\u0027s finances currently pooled?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if any transferring academy\u0027s finances arecurrently pooled",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "GAG pooled",
+                      "label": "GAG pooled"
+                    },
+                    {
+                      "value": "Reserve pooled",
+                      "label": "Reserve pooled"
+                    },
+                    {
+                      "value": "Not pooled",
+                      "label": "Not pooled"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": false,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-reserves-transfer",
+              "slug": "risks-reserves-transfer",
+              "title": "How much of any surplus or deficit funds from the academies will transfer over?",
+              "description": "",
+              "pageOrder": 8,
+              "fields": [
+                {
+                  "fieldId": "risksReservesTransfer",
+                  "type": "character-count",
+                  "label": {
+                    "value": "How much of any surplus or deficit funds from the academies will transfer over?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 4000,
+                      "message": "You must enter 4000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter how much of any surplus or deficit funds from the academies will transfer over",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-other-risks",
+              "slug": "risks-other-risks",
+              "title": "Are there other risks related to the transferring academies?",
+              "description": "",
+              "pageOrder": 9,
+              "fields": [
+                {
+                  "fieldId": "risksOtherRisks",
+                  "type": "radios",
+                  "label": {
+                    "value": "Are there other risks related to the transferring academies?",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": null,
+                  "tooltip": "Financial risks include: \n- loans \n- leases \n- financial investigations \n- any planned major capital projects\n\n Other risks include: \n- falling or low educational standards \n- leadership changes",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Select yes if there are other risks related to the transferring academies",
+                      "condition": null
+                    }
+                  ],
+                  "options": [
+                    {
+                      "value": "yes",
+                      "label": "Yes"
+                    },
+                    {
+                      "value": "no",
+                      "label": "No"
+                    }
+                  ],
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            },
+            {
+              "pageId": "risks-risk-management",
+              "slug": "risks-risk-management",
+              "title": "Summarise the other risks and plans to manage them",
+              "description": "",
+              "pageOrder": 10,
+              "fields": [
+                {
+                  "fieldId": "risksRiskManagement",
+                  "type": "character-count",
+                  "label": {
+                    "value": "Summarise the other risks and plans to manage them",
+                    "isVisible": false,
+                    "validationLabelValue": null
+                  },
+                  "placeholder": "",
+                  "tooltip": "",
+                  "required": null,
+                  "order": 1,
+                  "visibility": {
+                    "default": true
+                  },
+                  "validations": [
+                    {
+                      "type": "maxLength",
+                      "rule": 4000,
+                      "message": "You must enter 4000 characters or less",
+                      "condition": null
+                    },
+                    {
+                      "type": "required",
+                      "rule": true,
+                      "message": "Enter a summary of the other risks and plans to manage them",
+                      "condition": null
+                    }
+                  ],
+                  "options": null,
+                  "complexField": null,
+                  "Value": null
+                }
+              ],
+              "returnToSummaryPage": true,
+              "saveButtonLabel": null
+            }
+          ],
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": null,
+          "visibleInTaskList": null
+        }
+      ]
+    },
+    {
+      "groupId": "trust-academies-leaving-group",
+      "groupName": "About the trusts that academies are leaving",
+      "groupOrder": 3,
+      "groupStatus": "Incomplete",
+      "tasks": [
+        {
+          "taskId": "details-of-outgoing-trusts",
+          "taskName": "Details of trusts",
+          "caption": null,
+          "taskOrder": 1,
+          "taskStatus": "Incomplete",
+          "pages": null,
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": {
+            "mode": "multiCollectionFlow",
+            "title": null,
+            "description": null,
+            "flows": [
+              {
+                "flowId": "detailsOfOutgoingTrusts",
+                "title": "",
+                "description": "",
+                "fieldId": "detailsOfOutgoingTrusts",
+                "addButtonLabel": "Add a trust",
+                "minItems": 1,
+                "maxItems": 50,
+                "itemKind": "Trust",
+                "itemKindPlural": null,
+                "itemTitleBinding": "trustsSearch-field-flow.name",
+                "summaryColumns": [
+                  {
+                    "label": "Trust name",
+                    "field": "trustsSearch-field-flow"
+                  },
+                  {
+                    "label": "Contact details",
+                    "field": "outgoingTrustContactDetailsFullName"
+                  },
+                  {
+                    "label": "Will this trust close because of the transfer?",
+                    "field": "willTrustClose"
+                  },
+                  {
+                    "label": "Board resolution",
+                    "field": "outgoingTrustUploadBoardResolution"
+                  }
+                ],
+                "addItemMessage": "A trust that academies will be leaving has been added",
+                "updateItemMessage": "A trust has been updated",
+                "deleteItemMessage": "A trust has been removed",
+                "tableType": "card",
+                "pages": [
+                  {
+                    "pageId": "outgoing-trust-search",
+                    "slug": "outgoing-trust-search",
+                    "title": "Find a trust",
+                    "description": "",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "trustsSearch-field-flow",
+                        "type": "complexField",
+                        "label": {
+                          "value": "Trusts",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "Start typing to search for Trusts...",
+                        "tooltip": "Enter at least 3 characters to search by name, UKPRN, or Companies House number",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": ".{3,}",
+                            "message": "You must enter 3 characters or more to search for a trust",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter 3 characters or more to search for a trust",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": {
+                          "id": "TrustComplexField",
+                          "dropdownDisplay": null,
+                          "confirmationDisplay": null
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "outgoingTrustContactDetails-page",
+                    "slug": "outgoing-trust-contact-details",
+                    "title": "Contact details",
+                    "description": "",
+                    "pageOrder": 2,
+                    "fields": [
+                      {
+                        "fieldId": "outgoingTrustContactDetailsFullName",
+                        "type": "text",
+                        "label": {
+                          "value": "Full name",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 1,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the full name",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "outgoingTrustContactDetailsRole",
+                        "type": "text",
+                        "label": {
+                          "value": "Role",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": false,
+                        "order": 2,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the role",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "outgoingTrustContactDetailsPhoneNumber",
+                        "type": "text",
+                        "label": {
+                          "value": "Phone number",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "",
+                        "required": null,
+                        "order": 3,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "regex",
+                            "rule": "^(?:0|\\\u002B?44)\\s?(\\d\\s?){9,10}$",
+                            "message": "Enter a phone number, like 01632 960 001, 07700 900 982 or \u002B44 808 157 0192",
+                            "condition": null
+                          },
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter a UK phone number",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "outgoingTrustContactDetailsEmailAddress",
+                        "type": "email",
+                        "label": {
+                          "value": "Email address",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "",
+                        "tooltip": "We\u0027ll only use it to contact them about this application",
+                        "required": null,
+                        "order": 4,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter an email address",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "willTrustClose-page",
+                    "slug": "will-trust-close",
+                    "title": "Will this trust close because of the transfer?",
+                    "description": "",
+                    "pageOrder": 3,
+                    "fields": [
+                      {
+                        "fieldId": "willTrustClose",
+                        "type": "radios",
+                        "label": {
+                          "value": "Will this trust close because of the transfer?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select yes if this trust will close because of the transfer",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "Yes",
+                            "label": "Yes"
+                          },
+                          {
+                            "value": "No",
+                            "label": "No"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  },
+                  {
+                    "pageId": "outgoingTrustUploadBoardResolution-page",
+                    "slug": "outgoing-trust-upload-board-resolution",
+                    "title": "Board resolution",
+                    "description": "",
+                    "pageOrder": 4,
+                    "fields": [
+                      {
+                        "fieldId": "outgoingTrustUploadBoardResolution",
+                        "type": "complexField",
+                        "label": {
+                          "value": "Board resolution",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": "This is a placeholder",
+                        "tooltip": "This is the minutes from the meeting where the trust\u0027s board confirmed its decision to apply to transfer academies from one trust to another.",
+                        "required": null,
+                        "order": 6,
+                        "visibility": {
+                          "default": true
+                        },
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Select a file",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": {
+                          "id": "UploadDocumentsComplexField",
+                          "dropdownDisplay": null,
+                          "confirmationDisplay": null
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": false,
+                    "saveButtonLabel": null
+                  }
+                ]
+              }
+            ],
+            "derivedFlows": null
+          },
+          "visibleInTaskList": true
+        }
+      ]
+    },
+    {
+      "groupId": "declaration-group",
+      "groupName": "Declaration",
+      "groupOrder": 4,
+      "groupStatus": "Incomplete",
+      "tasks": [
+        {
+          "taskId": "declaration-from-academy-trust-chair",
+          "taskName": "Declaration from all chairs of trustees",
+          "caption": null,
+          "taskOrder": 1,
+          "taskStatus": "Incomplete",
+          "pages": null,
+          "startAtFirstPageWhenNotStarted": null,
+          "summary": {
+            "mode": "derivedCollectionFlow",
+            "title": "Declaration from all chairs of trustees",
+            "description": "The chair of trustees from each trust involved in the transfer must complete a declaration.",
+            "flows": null,
+            "derivedFlows": [
+              {
+                "flowId": "trust-declarations-joining",
+                "title": "Declaration for the trust that academies are joining",
+                "description": null,
+                "sourceFieldId": "detailsOfIncomingTrust",
+                "sourceType": "collection",
+                "fieldId": "trustDeclarations",
+                "itemTitleBinding": "name",
+                "sectionOrder": 1,
+                "signedMessage": "Declaration for {displayName} has been signed",
+                "statusField": "status",
+                "emptyStateMessage": null,
+                "noItemsErrorMessage": null,
+                "unsignedItemErrorMessage": null,
+                "pages": [
+                  {
+                    "pageId": "declaration-form-joining",
+                    "slug": "declaration-form",
+                    "title": "Declaration form",
+                    "description": "I hereby certify that the information entered in this form is correct.\n\nI understand that any decision made by the Regional Director on the basis of this information may be rendered null and void if the academy trust is found to have supplied inaccurate information.\n\nI understand that no changes should be made to the trust\u0027s articles of association or other trust documents until the Regional Director has approved them.\n\nI confirm that the trust\u0027s adopted policies and practices fulfil their equalities duties under the Equality Act 2010.\n\n## Name of trust \n\n{displayName}",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "equalities-duties-decision",
+                        "type": "radios",
+                        "label": {
+                          "value": "What did the board decide when considering their equalities duties?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select what the board decided when considering their equalities duties",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "The Secretary of State\u0027s decision is unlikely to disproportionately affect any particular person or group who share protected characteristics",
+                            "label": "The Secretary of State\u0027s decision is unlikely to disproportionately affect any particular person or group who share protected characteristics"
+                          },
+                          {
+                            "value": "There are some impacts, but on balance the changes will not disproportionately affect any particular person or group who share protected characteristics",
+                            "label": "There are some impacts, but on balance the changes will not disproportionately affect any particular person or group who share protected characteristics"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "chairName-joining",
+                        "type": "text",
+                        "label": {
+                          "value": "Name of chair of trustees",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": null,
+                        "order": 2,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the name of the chair of trustees",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "dateSigned-joining",
+                        "type": "date",
+                        "label": {
+                          "value": "Date signed",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": null,
+                        "order": 3,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the date signed",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": "Sign the declaration"
+                  }
+                ]
+              },
+              {
+                "flowId": "trust-declarations-leaving",
+                "title": "Declaration for the trusts that academies are leaving",
+                "description": null,
+                "sourceFieldId": "detailsOfOutgoingTrusts",
+                "sourceType": "collection",
+                "fieldId": "trustDeclarations-leaving",
+                "itemTitleBinding": "name",
+                "sectionOrder": 1,
+                "signedMessage": "Declaration for {displayName} has been signed",
+                "statusField": "status",
+                "emptyStateMessage": null,
+                "noItemsErrorMessage": null,
+                "unsignedItemErrorMessage": null,
+                "pages": [
+                  {
+                    "pageId": "declaration-form-leaving",
+                    "slug": "declaration-form",
+                    "title": "Declaration form",
+                    "description": "I hereby certify that the information entered in this form is correct.\n\nI understand that any decision made by the Regional Director on the basis of this information may be rendered null and void if the academy trust is found to have supplied inaccurate information.\n\nI understand that no changes should be made to the trust\u0027s articles of association or other trust documents until the Regional Director has approved them.\n\nI confirm that the trust\u0027s adopted policies and practices fulfil their equalities duties under the Equality Act 2010.\n\n**Name of trust** \n\n{displayName}",
+                    "pageOrder": 1,
+                    "fields": [
+                      {
+                        "fieldId": "equalities-duties-decision-leaving",
+                        "type": "radios",
+                        "label": {
+                          "value": "What did the board decide when considering their equalities duties?",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": false,
+                        "order": 1,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": "",
+                            "message": "Select what the board decided when considering their equalities duties",
+                            "condition": null
+                          }
+                        ],
+                        "options": [
+                          {
+                            "value": "The Secretary of State\u0027s decision is unlikely to disproportionately affect any particular person or group who share protected characteristics",
+                            "label": "The Secretary of State\u0027s decision is unlikely to disproportionately affect any particular person or group who share protected characteristics"
+                          },
+                          {
+                            "value": "There are some impacts, but on balance the changes will not disproportionately affect any particular person or group who share protected characteristics",
+                            "label": "There are some impacts, but on balance the changes will not disproportionately affect any particular person or group who share protected characteristics"
+                          }
+                        ],
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "chairName-leaving",
+                        "type": "text",
+                        "label": {
+                          "value": "Name of chair of trustees",
+                          "isVisible": false,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": null,
+                        "required": null,
+                        "order": 2,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the name of the chair of trustees",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      },
+                      {
+                        "fieldId": "dateSigned-leaving",
+                        "type": "date",
+                        "label": {
+                          "value": "Date signed",
+                          "isVisible": true,
+                          "validationLabelValue": null
+                        },
+                        "placeholder": null,
+                        "tooltip": "For example, 27 3 2027",
+                        "required": null,
+                        "order": 3,
+                        "visibility": null,
+                        "validations": [
+                          {
+                            "type": "required",
+                            "rule": true,
+                            "message": "Enter the date signed",
+                            "condition": null
+                          }
+                        ],
+                        "options": null,
+                        "complexField": null,
+                        "Value": null
+                      }
+                    ],
+                    "returnToSummaryPage": true,
+                    "saveButtonLabel": "Sign the declaration"
+                  }
+                ]
+              }
+            ]
+          },
+          "visibleInTaskList": true
+        }
+      ]
+    }
+  ],
+  "conditionalLogic": [
+    {
+      "id": "hide-pupil-forecast-for-no-risk",
+      "name": "Hide pupil forecast page when no pupil number risk",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksPupilNumbers",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-upload-pupil-numbers",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksUploadPupilNumbers",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-pupil-forecast-for-yes-risk",
+      "name": "Show pupil forecast page when pupil numbers at risk",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksPupilNumbers",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-upload-pupil-numbers",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksUploadPupilNumbers",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-risks-risk-management",
+      "name": "Hide what are the risks and plans to reduce them page when no other risks",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksOtherRisks",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-risk-management",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksRiskManagement",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-risks-risk-management",
+      "name": "Show what are the risks and plans to reduce them page when no other risks",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksOtherRisks",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-risk-management",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksRiskManagement",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-reason-and-benefits-trust-how-have-academies-trusts-worked-together",
+      "name": "Hide how have they worked together in the past when haven\u0027t worked together?",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "reasonAndBenefitsTrustAcademiesTrustsWorkedTogether",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "reason-and-benefits-trust-how-have-academies-trusts-worked-together",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "reasonAndBenefitsTrustHowHaveAcademiesTrustsWorkedTogether",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-reason-and-benefits-trust-how-have-academies-trusts-worked-together",
+      "name": "Show how have they worked together in the past when have worked together?",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "reasonAndBenefitsTrustAcademiesTrustsWorkedTogether",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "reason-and-benefits-trust-how-have-academies-trusts-worked-together",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "reasonAndBenefitsTrustHowHaveAcademiesTrustsWorkedTogether",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-finance-and-operations-upload-growth-plan-next-3-years",
+      "name": "Hide upload the trust\u0027s growth plans for the next 3 years when no growth plan",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsHaveGrowthPlanNext3Years",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-upload-growth-plan-next-3-years",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsUploadGrowthPlanNext3Years",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-finance-and-operations-upload-growth-plan-next-3-years",
+      "name": "Show upload the trust\u0027s growth plans for the next 3 years when growth plan",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsHaveGrowthPlanNext3Years",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-upload-growth-plan-next-3-years",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsUploadGrowthPlanNext3Years",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-finance-and-operations-how-will-policy-on-charges-made-to-its-academies",
+      "name": "Hide how will the trust change its policy on charges made to its academies when no change",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsPolicyOnChargesMadeToItsAcademies",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-how-will-policy-on-charges-made-to-its-academies",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsHowWillPolicyOnChargesMadeToItsAcademies",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-finance-and-operations-how-will-policy-on-charges-made-to-its-academies",
+      "name": "Show how will the trust change its policy on charges made to its academies when change",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsPolicyOnChargesMadeToItsAcademies",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-how-will-policy-on-charges-made-to-its-academies",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsHowWillPolicyOnChargesMadeToItsAcademies",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-finance-and-operations-local-authority-agreements",
+      "name": "Hide are there agreements with a local authority or other bodies regarding the provision of high needs places funding when no SAP academies",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsHaveSAPAcademies",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-local-authority-agreements",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsLocalAuthorityAgreements",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-finance-and-operations-local-authority-agreements",
+      "name": "Show are there agreements with a local authority or other bodies regarding the provision of high needs places funding when SAP academies",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsHaveSAPAcademies",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-local-authority-agreements",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsLocalAuthorityAgreements",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-finance-and-operations-summarise-the-agreements",
+      "name": "Hide summarise the agreements and if there is a need for those places in the future when no agreements",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "OR",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsLocalAuthorityAgreements",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          },
+          {
+            "triggerField": "financeAndOperationsHaveSAPAcademies",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-summarise-the-agreements",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsSummariseTheAgreements",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-finance-and-operations-summarise-the-agreements",
+      "name": "Show summarise the agreements and if there is a need for those places in the future when agreements",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "financeAndOperationsLocalAuthorityAgreements",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "finance-and-operations-summarise-the-agreements",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "financeAndOperationsSummariseTheAgreements",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-leadership-and-work-force-how-will-the-leadership-central-team-change",
+      "name": "Hide how will the leadership or central team change when no change",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "leadershipAndWorkForceWillTheLeadershipCentralTeamChange",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "leadership-and-work-force-how-will-the-leadership-central-team-change",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "leadershipAndWorkForceHowWillTheLeadershipCentralTeamChange",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-leadership-and-work-force-how-will-the-leadership-central-team-change",
+      "name": "Show how will the leadership or central team change when change",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "leadershipAndWorkForceWillTheLeadershipCentralTeamChange",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "leadership-and-work-force-how-will-the-leadership-central-team-change",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "leadershipAndWorkForceHowWillTheLeadershipCentralTeamChange",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-academy-operating-differently",
+      "name": "Hide the academy operating differently page when the academy is operating based on its funding agreement",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "academyFunding",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "academyOperatingDifferently-page",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "academyOperatingDifferently",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-academy-operating-differently",
+      "name": "Show the academy operating differently page when the academy is not operating based on its funding agreement",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "academyFunding",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "academyOperatingDifferently-page",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "academyOperatingDifferently",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-details-of-academies-upload-consent",
+      "name": "Hide the upload consent page when the diocesan consent do not need to be provided",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "detailsOfAcademiesDiocesanConsent",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "detailsOfAcademiesUploadConsent-page",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "detailsOfAcademiesUploadConsent",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-details-of-academies-upload-consent",
+      "name": "Show the upload consent page when the diocesan consent need to be provided",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "detailsOfAcademiesDiocesanConsent",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "detailsOfAcademiesUploadConsent-page",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "detailsOfAcademiesUploadConsent",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-details-of-skills-and-expertise",
+      "name": "show details of skills and expertise",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "governanceTeamConfirmation",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "governance-team-explanation",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "governanceTeamExplanation",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-details-of-skills-and-expertise",
+      "name": "hide details of skills and expertise",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "governanceTeamConfirmation",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "governance-team-explanation",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "governanceTeamExplanation",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-details-of-risks-financial-deficit",
+      "name": "hide details of risks financial deficit",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "OR",
+        "conditions": [
+          {
+            "triggerField": "risksTransferType",
+            "operator": "equals",
+            "value": "MATs that want to add an academy or academies from SATs",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          },
+          {
+            "triggerField": "risksTransferType",
+            "operator": "equals",
+            "value": "MATs merging or consolidating, where all the academies from one trust are transferring to another trust",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-financial-deficit",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancialDeficit",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risks-finances-pooled",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancesPooled",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risks-reserves-transfer",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksReservesTransfer",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risks-financial-forecast",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancialForecast",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-details-of-risks-financial-deficit",
+      "name": "show details of skills and expertise",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksTransferType",
+            "operator": "equals",
+            "value": "MATs that want to add an academy or academies from a different MAT",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-financial-deficit",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancialDeficit",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risks-finances-pooled",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancesPooled",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risks-reserves-transfer",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksReservesTransfer",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-risks-financial-forecast",
+      "name": "Show risks financial forecast",
+      "priority": 60,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksFinancialDeficit",
+            "operator": "equals",
+            "value": "no",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-financial-forecast",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancialForecast",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-risks-financial-forecast",
+      "name": "Show risks financial forecast",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "risksFinancialDeficit",
+            "operator": "equals",
+            "value": "yes",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "risks-financial-forecast",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "risksFinancialForecast",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-past-roles-member",
+      "name": "show professional background and skills",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "existingMember",
+            "operator": "equals",
+            "value": "New",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "pastRoles-page",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "pastRoles",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-past-roles-member",
+      "name": "hide professional background and skills",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "existingMember",
+            "operator": "equals",
+            "value": "Existing",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "pastRoles-page",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "pastRoles",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "show-past-roles-trustee",
+      "name": "show trustee professional background and skills",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "existingTrustee",
+            "operator": "equals",
+            "value": "New",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "trusteePastRoles-page",
+          "elementType": "page",
+          "action": "show",
+          "actionConfig": null
+        },
+        {
+          "elementId": "trusteePastRoles",
+          "elementType": "field",
+          "action": "show",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    },
+    {
+      "id": "hide-past-roles-trustee",
+      "name": "hide trustee professional background and skills",
+      "priority": 61,
+      "enabled": true,
+      "conditionGroup": {
+        "logicalOperator": "AND",
+        "conditions": [
+          {
+            "triggerField": "existingTrustee",
+            "operator": "equals",
+            "value": "Existing",
+            "dataType": "string",
+            "logicalOperator": null,
+            "conditions": null
+          }
+        ]
+      },
+      "affectedElements": [
+        {
+          "elementId": "trusteePastRoles-page",
+          "elementType": "page",
+          "action": "skip",
+          "actionConfig": null
+        },
+        {
+          "elementId": "trusteePastRoles",
+          "elementType": "field",
+          "action": "hide",
+          "actionConfig": null
+        }
+      ],
+      "executeOn": [
+        "change",
+        "load"
+      ],
+      "debounce": 300
+    }
+  ],
+  "defaultFieldRequirementPolicy": "required",
+  "hideFieldLabelWhenOnlyOneField": true,
+  "contributorPattern": true,
+  "dashboard": null
+}

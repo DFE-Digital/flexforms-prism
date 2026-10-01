@@ -1,6 +1,7 @@
 using System.Text;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Facts;
+using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUK.Dfe.FlexForms.Prism.Data;
@@ -94,7 +95,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
         modelBuilder.Entity<FieldCatalogEntry>(e =>
         {
             e.ToTable("field_catalog");
-            e.HasKey(x => new { x.TenantId, x.TemplateVersionId, x.FieldId, x.ContractVersion });
+            e.HasKey(x => new { x.TenantId, x.TemplateVersionId, x.ParentFieldId, x.FieldId, x.ContractVersion });
             e.Property(x => x.FieldId).HasMaxLength(200);
             e.Property(x => x.TemplateVersionNumber).HasMaxLength(50);
             e.Property(x => x.ParentFieldId).HasMaxLength(200);
@@ -117,7 +118,8 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
         modelBuilder.Entity<FieldExportPolicy>(e =>
         {
             e.ToTable("field_export_policy");
-            e.HasKey(x => new { x.TenantId, x.TemplateId, x.FieldId });
+            e.HasKey(x => new { x.TenantId, x.TemplateId, x.ParentFieldId, x.FieldId });
+            e.Property(x => x.ParentFieldId).HasMaxLength(200);
             e.Property(x => x.FieldId).HasMaxLength(200);
             e.Property(x => x.Reason).HasMaxLength(1000);
             e.Property(x => x.DecidedBy).HasMaxLength(256);

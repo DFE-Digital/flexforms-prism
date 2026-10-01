@@ -4,4 +4,8 @@
     <ProjectReference Include="..\..\src\GovUK.Dfe.FlexForms.Prism.Flattener\GovUK.Dfe.FlexForms.Prism.Flattener.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

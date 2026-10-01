@@ -42,7 +42,7 @@ internal static class AnswerFactTable
             applicationId,
             fact.LogicalKeyHash,
             fact.FieldId,
-            (object?)fact.ParentFieldId ?? DBNull.Value,
+            fact.ParentFieldId,
             fact.OccurrencePath,
             (object?)fact.ItemId ?? DBNull.Value,
             (object?)fact.ItemOrdinal ?? DBNull.Value,

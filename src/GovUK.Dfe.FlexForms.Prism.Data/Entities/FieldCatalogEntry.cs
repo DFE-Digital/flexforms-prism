@@ -1,3 +1,5 @@
+using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
+
 namespace GovUK.Dfe.FlexForms.Prism.Data.Entities;
 
 /// <summary>
@@ -8,11 +10,13 @@ public class FieldCatalogEntry
 {
     public Guid TenantId { get; set; }
     public Guid TemplateVersionId { get; set; }
+
+    /// <summary>The collection field that contains this field, or empty for top-level fields.</summary>
+    public string ParentFieldId { get; set; } = string.Empty;
     public string FieldId { get; set; } = string.Empty;
     public int ContractVersion { get; set; }
     public Guid TemplateId { get; set; }
     public string? TemplateVersionNumber { get; set; }
-    public string? ParentFieldId { get; set; }
     public string? FlowId { get; set; }
     public string? FlowMode { get; set; }
     public string? TaskGroupId { get; set; }

@@ -10,7 +10,7 @@ public class AnswerFactEntity
     public Guid ApplicationId { get; set; }
     public byte[] LogicalKeyHash { get; set; } = [];
     public string FieldId { get; set; } = string.Empty;
-    public string? ParentFieldId { get; set; }
+    public string ParentFieldId { get; set; } = string.Empty;
     public string OccurrencePath { get; set; } = string.Empty;
     public string? ItemId { get; set; }
     public int? ItemOrdinal { get; set; }

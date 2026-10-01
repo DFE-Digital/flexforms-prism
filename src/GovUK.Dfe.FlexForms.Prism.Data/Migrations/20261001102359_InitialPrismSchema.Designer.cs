@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
 {
     [DbContext(typeof(PrismDbContext))]
-    [Migration("20261001100944_InitialPrismSchema")]
+    [Migration("20261001102359_InitialPrismSchema")]
     partial class InitialPrismSchema
     {
         /// <inheritdoc />
@@ -93,6 +93,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnName("occurrence_path");
 
                     b.Property<string>("ParentFieldId")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("parent_field_id");
@@ -310,6 +311,11 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("template_version_id");
 
+                    b.Property<string>("ParentFieldId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("parent_field_id");
+
                     b.Property<string>("FieldId")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
@@ -380,11 +386,6 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("page_title");
 
-                    b.Property<string>("ParentFieldId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("parent_field_id");
-
                     b.Property<string>("SemanticKey")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
@@ -424,7 +425,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("template_version_number");
 
-                    b.HasKey("TenantId", "TemplateVersionId", "FieldId", "ContractVersion");
+                    b.HasKey("TenantId", "TemplateVersionId", "ParentFieldId", "FieldId", "ContractVersion");
 
                     b.HasIndex("TenantId", "TemplateId", "FieldId");
 
@@ -440,6 +441,11 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     b.Property<Guid>("TemplateId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("template_id");
+
+                    b.Property<string>("ParentFieldId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("parent_field_id");
 
                     b.Property<string>("FieldId")
                         .HasMaxLength(200)
@@ -471,7 +477,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasColumnName("reason");
 
-                    b.HasKey("TenantId", "TemplateId", "FieldId");
+                    b.HasKey("TenantId", "TemplateId", "ParentFieldId", "FieldId");
 
                     b.ToTable("field_export_policy", "prism");
                 });

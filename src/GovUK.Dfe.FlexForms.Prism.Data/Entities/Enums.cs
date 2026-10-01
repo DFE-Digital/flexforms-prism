@@ -20,19 +20,6 @@ public enum ApplicationLifecycle
     Deleted
 }
 
-public enum ExportStatus
-{
-    Unclassified,
-    Allowed,
-    Denied
-}
-
-public enum ExportDecision
-{
-    Allowed,
-    Denied
-}
-
 public enum BackfillStatus
 {
     Pending,
