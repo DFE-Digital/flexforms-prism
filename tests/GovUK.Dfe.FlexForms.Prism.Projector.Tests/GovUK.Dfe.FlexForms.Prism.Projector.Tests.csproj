@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GovUK.Dfe.FlexForms.Prism.Projector\GovUK.Dfe.FlexForms.Prism.Projector.csproj" />
+  </ItemGroup>
+
+</Project>

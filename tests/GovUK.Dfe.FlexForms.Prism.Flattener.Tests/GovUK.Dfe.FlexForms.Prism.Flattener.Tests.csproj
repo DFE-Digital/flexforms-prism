@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GovUK.Dfe.FlexForms.Prism.Flattener\GovUK.Dfe.FlexForms.Prism.Flattener.csproj" />
+  </ItemGroup>
+
+</Project>

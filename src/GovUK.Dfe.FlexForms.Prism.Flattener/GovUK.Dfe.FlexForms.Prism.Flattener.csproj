@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Pure flattening of FlexForms template versions and responses into typed answer facts.</Description>
+  </PropertyGroup>
+
+</Project>

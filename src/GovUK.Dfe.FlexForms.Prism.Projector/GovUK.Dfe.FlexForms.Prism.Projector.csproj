@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Projection orchestration: revision gate, flattening, writing and error classification.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Flattener\GovUK.Dfe.FlexForms.Prism.Flattener.csproj" />
+    <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Data\GovUK.Dfe.FlexForms.Prism.Data.csproj" />
+    <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Source\GovUK.Dfe.FlexForms.Prism.Source.csproj" />
+    <!-- TEMPORARY: swap for the GovUK.Dfe.CoreLibs.Messaging.Contracts package once the Prism contract is published. -->
+    <ProjectReference Include="..\..\..\DfE.CoreLibs\src\GovUK.Dfe.CoreLibs.Messaging.Contracts\GovUK.Dfe.CoreLibs.Messaging.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
