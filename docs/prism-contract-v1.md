@@ -101,7 +101,7 @@ Base path `v1/internal/prism`. Every call needs an Entra token for the FlexForms
 | `GET tenants` | `PrismTenantDto[]`: the authoritative tenant list, from tenant configuration. |
 | `GET applications/{applicationId}/current` | `PrismApplicationStateDto`: revision, status, deleted flag, template version, latest response with its body, and the submitted revision, submission ID and submitted response ID. |
 | `GET responses/{responseId}` | `PrismResponseDto`: one immutable response version. |
-| `GET template-versions/{templateVersionId}` | `PrismTemplateVersionDto`: the template JSON. Template versions are immutable, so Prism caches them for as long as the process runs. |
+| `GET template-versions/{templateVersionId}` | `PrismTemplateVersionDto`: the template ID, version number, template JSON and creation time. Used to flatten answers and to catalogue published versions; the creation time orders versions in `v_template_field_changes`. Template versions are immutable, so Prism caches them for as long as the process runs. |
 | `GET applications?modifiedSince=&page=&pageSize=` | `PrismApplicationPageDto` of `PrismApplicationSummaryDto`, ordered by creation. **Deleted applications are included**, with `IsDeleted = true`. |
 
 Applications are soft-deleted only. If FlexForms ever hard-deletes, it will need a deletion ledger first;
@@ -175,14 +175,16 @@ keeps its decision, because decisions are per field ID; review `label_changed` r
 - **Atomic generations.** A generation's facts become visible in one transaction. Readers never see a partly written
   generation, and never see facts from two generations of the same application at the same time.
 - **Fails closed.** Only fields with an explicit Allowed decision appear (see [export-policy.md](export-policy.md)).
-  `field_catalog` lists every field, including unclassified and denied ones, without values.
+  `field_catalog` lists every field, including unclassified and denied ones, without values. New template versions
+  are catalogued when published, so their new fields show up there (and in `v_template_field_changes`) as
+  `Unclassified` before any answers exist.
 - **Eventual consistency.** The views follow FlexForms within seconds normally. Reconciliation repairs any drift
   every night.
 
 ## Versioning rules
 
-- **`ContractVersion`** changes only for breaking changes to the event, the internal API or the meaning of the views.
-  Additive changes don't bump it. When it does change, Prism has to accept both versions before FlexForms
+- **`ContractVersion`** changes only for breaking changes to the events, the internal API or the meaning of the views.
+  Additive changes don't bump it. Each event carries its own `ContractVersion` (`CurrentContractVersion` on its type). When it does change, Prism has to accept both versions before FlexForms
   starts publishing the new one.
 - **`PrismVersions.ProjectorVersion`** is bumped whenever flattening output changes for the same input. Prism then
   re-projects every application at its current revision (run a backfill; see the runbook).

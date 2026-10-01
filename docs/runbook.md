@@ -19,6 +19,8 @@ through the same ordered, retried and dead-lettered path as live events.
 Logs go to Application Insights through the Functions integration. Projection logs carry `tenant_id`,
 `application_id`, `projection_reason`, `source_revision`, `response_id`, `submission_id`, `operation_id`,
 `projector_version`, `contract_version`, `message_id`, `session_id` and `delivery_count` in `customDimensions`.
+Template-version logs carry `tenant_id`, `template_id`, `template_version_id` and `template_version_number` instead
+of the application fields.
 Admin actions are logged as `Prism admin audit: ...`.
 
 Metrics are exported with OpenTelemetry when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set, and land in `customMetrics`:
@@ -111,12 +113,23 @@ Find the reason in the message's `DeadLetterReason` (or the `PrismFailure` prope
 | `invalid_message` | A malformed message or missing required fields. | Fix the publisher. |
 | `source_not_found` | The application, response or template version doesn't exist in that tenant. | Check the tenant ID. Usually safe to discard. |
 | `source_rejected` | FlexForms returned 400, 401 or 403. | Check Prism's `Prism.Read` role assignment and the API client settings. |
-| `source_mismatch` | The response belongs to a different application. | Investigate in FlexForms; this should never happen. |
+| `source_mismatch` | The response belongs to a different application, or a published template version belongs to a different template. | Investigate in FlexForms; this should never happen. |
 | `unreadable_template`, `unreadable_response` | JSON that the flattener can't read. | Fix the flattener, bump `ProjectorVersion` if the output changes, and deploy. |
 | `MaxDeliveryCountExceeded` | A transient error that kept recurring. | Look at the `Projection failed and will be retried` logs. |
 
 **Don't replay dead letters.** Messages are only notifications. Fix the cause, run a backfill (or a
 reconciliation) for the affected tenant so the current state is re-read, and then purge the dead-letter queue.
+
+A dead-lettered `TemplateVersionPublishedEvent` (session `{tenantId}:template:{templateId}`, failure logged as
+`Projection failed permanently` with `template_version_id` in the scope) only delays cataloguing: the version is
+still catalogued when the first of its applications is projected. Once the cause is fixed, a backfill for the tenant
+catalogues every version in use.
+
+### Reviewing template changes
+
+When a template version is published, check the new rows in `prism.v_template_field_changes` with the data owner and
+classify any `Added` fields. The steps are in [export-policy.md](export-policy.md#when-a-template-changes).
+`prism.templates.catalogued` confirms new versions are arriving.
 
 ### Projection is falling behind
 
@@ -201,7 +214,8 @@ See [export-policy.md](export-policy.md). A change starts a tenant backfill auto
 
 ## Rollout
 
-1. Merge the FlexForms API changes (revisions, outbox publishing, internal endpoints) and CoreLibs. Make sure
+1. Merge the FlexForms API changes (revisions, outbox publishing of application and template-version events,
+   internal endpoints) and CoreLibs. Make sure
    `MassTransit:Outbox:Enabled` is `true` in every environment.
 2. Create the Azure resources in [azure-setup.md](azure-setup.md). The topic must exist, with duplicate detection,
    **before** the API publishes.
@@ -209,7 +223,7 @@ See [export-policy.md](export-policy.md). A change starts a tenant backfill auto
 4. Run the migration bundle against the Prism database, then deploy the Function to dev.
 5. Run a backfill for every tenant, and wait for it to finish and the subscription to drain.
 6. Run a reconciliation. Expect no drift apart from `missing` for applications without responses.
-7. Classify the export policy with the data owner. Check that the policy queries in export-policy.md return
+7. Classify the export policy with the data owner, using `v_template_field_changes` to see each template's fields. Check that the policy queries in export-policy.md return
    nothing unexpected.
 8. Validate the views with data engineering against FlexForms for a sample of applications.
 9. Run a load check with the largest real applications, and watch lag and write duration.

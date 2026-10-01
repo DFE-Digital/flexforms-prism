@@ -8,12 +8,16 @@ application is saved, submitted or deleted. The event goes to the Service Bus to
 (`v1/internal/prism`, app role `Prism.Read`), flattens the response into typed answer facts and writes a new
 generation with a revision-aware compare-and-swap.
 
+The API also publishes a `TemplateVersionPublishedEvent` to the same topic whenever a template version is created
+(sessioned by `{tenantId}:template:{templateId}`). Prism catalogues that version's fields straight away, so the data
+team can see what changed (`prism.v_template_field_changes`) and classify new fields before any application uses them.
+
 ## Documentation
 
 | Document | For |
 | --- | --- |
-| [docs/prism-contract-v1.md](docs/prism-contract-v1.md) | The event, the internal API and the SQL views consumers read |
-| [docs/export-policy.md](docs/export-policy.md) | Classifying which fields may be exported |
+| [docs/prism-contract-v1.md](docs/prism-contract-v1.md) | The events, the internal API and the SQL views consumers read |
+| [docs/export-policy.md](docs/export-policy.md) | Classifying which fields may be exported, and reviewing template changes |
 | [docs/runbook.md](docs/runbook.md) | Operating Prism: telemetry, backfills, incidents, upgrades and rollout |
 | [docs/azure-setup.md](docs/azure-setup.md) | The Azure resources, roles and app settings Prism needs |
 
@@ -62,6 +66,8 @@ with an in-memory FlexForms (`FakeSource`) that returns the event the API would 
 delete. The test decides when, how often and in what order those events are delivered. The scenarios cover
 duplicates, reordering, a crash between bulk copy and commit (simulated with a trigger), concurrent writers,
 deletes that overtake or are lost, projector and export policy upgrades, cleanup and a large application.
+`TemplateChangeScenarios` publishes new template versions and checks the catalogue and
+`v_template_field_changes` (added, removed, relabelled and retyped fields, and classifying a new field early).
 
 ## Flattening
 
@@ -114,6 +120,8 @@ The Prism database lives in schema `prism` and is owned by EF Core migrations in
 - `prism.v_template_field_changes`: fields added, removed or changed by each template version, with their export decision.
 
 Generations that are still being built, or have been superseded, are never visible through the views.
+`prism.template_versions` records each catalogued template version with its FlexForms creation time, which orders
+the versions in `v_template_field_changes`.
 
 ```bash
 dotnet tool restore
@@ -133,7 +141,7 @@ Deployments apply migrations with a self-contained bundle (`prism-migrations` CI
 
 | Function | Trigger | What it does |
 | --- | --- | --- |
-| `ProjectionFunction` | Topic `flexforms-prism`, session subscription `prism-projector` | Projects one application per message |
+| `ProjectionFunction` | Topic `flexforms-prism`, session subscription `prism-projector` | Projects one application per message, or catalogues a newly published template version |
 | `OperationWorkerFunction` | Every minute | Advances pending and running backfill and reconciliation operations |
 | `ReconciliationFunction` | 02:00 UTC daily | Records a reconciliation operation for every tenant |
 | `GenerationCleanupFunction` | 03:30 UTC daily | Deletes unreferenced superseded generations past retention |

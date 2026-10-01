@@ -118,7 +118,7 @@ stop out-of-date projections from being noticed. Set the field to `Denied` inste
 ## Checking the result
 
 ```sql
--- Fields still waiting for a decision, for the latest template versions
+-- Fields still waiting for a decision, across every catalogued template version
 SELECT DISTINCT c.template_id, c.parent_field_id, c.field_id, c.label
 FROM prism.field_catalog c
 WHERE c.tenant_id = @tenant AND c.export_status = 'Unclassified';

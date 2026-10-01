@@ -23,12 +23,12 @@ publishing, otherwise the outbox keeps retrying.
 
 | Setting | Value | Why |
 |---|---|---|
-| Requires session | **On** | Messages for one application are handled in order. **Creation-time only.** |
+| Requires session | **On** | Messages for one application (or one template's versions) are handled in order. **Creation-time only.** |
 | Max delivery count | `10` | After that, a transiently failing message is dead-lettered. |
 | Lock duration | `1 minute` | The Function renews the lock for up to 10 minutes. |
 | Dead-lettering on message expiration | On | |
 | Default message time-to-live | `14 days` | |
-| Filter | None (the default "match all" rule) | The topic only carries Prism events. |
+| Filter | None (the default "match all" rule) | The topic only carries Prism events (`ApplicationProjectionRequestedEvent` and `TemplateVersionPublishedEvent`). |
 
 ### Access
 
@@ -57,7 +57,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::prism TO [<prism-function-identi
 CREATE USER [<prism-migration-identity>] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_owner ADD MEMBER [<prism-migration-identity>];
 
--- Data team readers: the views only (plus the catalogue, which has no answer values)
+-- Data team readers: the views only (plus the catalogue, which has no answer values).
+-- An existing database only needs the v_template_field_changes grant after the AddTemplateVersionsAndFieldChanges migration.
 CREATE ROLE prism_reader;
 GRANT SELECT ON prism.v_current_answer_facts TO prism_reader;
 GRANT SELECT ON prism.v_submission_answer_facts TO prism_reader;
