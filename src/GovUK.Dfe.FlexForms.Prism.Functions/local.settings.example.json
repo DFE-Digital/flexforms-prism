@@ -9,7 +9,7 @@
     "ServiceBus": "Endpoint=sb://<namespace>.servicebus.windows.net/;SharedAccessKeyName=<name>;SharedAccessKey=<key>",
     "Prism__ServiceBusTransport": "AmqpWebSockets",
 
-    "ExternalApplicationsApiClient__BaseUrl": "https://localhost:7001/",
+    "ExternalApplicationsApiClient__BaseUrl": "https://localhost:7089/",
     "ExternalApplicationsApiClient__Authority": "https://login.microsoftonline.com/<tenant-id>",
     "ExternalApplicationsApiClient__ClientId": "<prism-client-id>",
     "ExternalApplicationsApiClient__ClientSecret": "<prism-client-secret>",
