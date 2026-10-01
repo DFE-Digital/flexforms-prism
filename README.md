@@ -48,6 +48,12 @@ dotnet test GovUK.Dfe.FlexForms.Prism.slnx
 
 Package versions are managed centrally in `Directory.Packages.props`. Warnings are treated as errors.
 
+`GovUK.Dfe.FlexForms.Prism.Scenario.Tests` runs the real projector, writer and control plane against SQL Server,
+with an in-memory FlexForms (`FakeSource`) that returns the event the API would publish for each save, submit or
+delete. The test decides when, how often and in what order those events are delivered. The scenarios cover
+duplicates, reordering, a crash between bulk copy and commit (simulated with a trigger), concurrent writers,
+deletes that overtake or are lost, projector and export policy upgrades, cleanup and a large application.
+
 ## Flattening
 
 `GovUK.Dfe.FlexForms.Prism.Flattener` turns a template version and a response body into typed answer facts.
