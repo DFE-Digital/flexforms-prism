@@ -1,7 +1,10 @@
+using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
+using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Writing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GovUK.Dfe.FlexForms.Prism.Data;
 
@@ -11,7 +14,9 @@ public static class PrismDataServiceCollectionExtensions
     {
         services.AddDbContext<PrismDbContext>(options => ConfigureSqlServer(options, connectionString));
         services.AddScoped<IProjectionWriter, ProjectionWriter>();
-        services.AddSingleton(TimeProvider.System);
+        services.AddScoped<IProjectionStore, ProjectionStore>();
+        services.AddScoped<IFieldCatalogWriter, FieldCatalogWriter>();
+        services.TryAddSingleton(TimeProvider.System);
         return services;
     }
 

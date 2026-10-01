@@ -65,6 +65,27 @@ The Transfer template and response in `tests/GovUK.Dfe.FlexForms.Prism.Flattener
 golden outputs. If flattening output changes on purpose, regenerate them with `UPDATE_GOLDEN=1 dotnet test`,
 review the diff, and bump `PrismVersions.ProjectorVersion`.
 
+## Projection
+
+`ProjectionService` treats each message as a notification. It re-reads the source through the internal
+FlexForms API and compares the source revision with what is already stored, so duplicate, reordered or replayed
+messages all end in the same state.
+
+- A stored projection is replaced by a higher source revision or, at the same revision, by higher
+  (projector, contract, export policy) versions. A change to the export policy therefore re-projects
+  applications the next time they are touched or resynced.
+- When the flattened facts hash to the same value as the active generation, only the state metadata advances.
+- Submitted freezes the exact submitted response as a submission snapshot. Resync recreates a missing one.
+- Deleted writes a tombstone, and nothing is written for that application after it.
+- Failures that retrying cannot fix throw `PermanentProjectionException` (and should be dead-lettered). Any other
+  exception is transient.
+
+`Prism.Source` calls the API with client credentials. It sets `X-Tenant-ID` on each call, retries transient
+failures with Polly, and caches template versions in memory. It reads the `ExternalApplicationsApiClient`
+configuration section.
+
+Metrics are published on the `GovUK.Dfe.FlexForms.Prism` meter.
+
 ## Database
 
 The Prism database lives in schema `prism` and is owned by EF Core migrations in

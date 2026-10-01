@@ -209,6 +209,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     source_hash = table.Column<byte[]>(type: "binary(32)", fixedLength: true, maxLength: 32, nullable: true),
                     projector_version = table.Column<int>(type: "int", nullable: false),
                     contract_version = table.Column<int>(type: "int", nullable: false),
+                    export_policy_version = table.Column<int>(type: "int", nullable: false),
                     source_occurred_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     projected_at = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -242,6 +243,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     source_hash = table.Column<byte[]>(type: "binary(32)", fixedLength: true, maxLength: 32, nullable: false),
                     projector_version = table.Column<int>(type: "int", nullable: false),
                     contract_version = table.Column<int>(type: "int", nullable: false),
+                    export_policy_version = table.Column<int>(type: "int", nullable: false),
                     projected_at = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>

@@ -9,6 +9,15 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" />
   </ItemGroup>
 
+  <ItemGroup Label="Source">
+    <PackageVersion Include="Polly.Core" Version="8.6.4" />
+  </ItemGroup>
+
+  <ItemGroup Label="Projector">
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
   <ItemGroup Label="Hosting">
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
     <PackageVersion Include="Azure.Identity" Version="1.21.0" />

@@ -160,6 +160,10 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
+                    b.Property<int>("ExportPolicyVersion")
+                        .HasColumnType("int")
+                        .HasColumnName("export_policy_version");
+
                     b.Property<string>("Lifecycle")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -616,6 +620,10 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     b.Property<int>("ContractVersion")
                         .HasColumnType("int")
                         .HasColumnName("contract_version");
+
+                    b.Property<int>("ExportPolicyVersion")
+                        .HasColumnType("int")
+                        .HasColumnName("export_policy_version");
 
                     b.Property<DateTime>("ProjectedAt")
                         .HasColumnType("datetime2")

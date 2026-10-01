@@ -18,7 +18,7 @@ public interface IProjectionWriter
 
     /// <summary>
     /// Writes a Submission generation and selects it on the submission snapshot. A stored snapshot is only
-    /// replaced by a higher projector or contract version.
+    /// replaced by higher projection versions.
     /// </summary>
     Task<WriteResult> WriteSubmissionAsync(SubmissionProjection projection, IReadOnlyCollection<AnswerFact> facts, CancellationToken cancellationToken);
 

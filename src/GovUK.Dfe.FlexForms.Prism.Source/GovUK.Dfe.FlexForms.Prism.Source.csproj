@@ -5,8 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Polly.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- TEMPORARY: swap for the GovUK.Dfe.FlexForms.Api.Client package once the Prism endpoints are published. -->
     <ProjectReference Include="..\..\..\flexforms-api\src\GovUK.Dfe.FlexForms.Api.Client\GovUK.Dfe.FlexForms.Api.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="GovUK.Dfe.FlexForms.Prism.Projector.Tests" />
   </ItemGroup>
 
 </Project>

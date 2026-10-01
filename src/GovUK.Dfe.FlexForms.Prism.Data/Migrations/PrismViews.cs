@@ -57,6 +57,7 @@ internal static class PrismViews
             g.generation_id,
             g.projector_version,
             g.contract_version,
+            g.export_policy_version,
             {FactColumns}
         FROM prism.application_projection_state s
         INNER JOIN prism.projection_generations g
@@ -87,6 +88,7 @@ internal static class PrismViews
             g.generation_id,
             g.projector_version,
             g.contract_version,
+            g.export_policy_version,
             {FactColumns}
         FROM prism.submission_snapshots ss
         INNER JOIN prism.projection_generations g

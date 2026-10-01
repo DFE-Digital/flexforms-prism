@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
 {
     [DbContext(typeof(PrismDbContext))]
-    [Migration("20261001102359_InitialPrismSchema")]
+    [Migration("20261001104316_InitialPrismSchema")]
     partial class InitialPrismSchema
     {
         /// <inheritdoc />
@@ -162,6 +162,10 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
+
+                    b.Property<int>("ExportPolicyVersion")
+                        .HasColumnType("int")
+                        .HasColumnName("export_policy_version");
 
                     b.Property<string>("Lifecycle")
                         .IsRequired()
@@ -619,6 +623,10 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     b.Property<int>("ContractVersion")
                         .HasColumnType("int")
                         .HasColumnName("contract_version");
+
+                    b.Property<int>("ExportPolicyVersion")
+                        .HasColumnType("int")
+                        .HasColumnName("export_policy_version");
 
                     b.Property<DateTime>("ProjectedAt")
                         .HasColumnType("datetime2")

@@ -2,7 +2,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Entities;
 
 /// <summary>
 /// The latest projected state of an application, guarded by a version-aware compare-and-swap on
-/// (source revision, projector version, contract version).
+/// (source revision, projector version, contract version, export policy version).
 /// </summary>
 public class ApplicationProjectionState
 {
@@ -17,6 +17,7 @@ public class ApplicationProjectionState
     public byte[]? SourceHash { get; set; }
     public int ProjectorVersion { get; set; }
     public int ContractVersion { get; set; }
+    public int ExportPolicyVersion { get; set; }
     public DateTime? SourceOccurredAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime ProjectedAt { get; set; }

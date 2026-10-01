@@ -88,7 +88,7 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
                 return WriteResult.Tombstoned;
             }
 
-            if (snapshot is not null && !IsNewerVersion(snapshot.Value.ProjectorVersion, snapshot.Value.ContractVersion, projection.Versions))
+            if (snapshot is not null && snapshot.Value.Versions.CompareTo(projection.Versions) >= 0)
             {
                 return WriteResult.Stale;
             }
@@ -148,8 +148,8 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
                     INSERT INTO prism.application_projection_state
                         (tenant_id, application_id, active_generation_id, response_id, source_revision, lifecycle,
                          template_id, template_version_id, source_hash, projector_version, contract_version,
-                         source_occurred_at, created_at, projected_at)
-                    VALUES (@tenant, @application, NULL, NULL, @revision, @lifecycle, NULL, NULL, NULL, 0, 0, @deletedAt, @now, @now)
+                         export_policy_version, source_occurred_at, created_at, projected_at)
+                    VALUES (@tenant, @application, NULL, NULL, @revision, @lifecycle, NULL, NULL, NULL, 0, 0, 0, @deletedAt, @now, @now)
                     """, cancellationToken,
                     ("@tenant", deletion.TenantId), ("@application", deletion.ApplicationId), ("@revision", deletion.SourceRevision),
                     ("@lifecycle", nameof(ApplicationLifecycle.Deleted)), ("@deletedAt", deletion.DeletedAt), ("@now", now));
@@ -198,17 +198,12 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
     }
 
     private static bool IsNewer(StateRow state, long sourceRevision, ProjectionVersions versions)
-        => state.SourceRevision < sourceRevision
-           || (state.SourceRevision == sourceRevision && IsNewerVersion(state.ProjectorVersion, state.ContractVersion, versions));
-
-    private static bool IsNewerVersion(int storedProjectorVersion, int storedContractVersion, ProjectionVersions versions)
-        => storedProjectorVersion < versions.ProjectorVersion
-           || (storedProjectorVersion == versions.ProjectorVersion && storedContractVersion < versions.ContractVersion);
+        => ProjectionVersions.IsNewer(state.SourceRevision, state.Versions, sourceRevision, versions);
 
     private static async Task<StateRow?> LockStateAsync(SqlConnection connection, SqlTransaction transaction, Guid tenantId, Guid applicationId, CancellationToken cancellationToken)
     {
         await using var command = Command(connection, transaction, """
-            SELECT active_generation_id, source_revision, projector_version, contract_version
+            SELECT active_generation_id, source_revision, projector_version, contract_version, export_policy_version
             FROM prism.application_projection_state WITH (UPDLOCK, HOLDLOCK)
             WHERE tenant_id = @tenant AND application_id = @application
             """,
@@ -223,14 +218,13 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         return new StateRow(
             reader.IsDBNull(0) ? null : reader.GetGuid(0),
             reader.GetInt64(1),
-            reader.GetInt32(2),
-            reader.GetInt32(3));
+            new ProjectionVersions(reader.GetInt32(2), reader.GetInt32(3), reader.GetInt32(4)));
     }
 
     private static async Task<SnapshotRow?> LockSnapshotAsync(SqlConnection connection, SqlTransaction transaction, Guid tenantId, Guid submissionId, CancellationToken cancellationToken)
     {
         await using var command = Command(connection, transaction, """
-            SELECT selected_generation_id, projector_version, contract_version
+            SELECT selected_generation_id, projector_version, contract_version, export_policy_version
             FROM prism.submission_snapshots WITH (UPDLOCK, HOLDLOCK)
             WHERE tenant_id = @tenant AND submission_id = @submission
             """,
@@ -242,7 +236,7 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
             return null;
         }
 
-        return new SnapshotRow(reader.GetGuid(0), reader.GetInt32(1), reader.GetInt32(2));
+        return new SnapshotRow(reader.GetGuid(0), new ProjectionVersions(reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3)));
     }
 
     private static async Task<bool> IsTombstonedAsync(SqlConnection connection, SqlTransaction transaction, Guid tenantId, Guid applicationId, CancellationToken cancellationToken)
@@ -280,11 +274,11 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
             INSERT INTO prism.application_projection_state
                 (tenant_id, application_id, active_generation_id, response_id, source_revision, lifecycle,
                  template_id, template_version_id, source_hash, projector_version, contract_version,
-                 source_occurred_at, created_at, projected_at)
+                 export_policy_version, source_occurred_at, created_at, projected_at)
             VALUES
                 (@tenant, @application, @generation, @response, @revision, @lifecycle,
                  @template, @templateVersion, @hash, @projectorVersion, @contractVersion,
-                 @occurredAt, @now, @now)
+                 @exportPolicyVersion, @occurredAt, @now, @now)
             """, cancellationToken, StateParameters(projection, generationId, now));
 
     private static async Task<bool> UpdateStateAsync(SqlConnection connection, SqlTransaction transaction, CurrentProjection projection, Guid generationId, DateTime now, CancellationToken cancellationToken)
@@ -300,13 +294,17 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
                 source_hash = @hash,
                 projector_version = @projectorVersion,
                 contract_version = @contractVersion,
+                export_policy_version = @exportPolicyVersion,
                 source_occurred_at = @occurredAt,
                 projected_at = @now
             WHERE tenant_id = @tenant AND application_id = @application
               AND (source_revision < @revision
                    OR (source_revision = @revision
                        AND (projector_version < @projectorVersion
-                            OR (projector_version = @projectorVersion AND contract_version < @contractVersion))))
+                            OR (projector_version = @projectorVersion
+                                AND (contract_version < @contractVersion
+                                     OR (contract_version = @contractVersion
+                                         AND export_policy_version < @exportPolicyVersion))))))
             """, cancellationToken, StateParameters(projection, generationId, now));
 
         return updated == 1;
@@ -318,7 +316,7 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         ("@response", projection.ResponseId), ("@revision", projection.SourceRevision), ("@lifecycle", projection.Lifecycle.ToString()),
         ("@template", projection.TemplateId), ("@templateVersion", projection.TemplateVersionId), ("@hash", projection.SourceHash),
         ("@projectorVersion", projection.Versions.ProjectorVersion), ("@contractVersion", projection.Versions.ContractVersion),
-        ("@occurredAt", projection.SourceOccurredAt), ("@now", now)
+        ("@exportPolicyVersion", projection.Versions.ExportPolicyVersion), ("@occurredAt", projection.SourceOccurredAt), ("@now", now)
     ];
 
     private static Task UpsertSnapshotAsync(SqlConnection connection, SqlTransaction transaction, SubmissionProjection projection, Guid generationId, bool exists, DateTime now, CancellationToken cancellationToken)
@@ -329,18 +327,18 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
               SET selected_generation_id = @generation, response_id = @response, response_revision = @responseRevision,
                   source_revision = @revision, submitted_at = @submittedAt, template_id = @template,
                   template_version_id = @templateVersion, source_hash = @hash, projector_version = @projectorVersion,
-                  contract_version = @contractVersion, projected_at = @now
+                  contract_version = @contractVersion, export_policy_version = @exportPolicyVersion, projected_at = @now
               WHERE tenant_id = @tenant AND submission_id = @submission
               """
             : """
               INSERT INTO prism.submission_snapshots
                   (tenant_id, submission_id, application_id, response_id, response_revision, source_revision, submitted_at,
                    template_id, template_version_id, selected_generation_id, source_hash, projector_version,
-                   contract_version, projected_at)
+                   contract_version, export_policy_version, projected_at)
               VALUES
                   (@tenant, @submission, @application, @response, @responseRevision, @revision, @submittedAt,
                    @template, @templateVersion, @generation, @hash, @projectorVersion,
-                   @contractVersion, @now)
+                   @contractVersion, @exportPolicyVersion, @now)
               """;
 
         return ExecuteAsync(connection, transaction, sql, cancellationToken,
@@ -348,7 +346,8 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
             ("@response", projection.ResponseId), ("@responseRevision", projection.ResponseRevision), ("@revision", projection.SourceRevision),
             ("@submittedAt", projection.SubmittedAt), ("@template", projection.TemplateId), ("@templateVersion", projection.TemplateVersionId),
             ("@generation", generationId), ("@hash", projection.SourceHash), ("@projectorVersion", projection.Versions.ProjectorVersion),
-            ("@contractVersion", projection.Versions.ContractVersion), ("@now", now));
+            ("@contractVersion", projection.Versions.ContractVersion), ("@exportPolicyVersion", projection.Versions.ExportPolicyVersion),
+            ("@now", now));
     }
 
     private static async Task ActivateAsync(SqlConnection connection, SqlTransaction transaction, Guid generationId, Guid? previousGenerationId, DateTime now, CancellationToken cancellationToken)
@@ -414,9 +413,9 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         return command;
     }
 
-    private readonly record struct StateRow(Guid? ActiveGenerationId, long SourceRevision, int ProjectorVersion, int ContractVersion);
+    private readonly record struct StateRow(Guid? ActiveGenerationId, long SourceRevision, ProjectionVersions Versions);
 
-    private readonly record struct SnapshotRow(Guid SelectedGenerationId, int ProjectorVersion, int ContractVersion);
+    private readonly record struct SnapshotRow(Guid SelectedGenerationId, ProjectionVersions Versions);
 
     private sealed record GenerationRow(
         Guid GenerationId,

@@ -18,6 +18,7 @@ public class SubmissionSnapshot
     public byte[] SourceHash { get; set; } = [];
     public int ProjectorVersion { get; set; }
     public int ContractVersion { get; set; }
+    public int ExportPolicyVersion { get; set; }
     public DateTime ProjectedAt { get; set; }
 
     public ProjectionGeneration? SelectedGeneration { get; set; }

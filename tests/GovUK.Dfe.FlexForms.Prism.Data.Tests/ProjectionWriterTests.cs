@@ -92,16 +92,30 @@ public sealed class ProjectionWriterTests(SqlServerFixture sql)
     }
 
     [Theory]
-    [InlineData(2, 1)]
-    [InlineData(1, 2)]
-    public async Task Same_revision_with_a_newer_projector_or_contract_version_reprojects(int projectorVersion, int contractVersion)
+    [InlineData(2, 1, 1)]
+    [InlineData(1, 2, 1)]
+    [InlineData(1, 1, 2)]
+    [InlineData(2, 1, 0)]
+    public async Task Same_revision_with_newer_projection_versions_reprojects(int projectorVersion, int contractVersion, int exportPolicyVersion)
     {
         await WriteCurrent(Current(_tenant, _application, 3), "v1");
 
-        var result = await WriteCurrent(Current(_tenant, _application, 3, new ProjectionVersions(projectorVersion, contractVersion, 1)), "v2");
+        var result = await WriteCurrent(
+            Current(_tenant, _application, 3, new ProjectionVersions(projectorVersion, contractVersion, exportPolicyVersion)), "v2");
 
         Assert.Equal(WriteOutcome.Applied, result.Outcome);
         Assert.Equal(["v2"], await CurrentValues());
+    }
+
+    [Fact]
+    public async Task Same_revision_with_an_older_export_policy_version_is_stale()
+    {
+        await WriteCurrent(Current(_tenant, _application, 3, new ProjectionVersions(1, 1, 5)), "p5");
+
+        var result = await WriteCurrent(Current(_tenant, _application, 3, new ProjectionVersions(1, 1, 4)), "p4");
+
+        Assert.Equal(WriteOutcome.Stale, result.Outcome);
+        Assert.Equal(["p5"], await CurrentValues());
     }
 
     [Fact]

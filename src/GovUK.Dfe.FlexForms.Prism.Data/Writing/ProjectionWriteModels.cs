@@ -4,8 +4,35 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Writing;
 
 /// <summary>
 /// Versions that decide whether a projection of the same source revision should replace a stored one.
+/// They are ordered lexicographically: projector, then contract, then export policy.
 /// </summary>
-public sealed record ProjectionVersions(int ProjectorVersion, int ContractVersion, int ExportPolicyVersion);
+public sealed record ProjectionVersions(int ProjectorVersion, int ContractVersion, int ExportPolicyVersion)
+    : IComparable<ProjectionVersions>
+{
+    public int CompareTo(ProjectionVersions? other)
+    {
+        if (other is null)
+        {
+            return 1;
+        }
+
+        var projector = ProjectorVersion.CompareTo(other.ProjectorVersion);
+        if (projector != 0)
+        {
+            return projector;
+        }
+
+        var contract = ContractVersion.CompareTo(other.ContractVersion);
+        return contract != 0 ? contract : ExportPolicyVersion.CompareTo(other.ExportPolicyVersion);
+    }
+
+    /// <summary>
+    /// Whether a projection at (<paramref name="revision"/>, <paramref name="candidate"/>) should replace one stored
+    /// at (<paramref name="storedRevision"/>, <paramref name="stored"/>).
+    /// </summary>
+    public static bool IsNewer(long storedRevision, ProjectionVersions stored, long revision, ProjectionVersions candidate)
+        => storedRevision < revision || (storedRevision == revision && stored.CompareTo(candidate) < 0);
+}
 
 public sealed record CurrentProjection(
     Guid TenantId,
