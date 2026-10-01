@@ -12,6 +12,10 @@ internal static class TestSupport
         Guid? operationId = null) =>
         new(ApplicationProjectionRequestedEvent.CurrentContractVersion, Guid.NewGuid(), Guid.NewGuid(), reason, revision,
             Guid.NewGuid(), null, Guid.NewGuid(), Guid.NewGuid(), operationId, new DateTime(2026, 9, 30, 12, 0, 0, DateTimeKind.Utc));
+
+    public static TemplateVersionPublishedEvent TemplateVersionPublished() =>
+        new(TemplateVersionPublishedEvent.CurrentContractVersion, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "1.2.0",
+            new DateTime(2026, 9, 30, 12, 0, 0, DateTimeKind.Utc));
 }
 
 internal sealed class TestMeterFactory : IMeterFactory

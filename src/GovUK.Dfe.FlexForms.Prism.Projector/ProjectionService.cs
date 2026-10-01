@@ -7,6 +7,7 @@ using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Writing;
 using GovUK.Dfe.FlexForms.Prism.Flattener;
+using GovUK.Dfe.FlexForms.Prism.Flattener.Catalogue;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Facts;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Flattening;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
@@ -23,6 +24,12 @@ public interface IProjectionService
     /// the message can never succeed; any other exception is transient and the message should be retried.
     /// </summary>
     Task<ProjectionOutcome> ProjectAsync(ApplicationProjectionRequestedEvent message, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Catalogues a newly published template version so its fields can be classified, and its changes reviewed,
+    /// before any application uses it. Failures are reported the same way as <see cref="ProjectAsync"/>.
+    /// </summary>
+    Task CatalogueTemplateVersionAsync(TemplateVersionPublishedEvent message, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -94,6 +101,81 @@ public sealed partial class ProjectionService(
             metrics.Failed(message.Reason, ex.GetType().Name, permanent: false);
             LogTransientFailure(ex);
             throw;
+        }
+    }
+
+    public async Task CatalogueTemplateVersionAsync(TemplateVersionPublishedEvent message, CancellationToken cancellationToken)
+    {
+        using var scope = logger.BeginScope(new Dictionary<string, object?>
+        {
+            ["tenant_id"] = message.TenantId,
+            ["template_id"] = message.TemplateId,
+            ["template_version_id"] = message.TemplateVersionId,
+            ["template_version_number"] = message.VersionNumber,
+            ["projector_version"] = PrismVersions.ProjectorVersion,
+            ["contract_version"] = message.ContractVersion,
+        });
+
+        try
+        {
+            Validate(message);
+
+            try
+            {
+                var (tenantId, templateVersionId) = (message.TenantId, message.TemplateVersionId);
+                var template = await TimeSourceAsync("get_template_version", () => source.GetTemplateVersionAsync(tenantId, templateVersionId, cancellationToken));
+                if (template.TemplateId != message.TemplateId)
+                {
+                    throw new PermanentProjectionException(
+                        PermanentFailureReasons.SourceMismatch,
+                        $"Template version {templateVersionId} belongs to template {template.TemplateId}, not {message.TemplateId}.");
+                }
+
+                var policy = await store.GetExportPolicyAsync(tenantId, template.TemplateId, cancellationToken);
+                var catalogue = catalogues.GetOrBuild(tenantId, templateVersionId, template.JsonSchema);
+                await EnsureCatalogueAsync(tenantId, template, catalogue, policy, force: true, cancellationToken);
+                metrics.TemplateVersionCatalogued(catalogue.Fields.Count);
+                LogTemplateCatalogued(catalogue.Fields.Count);
+            }
+            catch (Exception ex) when (Classify(ex) is { } permanent)
+            {
+                throw permanent;
+            }
+        }
+        catch (PermanentProjectionException ex)
+        {
+            metrics.TemplateCatalogueFailed(ex.Reason, permanent: true);
+            LogPermanentFailure(ex, ex.Reason);
+            throw;
+        }
+        catch (Exception ex) when (!(ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
+        {
+            metrics.TemplateCatalogueFailed(ex.GetType().Name, permanent: false);
+            LogTransientFailure(ex);
+            throw;
+        }
+    }
+
+    private static void Validate(TemplateVersionPublishedEvent message)
+    {
+        if (message.ContractVersion != TemplateVersionPublishedEvent.CurrentContractVersion)
+        {
+            throw new PermanentProjectionException(
+                PermanentFailureReasons.UnsupportedContract,
+                $"Contract version {message.ContractVersion} is not supported; expected {TemplateVersionPublishedEvent.CurrentContractVersion}.");
+        }
+
+        var problem = message switch
+        {
+            { TenantId: var t } when t == Guid.Empty => "TenantId is required.",
+            { TemplateId: var t } when t == Guid.Empty => "TemplateId is required.",
+            { TemplateVersionId: var v } when v == Guid.Empty => "TemplateVersionId is required.",
+            _ => null,
+        };
+
+        if (problem is not null)
+        {
+            throw new PermanentProjectionException(PermanentFailureReasons.InvalidMessage, problem);
         }
     }
 
@@ -321,16 +403,7 @@ public sealed partial class ProjectionService(
     {
         var template = await TimeSourceAsync("get_template_version", () => source.GetTemplateVersionAsync(tenantId, templateVersionId, cancellationToken));
         var catalogue = catalogues.GetOrBuild(tenantId, templateVersionId, template.JsonSchema);
-
-        if (!catalogues.IsEnsured(tenantId, templateVersionId, PrismVersions.ContractVersion, policy.Version))
-        {
-            await catalogWriter.EnsureAsync(
-                new CatalogueSource(tenantId, template.TemplateId, templateVersionId, template.VersionNumber),
-                catalogue,
-                policy,
-                cancellationToken);
-            catalogues.MarkEnsured(tenantId, templateVersionId, PrismVersions.ContractVersion, policy.Version);
-        }
+        await EnsureCatalogueAsync(tenantId, template, catalogue, policy, force: false, cancellationToken);
 
         var started = clock.GetTimestamp();
         var result = ResponseFlattener.Flatten(catalogue, ResponseParser.Parse(body), policy);
@@ -345,6 +418,28 @@ public sealed partial class ProjectionService(
         }
 
         return new Flattened(result.Facts, hash);
+    }
+
+    private async Task EnsureCatalogueAsync(
+        Guid tenantId,
+        PrismTemplateVersionDto template,
+        TemplateCatalogue catalogue,
+        ExportPolicy policy,
+        bool force,
+        CancellationToken cancellationToken)
+    {
+        var templateVersionId = template.TemplateVersionId;
+        if (!force && catalogues.IsEnsured(tenantId, templateVersionId, PrismVersions.ContractVersion, policy.Version))
+        {
+            return;
+        }
+
+        await catalogWriter.EnsureAsync(
+            new CatalogueSource(tenantId, template.TemplateId, templateVersionId, template.VersionNumber, template.CreatedOn),
+            catalogue,
+            policy,
+            cancellationToken);
+        catalogues.MarkEnsured(tenantId, templateVersionId, PrismVersions.ContractVersion, policy.Version);
     }
 
     private Task<PrismApplicationStateDto> GetApplicationAsync(Guid tenantId, Guid applicationId, CancellationToken cancellationToken)
@@ -375,6 +470,9 @@ public sealed partial class ProjectionService(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Projection {Status}: {Outcome} (generation {GenerationId})")]
     private partial void LogProjected(ProjectionStatus status, string outcome, Guid? generationId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Template version catalogued with {FieldCount} fields")]
+    private partial void LogTemplateCatalogued(int fieldCount);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Flattening reported {WarningCount} warnings: {WarningSummary}")]
     private partial void LogFlattenWarnings(int warningCount, string warningSummary);

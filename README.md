@@ -92,6 +92,8 @@ messages all end in the same state.
 - When the flattened facts hash to the same value as the active generation, only the state metadata advances.
 - Submitted freezes the exact submitted response as a submission snapshot. Resync recreates a missing one.
 - Deleted writes a tombstone, and nothing is written for that application after it.
+- `TemplateVersionPublishedEvent` catalogues a new template version straight away, so its fields can be classified
+  before any application uses it. The same topic carries both events; the envelope's `messageType` tells them apart.
 - Failures that retrying cannot fix throw `PermanentProjectionException` (and should be dead-lettered). Any other
   exception is transient.
 
@@ -109,6 +111,7 @@ The Prism database lives in schema `prism` and is owned by EF Core migrations in
 
 - `prism.v_current_answer_facts`: facts of each application's active generation, excluding deleted applications.
 - `prism.v_submission_answer_facts`: facts of each submission's selected generation, excluding deleted applications.
+- `prism.v_template_field_changes`: fields added, removed or changed by each template version, with their export decision.
 
 Generations that are still being built, or have been superseded, are never visible through the views.
 

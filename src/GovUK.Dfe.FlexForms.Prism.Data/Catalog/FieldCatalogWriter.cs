@@ -9,13 +9,14 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 
 /// <summary>Identifies the template version a catalogue belongs to.</summary>
-public sealed record CatalogueSource(Guid TenantId, Guid TemplateId, Guid TemplateVersionId, string? TemplateVersionNumber);
+/// <param name="CreatedOn">When the version was created in FlexForms; orders the versions of a template.</param>
+public sealed record CatalogueSource(Guid TenantId, Guid TemplateId, Guid TemplateVersionId, string? TemplateVersionNumber, DateTime CreatedOn);
 
 public interface IFieldCatalogWriter
 {
     /// <summary>
-    /// Makes sure every field of the template version is catalogued for the current contract version, and that
-    /// each entry's export status reflects <paramref name="policy"/>.
+    /// Makes sure the template version and every one of its fields are catalogued for the current contract version,
+    /// and that each entry's export status reflects <paramref name="policy"/>.
     /// </summary>
     Task EnsureAsync(CatalogueSource source, TemplateCatalogue catalogue, ExportPolicy policy, CancellationToken cancellationToken);
 }
@@ -56,6 +57,26 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
             .ToDictionary(c => (c.ParentFieldId, c.FieldId), KeyComparer.Instance);
 
         var now = clock.GetUtcNow().UtcDateTime;
+
+        var version = await db.TemplateVersions.FindAsync([source.TenantId, source.TemplateVersionId], cancellationToken);
+        if (version is null)
+        {
+            db.TemplateVersions.Add(new TemplateVersionEntry
+            {
+                TenantId = source.TenantId,
+                TemplateVersionId = source.TemplateVersionId,
+                TemplateId = source.TemplateId,
+                VersionNumber = Truncate(source.TemplateVersionNumber, 50),
+                CreatedOn = source.CreatedOn,
+                CataloguedAt = now,
+            });
+        }
+        else
+        {
+            // Versions catalogued before this table existed were backfilled with the catalogue time.
+            version.CreatedOn = source.CreatedOn;
+        }
+
         foreach (var field in catalogue.Fields)
         {
             var status = policy.StatusOf(field);

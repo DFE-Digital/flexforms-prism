@@ -15,6 +15,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
     public DbSet<SubmissionSnapshot> SubmissionSnapshots => Set<SubmissionSnapshot>();
     public DbSet<AnswerFactEntity> AnswerFacts => Set<AnswerFactEntity>();
     public DbSet<FieldCatalogEntry> FieldCatalog => Set<FieldCatalogEntry>();
+    public DbSet<TemplateVersionEntry> TemplateVersions => Set<TemplateVersionEntry>();
     public DbSet<FieldExportPolicy> FieldExportPolicies => Set<FieldExportPolicy>();
     public DbSet<DeletionTombstone> DeletionTombstones => Set<DeletionTombstone>();
     public DbSet<BackfillOperation> BackfillOperations => Set<BackfillOperation>();
@@ -114,6 +115,14 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.Property(x => x.Sensitivity).HasMaxLength(40);
             e.Property(x => x.SemanticKey).HasMaxLength(200);
             e.HasIndex(x => new { x.TenantId, x.TemplateId, x.FieldId });
+        });
+
+        modelBuilder.Entity<TemplateVersionEntry>(e =>
+        {
+            e.ToTable("template_versions");
+            e.HasKey(x => new { x.TenantId, x.TemplateVersionId });
+            e.Property(x => x.VersionNumber).HasMaxLength(50);
+            e.HasIndex(x => new { x.TenantId, x.TemplateId, x.CreatedOn });
         });
 
         modelBuilder.Entity<FieldExportPolicy>(e =>

@@ -2,7 +2,7 @@
 
 Prism has three contracts. Each one can change without breaking the other two:
 
-1. **The event** that FlexForms publishes when an application changes.
+1. **The events** that FlexForms publishes when an application changes or a template version is published.
 2. **The internal read API** that Prism calls to fetch the current source state.
 3. **The SQL views** that the data team reads.
 
@@ -62,6 +62,34 @@ state from the API and compares revisions. As a result:
 | Permanent failure | Dead-letters immediately with reason `unsupported_contract`, `invalid_message`, `source_not_found`, `source_rejected`, `source_mismatch`, `unreadable_template` or `unreadable_response`. The reason is also in the `PrismFailure` application property. |
 | Anything else (SQL, network, API 5xx or 429) | Abandons the message, so Service Bus redelivers it until `MaxDeliveryCount`, then dead-letters it. |
 
+### Template versions
+
+`TemplateVersionPublishedEvent` (same namespace) tells Prism that a new template version exists, so its fields are
+catalogued, and can be classified, before any application uses it.
+
+| Field | Type | Rules |
+|---|---|---|
+| `ContractVersion` | int | `1`. Any other value is dead-lettered with `unsupported_contract`. |
+| `TenantId`, `TemplateId`, `TemplateVersionId` | Guid | Always required. |
+| `VersionNumber` | string | The version label, for example `1.4.0`. Informational. |
+| `CreatedAt` | DateTime (UTC) | When the version was created. |
+
+- **When:** FlexForms publishes it when a template is created with an initial version, and every time a new version
+  is added. Template versions are immutable, so there is no "changed" or "deleted" event: a change to a template
+  is always a new version.
+- **Transport:** the same topic and subscription. The envelope's `messageType` is
+  `urn:message:GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events:TemplateVersionPublishedEvent`; Prism uses it to
+  tell the two events apart. **Session ID:** `{tenantId}:template:{templateId}`. **MessageId:** UUIDv5 of
+  `prism-template-version:{tenantId}:{templateVersionId}`. Both come from `ApplicationProjectionIdentifiers`.
+- **Publishing:** through the transactional outbox, in the transaction that inserts the version row.
+- **Meaning:** a notification. Prism fetches the version from `GET template-versions/{templateVersionId}`, checks it
+  belongs to `TemplateId` (otherwise `source_mismatch`), and catalogues it into `field_catalog` and
+  `template_versions` with the template's current export policy. Redelivery is harmless. Failures are handled
+  exactly like the application event.
+
+Versions created before FlexForms started publishing this event are catalogued the first time one of their
+applications is projected, as before.
+
 ## 2. Internal read API (FlexForms)
 
 Base path `v1/internal/prism`. Every call needs an Entra token for the FlexForms API's app registration
@@ -120,6 +148,27 @@ never alter these rows. They disappear only if the application is deleted.
 | `label`, `task_group_*`, `task_*`, `page_*`, `semantic_key` | Field metadata from `field_catalog`. |
 
 Within one generation, `(field_id, parent_field_id, occurrence_path, nested_path)` is unique.
+
+### `prism.v_template_field_changes`
+
+What each template version changed compared with the version created before it, so the data team can review new,
+removed and altered fields. There is one row per field that changed. Every field of a template's first catalogued
+version appears as `Added`. Fields are matched by `(parent_field_id, field_id)`, so a field whose ID changed shows
+as one `Removed` and one `Added` row.
+
+| Column | Meaning |
+|---|---|
+| `tenant_id`, `template_id`, `template_version_id`, `version_number`, `version_created_on` | The version. Always filter on `tenant_id`. |
+| `previous_template_version_id`, `previous_version_number` | The version it is compared with, by creation time. Null for the first version. |
+| `parent_field_id`, `field_id` | The field. |
+| `change_type` | `Added`, `Removed` or `Changed`. |
+| `label_changed`, `type_changed`, `required_changed`, `choices_changed`, `location_changed` | For `Changed` rows, what changed. `type_changed` covers data type, control type and collection; `location_changed` covers task, page and flow. Labels and choices are compared case-sensitively. |
+| `previous_label`, `label`, `previous_data_type`, `data_type`, `previous_control_type`, `control_type`, `previous_is_required`, `is_required`, `previous_choices_json`, `choices_json`, `previous_task_name`, `task_name`, `previous_page_title`, `page_title` | Before and after. |
+| `export_decision` | The field's current decision for the template: `Allowed`, `Denied` or `Unclassified`. |
+| `contract_version` | The catalogue contract version compared. Only the current one is shown. |
+
+A new field is always `Unclassified` until someone decides, so it is never exported by accident. A relabelled field
+keeps its decision, because decisions are per field ID; review `label_changed` rows in case the meaning changed.
 
 ### Guarantees
 

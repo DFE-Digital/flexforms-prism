@@ -62,6 +62,7 @@ CREATE ROLE prism_reader;
 GRANT SELECT ON prism.v_current_answer_facts TO prism_reader;
 GRANT SELECT ON prism.v_submission_answer_facts TO prism_reader;
 GRANT SELECT ON prism.field_catalog TO prism_reader;
+GRANT SELECT ON prism.v_template_field_changes TO prism_reader;
 CREATE USER [<data-team-identity-or-group>] FROM EXTERNAL PROVIDER;
 ALTER ROLE prism_reader ADD MEMBER [<data-team-identity-or-group>];
 ```

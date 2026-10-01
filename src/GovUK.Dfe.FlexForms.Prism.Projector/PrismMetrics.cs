@@ -20,6 +20,9 @@ public sealed class PrismMetrics
     private readonly Histogram<double> sourceLatency;
     private readonly Histogram<double> flattenDuration;
     private readonly Histogram<double> writeDuration;
+    private readonly Counter<long> templatesCatalogued;
+    private readonly Counter<long> templateFieldsCatalogued;
+    private readonly Counter<long> templatesFailed;
 
     public PrismMetrics(IMeterFactory meterFactory)
     {
@@ -36,7 +39,19 @@ public sealed class PrismMetrics
         sourceLatency = meter.CreateHistogram<double>("prism.source.duration", "ms", "FlexForms API call duration, by operation.");
         flattenDuration = meter.CreateHistogram<double>("prism.flatten.duration", "ms", "Time to parse, flatten and hash a response.");
         writeDuration = meter.CreateHistogram<double>("prism.write.duration", "ms", "Projection write duration (bulk copy and SQL), by operation.");
+        templatesCatalogued = meter.CreateCounter<long>("prism.templates.catalogued", description: "Published template versions catalogued.");
+        templateFieldsCatalogued = meter.CreateCounter<long>("prism.templates.fields_catalogued", description: "Fields in the template versions catalogued.");
+        templatesFailed = meter.CreateCounter<long>("prism.templates.failed", description: "Template version messages that failed, by failure reason.");
     }
+
+    public void TemplateVersionCatalogued(int fieldCount)
+    {
+        templatesCatalogued.Add(1);
+        templateFieldsCatalogued.Add(fieldCount);
+    }
+
+    public void TemplateCatalogueFailed(string failure, bool permanent) =>
+        templatesFailed.Add(1, new("failure", failure), new("permanent", permanent));
 
     public void Succeeded(ProjectionReason reason, ProjectionOutcome outcome, DateTime occurredAt, DateTime now)
     {

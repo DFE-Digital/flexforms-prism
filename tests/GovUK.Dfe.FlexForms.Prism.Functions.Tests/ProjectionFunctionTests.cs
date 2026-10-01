@@ -39,6 +39,32 @@ public class ProjectionFunctionTests
     }
 
     [Fact]
+    public async Task A_template_version_message_is_catalogued_and_completed()
+    {
+        var published = TestSupport.TemplateVersionPublished();
+        var message = Received(ProjectionMessages.Create(published).Body);
+
+        await function.Run(message, actions, default);
+
+        await projector.Received(1).CatalogueTemplateVersionAsync(published, Arg.Any<CancellationToken>());
+        await projector.DidNotReceiveWithAnyArgs().ProjectAsync(default!, default);
+        await actions.Received(1).CompleteMessageAsync(message, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_permanent_template_failure_is_dead_lettered()
+    {
+        var message = Received(ProjectionMessages.Create(TestSupport.TemplateVersionPublished()).Body);
+        projector.CatalogueTemplateVersionAsync(Arg.Any<TemplateVersionPublishedEvent>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new PermanentProjectionException(PermanentFailureReasons.UnreadableTemplate, "bad"));
+
+        await function.Run(message, actions, default);
+
+        await actions.Received(1).DeadLetterMessageAsync(
+            message, Arg.Any<Dictionary<string, object>>(), PermanentFailureReasons.UnreadableTemplate, "bad", Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task A_permanent_failure_is_dead_lettered_with_its_reason()
     {
         var message = Received(ProjectionMessages.Create(TestSupport.Event()).Body);

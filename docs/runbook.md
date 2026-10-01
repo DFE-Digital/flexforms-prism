@@ -4,7 +4,7 @@
 
 | Function | Trigger | Job |
 |---|---|---|
-| `ProjectionFunction` | Service Bus `flexforms-prism` / `prism-projector`, sessions | Projects one application per message. |
+| `ProjectionFunction` | Service Bus `flexforms-prism` / `prism-projector`, sessions | Projects one application per message, or catalogues a newly published template version. |
 | `OperationWorkerFunction` | Every minute | Pages through FlexForms for the oldest pending backfill or reconciliation operation, and enqueues `Resync` messages. |
 | `ReconciliationFunction` | 02:00 UTC daily | Records a reconciliation operation for all tenants (the worker runs it). |
 | `GenerationCleanupFunction` | 03:30 UTC daily | Deletes superseded generations older than `Prism:Cleanup:RetentionDays` (30 by default). |
@@ -38,6 +38,8 @@ Metrics are exported with OpenTelemetry when `APPLICATIONINSIGHTS_CONNECTION_STR
 | `prism.operations.enqueued` | `kind` | |
 | `prism.operations.finished` | `kind`, `status` | Alert on `Failed`. |
 | `prism.reconciliation.drift` | `drift_kind` | See "Reconciliation found drift". |
+| `prism.templates.catalogued`, `prism.templates.fields_catalogued` | | Template versions catalogued from `TemplateVersionPublishedEvent`. |
+| `prism.templates.failed` | `failure`, `permanent` | Any `permanent = true` means a dead-lettered template event. |
 | `prism.cleanup.generations_deleted`, `prism.cleanup.facts_deleted` | | |
 
 ```kusto

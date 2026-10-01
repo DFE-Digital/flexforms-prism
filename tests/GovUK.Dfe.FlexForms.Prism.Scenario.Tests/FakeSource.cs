@@ -27,6 +27,25 @@ internal sealed class FakeSource : ISourceClient
         templates[templateVersionId] = new PrismTemplateVersionDto(templateVersionId, templateId, "1.0", templateJson, DateTime.UtcNow);
     }
 
+    /// <summary>The event the API publishes for the template version the source was created with.</summary>
+    public TemplateVersionPublishedEvent InitialTemplateVersion() => Published(templates[TemplateVersionId]);
+
+    /// <summary>Adds a newer version of the template and returns the event the API would publish for it.</summary>
+    public TemplateVersionPublishedEvent PublishTemplateVersion(string versionNumber, string templateJson)
+    {
+        lock (gate)
+        {
+            var createdOn = templates.Values.Max(t => t.CreatedOn).AddMinutes(1);
+            var version = new PrismTemplateVersionDto(Guid.NewGuid(), TemplateId, versionNumber, templateJson, createdOn);
+            templates[version.TemplateVersionId] = version;
+            return Published(version);
+        }
+    }
+
+    private TemplateVersionPublishedEvent Published(PrismTemplateVersionDto version) => new(
+        TemplateVersionPublishedEvent.CurrentContractVersion, TenantId, version.TemplateId, version.TemplateVersionId,
+        version.VersionNumber, version.CreatedOn);
+
     public Guid TenantId { get; }
     public Guid TemplateId { get; }
     public Guid TemplateVersionId { get; }
@@ -138,7 +157,12 @@ internal sealed class FakeSource : ISourceClient
     }
 
     public Task<PrismTemplateVersionDto> GetTemplateVersionAsync(Guid tenantId, Guid templateVersionId, CancellationToken cancellationToken)
-        => Task.FromResult(templates[templateVersionId]);
+    {
+        lock (gate)
+        {
+            return Task.FromResult(templates[templateVersionId]);
+        }
+    }
 
     public Task<PrismApplicationPageDto> ListApplicationsAsync(Guid tenantId, DateTime? modifiedSince, int page, int pageSize, CancellationToken cancellationToken)
     {

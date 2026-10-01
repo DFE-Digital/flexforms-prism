@@ -50,8 +50,30 @@ Authorization: Bearer <token>
 ```
 
 This returns the policy version and every catalogued field with its `exportStatus` (`Unclassified`, `Allowed`
-or `Denied`), its label, type, task and page, and who decided it. A template is catalogued the first time one of its
-applications is projected. Before that, the endpoint returns 404; run a backfill for the tenant if needed.
+or `Denied`), its label, type, task and page, and who decided it. A template version is catalogued as soon as
+FlexForms publishes it (`TemplateVersionPublishedEvent`), so new fields can be classified before anyone answers them.
+Versions published before that event existed are catalogued the first time one of their applications is projected;
+until then the endpoint returns 404, so run a backfill for the tenant if needed.
+
+### When a template changes
+
+Every template change is a new template version. When one is published:
+
+1. Prism catalogues it within seconds. New fields are `Unclassified` and are not exported.
+2. Review what changed in `prism.v_template_field_changes`:
+
+   ```sql
+   SELECT version_number, change_type, parent_field_id, field_id, previous_label, label,
+          label_changed, type_changed, required_changed, choices_changed, export_decision
+   FROM prism.v_template_field_changes
+   WHERE tenant_id = @tenant AND template_id = @template
+   ORDER BY version_created_on DESC, change_type, parent_field_id, field_id;
+   ```
+
+3. Classify `Added` fields with the `PUT` below.
+4. Check `Changed` rows with `label_changed` or `type_changed`. Their existing decision carries over, so set it to
+   `Denied` if the field now collects something that shouldn't leave FlexForms.
+5. `Removed` fields keep their decision for older versions' applications; nothing needs doing.
 
 ### Change decisions
 

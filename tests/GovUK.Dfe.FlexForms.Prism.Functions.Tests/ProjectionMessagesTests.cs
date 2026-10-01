@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Enums;
+using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Identifiers;
 using GovUK.Dfe.FlexForms.Prism.Functions.Messaging;
 using GovUK.Dfe.FlexForms.Prism.Projector;
@@ -44,7 +45,7 @@ public class ProjectionMessagesTests
             }
             """;
 
-        var request = ProjectionMessages.Read(BinaryData.FromString(body));
+        var request = Assert.IsType<ApplicationProjectionRequestedEvent>(ProjectionMessages.Read(BinaryData.FromString(body)));
 
         Assert.Equal(ProjectionReason.Submitted, request.Reason);
         Assert.Equal(tenant, request.TenantId);
@@ -58,6 +59,45 @@ public class ProjectionMessagesTests
         var request = TestSupport.Event();
 
         Assert.Equal(request, ProjectionMessages.Read(BinaryData.FromObjectAsJson(request)));
+    }
+
+    [Fact]
+    public void A_template_version_message_round_trips_on_the_template_session()
+    {
+        var published = TestSupport.TemplateVersionPublished();
+
+        var message = ProjectionMessages.Create(published);
+
+        Assert.Equal(published, ProjectionMessages.Read(message.Body));
+        Assert.Equal(ApplicationProjectionIdentifiers.TemplateSessionId(published.TenantId, published.TemplateId), message.SessionId);
+        Assert.Equal(
+            ApplicationProjectionIdentifiers.TemplateVersionMessageId(published.TenantId, published.TemplateVersionId).ToString("D"),
+            message.MessageId);
+
+        using var envelope = JsonDocument.Parse(message.Body);
+        Assert.Equal(ProjectionMessages.TemplateVersionMessageType, envelope.RootElement.GetProperty("messageType")[0].GetString());
+    }
+
+    [Fact]
+    public void Reads_a_template_version_envelope_as_the_API_publishes_it()
+    {
+        var (tenant, template, version) = (Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var body = $$"""
+            {
+              "messageId": "{{Guid.NewGuid()}}",
+              "messageType": [
+                "urn:message:GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events:TemplateVersionPublishedEvent"
+              ],
+              "message": {
+                "contractVersion": 1, "tenantId": "{{tenant}}", "templateId": "{{template}}", "templateVersionId": "{{version}}",
+                "versionNumber": "1.4.0", "createdAt": "2026-09-30T12:00:00Z"
+              }
+            }
+            """;
+
+        var published = Assert.IsType<TemplateVersionPublishedEvent>(ProjectionMessages.Read(BinaryData.FromString(body)));
+
+        Assert.Equal((tenant, template, version, "1.4.0"), (published.TenantId, published.TemplateId, published.TemplateVersionId, published.VersionNumber));
     }
 
     [Theory]

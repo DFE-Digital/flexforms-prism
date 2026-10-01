@@ -88,6 +88,11 @@ internal sealed class ProjectorHarness
             submissionId ?? (reason == ProjectionReason.Submitted ? Guid.NewGuid() : null),
             TemplateId, TemplateVersionId, reason == ProjectionReason.Resync ? Guid.NewGuid() : null, OccurredAt);
 
+    public TemplateVersionPublishedEvent TemplatePublished(
+        Guid? templateId = null,
+        int contractVersion = TemplateVersionPublishedEvent.CurrentContractVersion) =>
+        new(contractVersion, TenantId, templateId ?? TemplateId, TemplateVersionId, "1.0", OccurredAt);
+
     public PrismApplicationStateDto State(
         long revision,
         string? body = "{}",

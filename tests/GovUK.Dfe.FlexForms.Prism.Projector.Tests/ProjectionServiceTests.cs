@@ -308,4 +308,79 @@ public class ProjectionServiceTests
 
         Assert.Equal(PermanentFailureReasons.UnreadableResponse, ex.Reason);
     }
+
+    [Fact]
+    public async Task A_published_template_version_is_catalogued_with_its_source_creation_time_and_policy()
+    {
+        await h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(), default);
+
+        await h.CatalogWriter.Received(1).EnsureAsync(
+            new CatalogueSource(h.TenantId, h.TemplateId, h.TemplateVersionId, "1.0", h.OccurredAt),
+            Arg.Is<TemplateCatalogue>(c => c.Fields.Select(f => f.FieldId).SequenceEqual(new[] { "name", "pupils" })),
+            Arg.Is<ExportPolicy>(p => p.Version == 1),
+            Arg.Any<CancellationToken>());
+        await h.Writer.DidNotReceiveWithAnyArgs().WriteCurrentAsync(default!, default!, default);
+    }
+
+    [Fact]
+    public async Task A_redelivered_template_version_is_catalogued_again()
+    {
+        await h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(), default);
+        await h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(), default);
+
+        await h.CatalogWriter.Received(2).EnsureAsync(
+            Arg.Any<CatalogueSource>(), Arg.Any<TemplateCatalogue>(), Arg.Any<ExportPolicy>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Projecting_after_the_template_event_reuses_the_catalogue()
+    {
+        await h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(), default);
+        h.SourceReturns(h.State(1, ProjectorHarness.Body("Ada")));
+
+        await h.Service.ProjectAsync(h.Message(ProjectionReason.Saved, 1), default);
+
+        await h.CatalogWriter.Received(1).EnsureAsync(
+            Arg.Any<CatalogueSource>(), Arg.Any<TemplateCatalogue>(), Arg.Any<ExportPolicy>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_template_version_that_belongs_to_another_template_fails_permanently()
+    {
+        var ex = await Assert.ThrowsAsync<PermanentProjectionException>(
+            () => h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(templateId: Guid.NewGuid()), default));
+
+        Assert.Equal(PermanentFailureReasons.SourceMismatch, ex.Reason);
+        await h.CatalogWriter.DidNotReceiveWithAnyArgs().EnsureAsync(default!, default!, default!, default);
+    }
+
+    [Fact]
+    public async Task An_unsupported_template_event_contract_fails_permanently()
+    {
+        var ex = await Assert.ThrowsAsync<PermanentProjectionException>(
+            () => h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(contractVersion: 2), default));
+
+        Assert.Equal(PermanentFailureReasons.UnsupportedContract, ex.Reason);
+    }
+
+    [Fact]
+    public async Task An_unreadable_published_template_fails_permanently()
+    {
+        h.Source.GetTemplateVersionAsync(h.TenantId, h.TemplateVersionId, Arg.Any<CancellationToken>())
+            .Returns(new PrismTemplateVersionDto(h.TemplateVersionId, h.TemplateId, "1.0", "not json", h.OccurredAt));
+
+        var ex = await Assert.ThrowsAsync<PermanentProjectionException>(
+            () => h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(), default));
+
+        Assert.Equal(PermanentFailureReasons.UnreadableTemplate, ex.Reason);
+    }
+
+    [Fact]
+    public async Task An_unavailable_source_while_cataloguing_is_rethrown_for_retry()
+    {
+        h.Source.GetTemplateVersionAsync(h.TenantId, h.TemplateVersionId, Arg.Any<CancellationToken>())
+            .ThrowsAsync(new SourceUnavailableException("down", 503));
+
+        await Assert.ThrowsAsync<SourceUnavailableException>(() => h.Service.CatalogueTemplateVersionAsync(h.TemplatePublished(), default));
+    }
 }

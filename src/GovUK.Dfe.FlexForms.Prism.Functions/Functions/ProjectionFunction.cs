@@ -1,4 +1,5 @@
 using Azure.Messaging.ServiceBus;
+using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events;
 using GovUK.Dfe.FlexForms.Prism.Functions.Messaging;
 using GovUK.Dfe.FlexForms.Prism.Projector;
 using Microsoft.Azure.Functions.Worker;
@@ -7,7 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace GovUK.Dfe.FlexForms.Prism.Functions.Functions;
 
 /// <summary>
-/// Projects one application per message. Sessions keep every message for an application in order. Messages are
+/// Projects one application per message, or catalogues a newly published template version. Sessions keep every
+/// message for an application (or a template) in order. Messages are
 /// completed on success or skip, dead-lettered on permanent failures, and abandoned on transient failures so
 /// Service Bus redelivers them until <c>MaxDeliveryCount</c>.
 /// </summary>
@@ -31,13 +33,22 @@ public sealed partial class ProjectionFunction(IProjectionService projector, Pri
 
         try
         {
-            var request = ProjectionMessages.Read(message.Body);
-            if (message.DeliveryCount > 1)
+            switch (ProjectionMessages.Read(message.Body))
             {
-                metrics.Retried(request.Reason);
+                case ApplicationProjectionRequestedEvent request:
+                    if (message.DeliveryCount > 1)
+                    {
+                        metrics.Retried(request.Reason);
+                    }
+
+                    await projector.ProjectAsync(request, cancellationToken);
+                    break;
+
+                case TemplateVersionPublishedEvent published:
+                    await projector.CatalogueTemplateVersionAsync(published, cancellationToken);
+                    break;
             }
 
-            await projector.ProjectAsync(request, cancellationToken);
             await actions.CompleteMessageAsync(message, cancellationToken);
         }
         catch (PermanentProjectionException ex)

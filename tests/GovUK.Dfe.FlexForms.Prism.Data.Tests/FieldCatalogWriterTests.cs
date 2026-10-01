@@ -32,7 +32,8 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
 
     private static readonly TemplateCatalogue Catalogue = TemplateCatalogueBuilder.Build(Template);
 
-    private readonly CatalogueSource _source = new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "2.1");
+    private readonly CatalogueSource _source = new(
+        Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "2.1", new DateTime(2026, 9, 1, 10, 0, 0, DateTimeKind.Utc));
 
     private async Task Ensure(ExportPolicy policy)
     {
@@ -87,5 +88,20 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
         await Task.WhenAll(Enumerable.Range(0, 4).Select(_ => Ensure(ExportPolicy.DenyAll)));
 
         Assert.Equal(2, (await Entries()).Count);
+        await using var db = sql.CreateContext();
+        Assert.Equal(1, await db.TemplateVersions.CountAsync(v => v.TenantId == _source.TenantId));
+    }
+
+    [Fact]
+    public async Task Records_the_template_version_with_its_source_creation_time()
+    {
+        await Ensure(ExportPolicy.DenyAll);
+        await Ensure(ExportPolicy.DenyAll);
+
+        await using var db = sql.CreateContext();
+        var version = await db.TemplateVersions.AsNoTracking().SingleAsync(v => v.TenantId == _source.TenantId);
+        Assert.Equal(
+            (_source.TemplateVersionId, _source.TemplateId, "2.1", _source.CreatedOn),
+            (version.TemplateVersionId, version.TemplateId, version.VersionNumber, version.CreatedOn));
     }
 }

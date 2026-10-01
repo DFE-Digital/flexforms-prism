@@ -1,5 +1,6 @@
 using System.Diagnostics.Metrics;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events;
+using GovUK.Dfe.FlexForms.Prism.Data;
 using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Maintenance;
@@ -18,6 +19,20 @@ using Microsoft.Extensions.Options;
 namespace GovUK.Dfe.FlexForms.Prism.Scenario.Tests;
 
 public sealed record FactRow(string FieldId, string OccurrencePath, string? Value);
+
+public sealed record FieldChangeRow(
+    string ParentFieldId,
+    string FieldId,
+    string ChangeType,
+    Guid? PreviousTemplateVersionId,
+    string? PreviousLabel,
+    string? Label,
+    bool LabelChanged,
+    bool TypeChanged,
+    bool RequiredChanged,
+    bool ChoicesChanged,
+    bool LocationChanged,
+    string ExportDecision);
 
 /// <summary>
 /// The real projector, writer, store and control plane over SQL Server, fed by <see cref="FakeSource"/>. Each
@@ -118,13 +133,38 @@ internal sealed class ScenarioHarness
     /// <summary>Delivers a message the way the function would, through the Service Bus wire format.</summary>
     public async Task<ProjectionOutcome> DeliverAsync(ApplicationProjectionRequestedEvent message)
     {
-        var received = ProjectionMessages.Read(ProjectionMessages.Create(message).Body);
+        var received = (ApplicationProjectionRequestedEvent)ProjectionMessages.Read(ProjectionMessages.Create(message).Body);
         await using var db = sql.CreateContext();
-        var service = new ProjectionService(
-            Source, new ProjectionStore(db), new ProjectionWriter(db, TimeProvider.System), new FieldCatalogWriter(db, TimeProvider.System),
-            catalogues, new PrismMetrics(meters), TimeProvider.System, NullLogger<ProjectionService>.Instance);
-        return await service.ProjectAsync(received, CancellationToken.None);
+        return await CreateService(db).ProjectAsync(received, CancellationToken.None);
     }
+
+    /// <summary>Delivers a template event the way the function would, through the Service Bus wire format.</summary>
+    public async Task DeliverAsync(TemplateVersionPublishedEvent message)
+    {
+        var received = (TemplateVersionPublishedEvent)ProjectionMessages.Read(ProjectionMessages.Create(message).Body);
+        await using var db = sql.CreateContext();
+        await CreateService(db).CatalogueTemplateVersionAsync(received, CancellationToken.None);
+    }
+
+    public async Task<List<FieldChangeRow>> FieldChangesAsync(Guid templateVersionId)
+    {
+        await using var db = sql.CreateContext();
+        return await db.Database
+            .SqlQuery<FieldChangeRow>($"""
+                SELECT parent_field_id AS ParentFieldId, field_id AS FieldId, change_type AS ChangeType,
+                       previous_template_version_id AS PreviousTemplateVersionId, previous_label AS PreviousLabel, label AS Label,
+                       label_changed AS LabelChanged, type_changed AS TypeChanged, required_changed AS RequiredChanged,
+                       choices_changed AS ChoicesChanged, location_changed AS LocationChanged, export_decision AS ExportDecision
+                FROM prism.v_template_field_changes
+                WHERE tenant_id = {TenantId} AND template_version_id = {templateVersionId}
+                ORDER BY parent_field_id, field_id
+                """)
+            .ToListAsync();
+    }
+
+    private ProjectionService CreateService(PrismDbContext db) => new(
+        Source, new ProjectionStore(db), new ProjectionWriter(db, TimeProvider.System), new FieldCatalogWriter(db, TimeProvider.System),
+        catalogues, new PrismMetrics(meters), TimeProvider.System, NullLogger<ProjectionService>.Instance);
 
     /// <summary>Runs a backfill or reconciliation to completion and delivers every message it enqueued.</summary>
     public async Task<(OperationView Operation, IReadOnlyList<ApplicationProjectionRequestedEvent> Enqueued)> RunOperationAsync(OperationKind kind)
