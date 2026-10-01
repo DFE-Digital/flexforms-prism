@@ -48,6 +48,30 @@ dotnet test GovUK.Dfe.FlexForms.Prism.slnx
 
 Package versions are managed centrally in `Directory.Packages.props`. Warnings are treated as errors.
 
+## Database
+
+The Prism database lives in schema `prism` and is owned by EF Core migrations in
+`src/GovUK.Dfe.FlexForms.Prism.Data/Migrations`. Consumers read only the views:
+
+- `prism.v_current_answer_facts`: facts of each application's active generation, excluding deleted applications.
+- `prism.v_submission_answer_facts`: facts of each submission's selected generation, excluding deleted applications.
+
+Generations that are still being built, or have been superseded, are never visible through the views.
+
+```bash
+dotnet tool restore
+
+# Add a migration
+dotnet ef migrations add <Name> --project src/GovUK.Dfe.FlexForms.Prism.Data --startup-project src/GovUK.Dfe.FlexForms.Prism.Data
+
+# Apply to a local database
+PRISM_DB_CONNECTION="Server=localhost,1433;Database=prism;User Id=sa;Password=...;TrustServerCertificate=true" \
+  dotnet ef database update --project src/GovUK.Dfe.FlexForms.Prism.Data --startup-project src/GovUK.Dfe.FlexForms.Prism.Data
+```
+
+Deployments apply migrations with a self-contained bundle (`prism-migrations` CI artifact, or
+`Dockerfile.migrations`) through `script/migrate-prism-db.sh`, which reads `PRISM_DB_CONNECTION`.
+
 ## Run the Functions host locally
 
 ```bash

@@ -124,3 +124,19 @@ jobs:
         with:
           name: prism-functions
           path: artifacts/prism-functions.zip
+
+      - name: Build migration bundle
+        run: |
+          dotnet tool restore
+          dotnet ef migrations bundle \
+            --project src/GovUK.Dfe.FlexForms.Prism.Data \
+            --startup-project src/GovUK.Dfe.FlexForms.Prism.Data \
+            --self-contained -r linux-x64 \
+            -o ../artifacts/migrations/efbundle
+          cp script/migrate-prism-db.sh ../artifacts/migrations/
+
+      - name: Upload migration bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-migrations
+          path: artifacts/migrations
