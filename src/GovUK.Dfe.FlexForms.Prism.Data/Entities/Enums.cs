@@ -20,6 +20,12 @@ public enum ApplicationLifecycle
     Deleted
 }
 
+public enum OperationKind
+{
+    Backfill,
+    Reconciliation
+}
+
 public enum BackfillStatus
 {
     Pending,

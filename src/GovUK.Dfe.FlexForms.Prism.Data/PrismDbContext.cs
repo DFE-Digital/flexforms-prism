@@ -28,6 +28,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
         configurationBuilder.Properties<ExportStatus>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<ExportDecision>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<BackfillStatus>().HaveConversion<string>().HaveMaxLength(20);
+        configurationBuilder.Properties<OperationKind>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<InterpretationStatus>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<DateTime>().HaveColumnType("datetime2");
     }
@@ -136,6 +137,8 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.ToTable("backfill_operations");
             e.HasKey(x => x.OperationId);
             e.Property(x => x.RequestedBy).HasMaxLength(256);
+            e.Property(x => x.CancelledBy).HasMaxLength(256);
+            e.Property(x => x.Error).HasMaxLength(2000);
             e.HasIndex(x => new { x.Status, x.CreatedAt });
         });
 

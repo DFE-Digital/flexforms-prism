@@ -2,6 +2,24 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+
+    "ConnectionStrings__Prism": "Server=localhost,1433;Database=prism;User Id=sa;Password=<password>;TrustServerCertificate=True",
+
+    "ServiceBus": "Endpoint=sb://<namespace>.servicebus.windows.net/;SharedAccessKeyName=<name>;SharedAccessKey=<key>",
+    "Prism__ServiceBusTransport": "AmqpWebSockets",
+
+    "ExternalApplicationsApiClient__BaseUrl": "https://localhost:7001/",
+    "ExternalApplicationsApiClient__Authority": "https://login.microsoftonline.com/<tenant-id>",
+    "ExternalApplicationsApiClient__ClientId": "<prism-client-id>",
+    "ExternalApplicationsApiClient__ClientSecret": "<prism-client-secret>",
+    "ExternalApplicationsApiClient__Scope": "api://<flexforms-api-client-id>/.default",
+
+    "Prism__Admin__Authority": "https://login.microsoftonline.com/<tenant-id>/v2.0",
+    "Prism__Admin__Audience": "api://<prism-client-id>",
+    "Prism__Admin__RequiredRole": "Prism.Admin",
+
+    "Prism__Backfill__PageSize": "200",
+    "Prism__Cleanup__RetentionDays": "30"
   }
 }

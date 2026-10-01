@@ -13,6 +13,9 @@ public sealed record StoredProjectionState(
     Guid? TemplateId,
     ProjectionVersions Versions);
 
+/// <summary>Enough of an application's stored state to detect drift from the source.</summary>
+public sealed record StoredSummary(long SourceRevision, ApplicationLifecycle Lifecycle, ProjectionVersions Versions, bool Tombstoned);
+
 /// <summary>What has already been projected for a submission.</summary>
 public sealed record StoredSubmission(Guid SelectedGenerationId, long SourceRevision, ProjectionVersions Versions);
 
@@ -23,6 +26,12 @@ public sealed record StoredSubmission(Guid SelectedGenerationId, long SourceRevi
 public interface IProjectionStore
 {
     Task<StoredProjectionState?> GetStateAsync(Guid tenantId, Guid applicationId, CancellationToken cancellationToken);
+
+    /// <summary>Stored summaries keyed by application id; applications Prism has never seen are absent.</summary>
+    Task<IReadOnlyDictionary<Guid, StoredSummary>> GetSummariesAsync(
+        Guid tenantId,
+        IReadOnlyCollection<Guid> applicationIds,
+        CancellationToken cancellationToken);
 
     Task<bool> IsTombstonedAsync(Guid tenantId, Guid applicationId, CancellationToken cancellationToken);
 

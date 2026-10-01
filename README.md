@@ -110,7 +110,52 @@ PRISM_DB_CONNECTION="Server=localhost,1433;Database=prism;User Id=sa;Password=..
 Deployments apply migrations with a self-contained bundle (`prism-migrations` CI artifact, or
 `Dockerfile.migrations`) through `script/migrate-prism-db.sh`, which reads `PRISM_DB_CONNECTION`.
 
-## Run the Functions host locally
+## Functions
+
+| Function | Trigger | What it does |
+| --- | --- | --- |
+| `ProjectionFunction` | Topic `flexforms-prism`, session subscription `prism-projector` | Projects one application per message |
+| `OperationWorkerFunction` | Every minute | Advances pending and running backfill and reconciliation operations |
+| `ReconciliationFunction` | 02:00 UTC daily | Records a reconciliation operation for every tenant |
+| `GenerationCleanupFunction` | 03:30 UTC daily | Deletes unreferenced superseded generations past retention |
+| `CreateBackfill`, `CreateReconciliation`, `GetBackfill`, `CancelBackfill` | HTTP, `/api/admin/...` | Control plane |
+
+The projection function completes a message on success or skip. It dead-letters permanent failures straight
+away, with the failure reason as the dead-letter reason. Transient failures are abandoned, so Service Bus
+retries them until the subscription's `MaxDeliveryCount`.
+
+### Control plane
+
+Backfill and reconciliation never project anything themselves. They record an operation in
+`prism.backfill_operations`, and the operation worker pages through the internal FlexForms list endpoint,
+enqueuing `Resync` messages on the same topic. Those messages go through the normal projector, with session
+ordering, retries and dead-lettering. Progress is saved after every page, so the worker can stop at its time
+budget and resume on the next tick. A backfill enqueues every application. A reconciliation enqueues only
+applications that are missing, behind the source revision, deleted at source without a tombstone, or projected
+by an older projector or contract version.
+
+Every admin call needs an Entra ID token for the Prism app registration with the `Prism.Admin` app role
+(`Prism:Admin:Authority`, `Prism:Admin:Audience`). Without that configuration all admin calls are rejected.
+Calls are audit-logged with the caller, who is also stored as `requested_by` or `cancelled_by`.
+
+```http
+POST /api/admin/backfill            { "tenantId": "<optional>", "modifiedSince": "<optional>" }
+POST /api/admin/reconciliation      { "tenantId": "<optional>" }
+GET  /api/admin/backfill/{operationId}
+POST /api/admin/backfill/{operationId}/cancel
+```
+
+### Configuration
+
+- `ConnectionStrings:Prism`: the Prism database. Use `Authentication=Active Directory Default` for managed identity.
+- `ServiceBus`: a connection string, or `ServiceBus:fullyQualifiedNamespace` for managed identity. Add
+  `ServiceBus:clientId` for a user-assigned identity. The trigger and the control plane's sender share it,
+  and the sender needs Send on the topic.
+- `ExternalApplicationsApiClient`: base URL and client credentials for the internal FlexForms endpoints.
+- `Prism:ServiceBusTransport` (`AmqpWebSockets` by default), `Prism:Backfill:PageSize`,
+  `Prism:Backfill:TimeBudget`, `Prism:Cleanup:RetentionDays`, `Prism:Cleanup:MaxGenerationsPerRun`.
+
+### Run locally
 
 ```bash
 cd src/GovUK.Dfe.FlexForms.Prism.Functions

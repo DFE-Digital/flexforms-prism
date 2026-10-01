@@ -220,6 +220,15 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("operation_id");
 
+                    b.Property<int>("ApplicationsScanned")
+                        .HasColumnType("int")
+                        .HasColumnName("applications_scanned");
+
+                    b.Property<string>("CancelledBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("cancelled_by");
+
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("completed_at");
@@ -228,9 +237,20 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
+                    b.Property<Guid?>("CurrentTenantId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("current_tenant_id");
+
                     b.Property<string>("Error")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
                         .HasColumnName("error");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("kind");
 
                     b.Property<int>("MessagesEnqueued")
                         .HasColumnType("int")
@@ -239,6 +259,10 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     b.Property<DateTime?>("ModifiedSince")
                         .HasColumnType("datetime2")
                         .HasColumnName("modified_since");
+
+                    b.Property<int>("NextPage")
+                        .HasColumnType("int")
+                        .HasColumnName("next_page");
 
                     b.Property<int>("PagesProcessed")
                         .HasColumnType("int")
