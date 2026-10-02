@@ -1,5 +1,6 @@
 using System.Text;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
+using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Tests;
 using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
@@ -178,6 +179,99 @@ public sealed class ExportPolicyApiTests(SqlServerFixture sql) : IAsyncLifetime
             """)).Value);
 
         Assert.Contains(result.Result.Warnings, w => w.Contains("members.memberName", StringComparison.Ordinal));
+    }
+
+    private async Task<JsonResult> PutDefaultAsync(string json, bool forTemplate = false)
+    {
+        await using var db = sql.CreateContext();
+        var api = Api(db);
+        return Assert.IsType<JsonResult>(forTemplate
+            ? await api.ChangeTemplateDefault(Request(json), tenant, template, default)
+            : await api.ChangeTenantDefault(Request(json), tenant, default));
+    }
+
+    private async Task<ExportDefaultView> GetDefaultAsync(bool forTemplate = false)
+    {
+        await using var db = sql.CreateContext();
+        var api = Api(db);
+        var result = Assert.IsType<JsonResult>(forTemplate
+            ? await api.GetTemplateDefault(Request(), tenant, template, default)
+            : await api.GetTenantDefault(Request(), tenant, default));
+        return Assert.IsType<ExportDefaultView>(result.Value);
+    }
+
+    [Fact]
+    public async Task Tenant_export_all_default_marks_undecided_fields_as_exported_and_starts_a_backfill()
+    {
+        await PutAsync("""{ "decisions": [ { "fieldId": "members", "decision": "Denied" } ] }""");
+
+        var change = Assert.IsType<ExportDefaultChangeResponse>((await PutDefaultAsync("""{ "mode": "ExportAll", "reason": "DPO approved" }""")).Value);
+        var repeated = Assert.IsType<ExportDefaultChangeResponse>((await PutDefaultAsync("""{ "mode": "ExportAll", "reason": "DPO approved" }""")).Value);
+
+        Assert.Equal((ApplyStatus.Applied, 2), (change.Result.Status, change.Result.PolicyVersion));
+        Assert.Equal((OperationKind.Backfill, tenant), (change.Backfill!.Kind, change.Backfill.TenantId));
+        Assert.Equal((ApplyStatus.Unchanged, null), (repeated.Result.Status, repeated.Backfill));
+        var tenantDefault = await GetDefaultAsync();
+        Assert.Equal((ExportDefaultChoice.ExportAll, DefaultExportMode.ExportAll, ExportDefaultSource.Tenant, "DPO approved", Admin),
+            (tenantDefault.Mode, tenantDefault.EffectiveMode, tenantDefault.Source, tenantDefault.Reason, tenantDefault.DecidedBy));
+
+        var policy = await GetAsync();
+        Assert.Equal((2, DefaultExportMode.ExportAll, ExportDefaultSource.Tenant), (policy.PolicyVersion, policy.DefaultMode, policy.DefaultSource));
+        Assert.Equal(ExportStatus.AllowedByDefault, policy.Fields.Single(f => f.FieldId == "name").ExportStatus);
+        Assert.Equal(ExportStatus.Denied, policy.Fields.Single(f => f.FieldId == "members").ExportStatus);
+    }
+
+    [Fact]
+    public async Task Template_default_overrides_the_tenant_until_set_back_to_inherit()
+    {
+        await PutDefaultAsync("""{ "mode": "ExportAll" }""");
+        await PutDefaultAsync("""{ "mode": "ApproveFirst" }""", forTemplate: true);
+
+        var overridden = await GetDefaultAsync(forTemplate: true);
+        Assert.Equal((ExportDefaultChoice.ApproveFirst, DefaultExportMode.ApproveFirst, ExportDefaultSource.Template, 2),
+            (overridden.Mode, overridden.EffectiveMode, overridden.Source, overridden.PolicyVersion));
+        Assert.Equal(ExportStatus.Unclassified, (await GetAsync()).Fields.Single(f => f.FieldId == "name").ExportStatus);
+
+        var inherit = Assert.IsType<ExportDefaultChangeResponse>((await PutDefaultAsync("""{ "mode": "Inherit" }""", forTemplate: true)).Value);
+
+        Assert.Equal(3, inherit.Result.PolicyVersion);
+        var inherited = await GetDefaultAsync(forTemplate: true);
+        Assert.Equal((ExportDefaultChoice.Inherit, DefaultExportMode.ExportAll, ExportDefaultSource.Tenant),
+            (inherited.Mode, inherited.EffectiveMode, inherited.Source));
+        Assert.Equal(3, (await GetAsync()).PolicyVersion);
+    }
+
+    [Fact]
+    public async Task Tenant_default_change_raises_every_template_above_its_previous_version()
+    {
+        var other = Guid.NewGuid();
+        await using (var db = sql.CreateContext())
+        {
+            db.FieldExportPolicies.Add(new FieldExportPolicy
+            {
+                TenantId = tenant, TemplateId = other, FieldId = "x", Decision = ExportDecision.Allowed, PolicyVersion = 9,
+                DecidedBy = Admin, DecidedAt = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var change = Assert.IsType<ExportDefaultChangeResponse>((await PutDefaultAsync("""{ "mode": "ExportAll" }""")).Value);
+
+        Assert.Equal(10, change.Result.PolicyVersion);
+        Assert.Equal(10, (await GetAsync()).PolicyVersion);
+    }
+
+    [Theory]
+    [InlineData("""{ }""")]
+    [InlineData("""{ "mode": "Sometimes" }""")]
+    [InlineData("""{ "mode": 2 }""")]
+    public async Task Missing_or_unknown_default_mode_is_rejected(string json)
+    {
+        var result = await PutDefaultAsync(json);
+
+        Assert.Equal(400, result.StatusCode);
+        await using var db = sql.CreateContext();
+        Assert.False(await db.ExportDefaults.AnyAsync(d => d.TenantId == tenant));
     }
 
     [Fact]

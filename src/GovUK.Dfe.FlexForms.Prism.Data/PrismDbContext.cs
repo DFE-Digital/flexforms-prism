@@ -17,6 +17,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
     public DbSet<FieldCatalogEntry> FieldCatalog => Set<FieldCatalogEntry>();
     public DbSet<TemplateVersionEntry> TemplateVersions => Set<TemplateVersionEntry>();
     public DbSet<FieldExportPolicy> FieldExportPolicies => Set<FieldExportPolicy>();
+    public DbSet<ExportDefault> ExportDefaults => Set<ExportDefault>();
     public DbSet<DeletionTombstone> DeletionTombstones => Set<DeletionTombstone>();
     public DbSet<BackfillOperation> BackfillOperations => Set<BackfillOperation>();
     public DbSet<SchemaInfo> SchemaInfoEntries => Set<SchemaInfo>();
@@ -28,6 +29,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
         configurationBuilder.Properties<ApplicationLifecycle>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<ExportStatus>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<ExportDecision>().HaveConversion<string>().HaveMaxLength(20);
+        configurationBuilder.Properties<DefaultExportMode>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<BackfillStatus>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<OperationKind>().HaveConversion<string>().HaveMaxLength(20);
         configurationBuilder.Properties<InterpretationStatus>().HaveConversion<string>().HaveMaxLength(20);
@@ -131,6 +133,14 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.HasKey(x => new { x.TenantId, x.TemplateId, x.ParentFieldId, x.FieldId });
             e.Property(x => x.ParentFieldId).HasMaxLength(200);
             e.Property(x => x.FieldId).HasMaxLength(200);
+            e.Property(x => x.Reason).HasMaxLength(1000);
+            e.Property(x => x.DecidedBy).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<ExportDefault>(e =>
+        {
+            e.ToTable("export_defaults");
+            e.HasKey(x => new { x.TenantId, x.TemplateId });
             e.Property(x => x.Reason).HasMaxLength(1000);
             e.Property(x => x.DecidedBy).HasMaxLength(256);
         });

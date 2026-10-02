@@ -1,5 +1,6 @@
 using GovUK.Dfe.FlexForms.Prism.Data;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
+using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,13 @@ public sealed record FieldClassification(
     DateTime? DecidedAt,
     int? PolicyVersion);
 
-public sealed record ExportPolicyView(Guid TenantId, Guid TemplateId, int PolicyVersion, IReadOnlyList<FieldClassification> Fields);
+public sealed record ExportPolicyView(
+    Guid TenantId,
+    Guid TemplateId,
+    int PolicyVersion,
+    DefaultExportMode DefaultMode,
+    ExportDefaultSource DefaultSource,
+    IReadOnlyList<FieldClassification> Fields);
 
 public enum ApplyStatus
 {
@@ -36,13 +43,42 @@ public enum ApplyStatus
 
 public sealed record ApplyResult(ApplyStatus Status, int PolicyVersion, int Changed, IReadOnlyList<string> Problems, IReadOnlyList<string> Warnings);
 
+/// <summary>A default as set by an admin: <see cref="Inherit"/> clears it so the next level applies.</summary>
+public enum ExportDefaultChoice
+{
+    Inherit,
+    ApproveFirst,
+    ExportAll
+}
+
+/// <summary><see cref="Mode"/> is nullable so a missing value is rejected rather than read as Inherit.</summary>
+public sealed record ExportDefaultRequest(ExportDefaultChoice? Mode, string? Reason);
+
 /// <summary>
-/// Reads and changes a template's export policy. Every change raises the policy version, which makes the
-/// projector re-project the affected applications at their current revision.
+/// A tenant or template default. <see cref="Mode"/> is what was set at this level; <see cref="EffectiveMode"/> and
+/// <see cref="Source"/> are what applies once inheritance is resolved.
+/// </summary>
+public sealed record ExportDefaultView(
+    Guid TenantId,
+    Guid? TemplateId,
+    ExportDefaultChoice Mode,
+    DefaultExportMode EffectiveMode,
+    ExportDefaultSource Source,
+    string? Reason,
+    string? DecidedBy,
+    DateTime? DecidedAt,
+    int? PolicyVersion);
+
+public sealed record DefaultChangeResult(ApplyStatus Status, int PolicyVersion, ExportDefaultView? Default, IReadOnlyList<string> Problems);
+
+/// <summary>
+/// Reads and changes a template's export policy: explicit field decisions plus the default for undecided fields.
+/// Every change raises the policy version of each template it affects, which makes the projector re-project the
+/// affected applications at their current revision.
 /// </summary>
 public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
 {
-    /// <summary>Every catalogued field of the template with its decision, or null if nothing is known about the template.</summary>
+    /// <summary>Every catalogued field of the template with its status, or null if nothing is known about the template.</summary>
     public async Task<ExportPolicyView?> GetAsync(Guid tenantId, Guid templateId, CancellationToken cancellationToken)
     {
         var catalogued = await LatestCatalogueAsync(tenantId, templateId, cancellationToken);
@@ -55,14 +91,17 @@ public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
             return null;
         }
 
+        var resolved = await ExportPolicyReader.GetDefaultAsync(db, tenantId, templateId, cancellationToken);
+        var policy = new ExportPolicy(0, decisions.Values.Select(d => new ExportRule(d.ParentFieldId, d.FieldId, d.Decision)), resolved.Mode);
         var fields = catalogued
-            .Select(c => Classify(c.ParentFieldId, c.FieldId, c, decisions.GetValueOrDefault((c.ParentFieldId, c.FieldId))))
+            .Select(c => Classify(c.ParentFieldId, c.FieldId, c, decisions.GetValueOrDefault((c.ParentFieldId, c.FieldId)), policy))
             .Concat(decisions.Values
                 .Where(d => !catalogued.Any(c => c.ParentFieldId == d.ParentFieldId && c.FieldId == d.FieldId))
-                .Select(d => Classify(d.ParentFieldId, d.FieldId, null, d)))
+                .Select(d => Classify(d.ParentFieldId, d.FieldId, null, d, policy)))
             .ToList();
 
-        return new ExportPolicyView(tenantId, templateId, decisions.Count == 0 ? 0 : decisions.Values.Max(d => d.PolicyVersion), fields);
+        var version = Math.Max(resolved.Version, decisions.Count == 0 ? 0 : decisions.Values.Max(d => d.PolicyVersion));
+        return new ExportPolicyView(tenantId, templateId, version, resolved.Mode, resolved.Source, fields);
     }
 
     public async Task<ApplyResult> ApplyAsync(
@@ -91,15 +130,8 @@ public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
         }
 
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
-
-        // Range-locks the template's rows so concurrent changes get distinct, increasing versions.
-        var currentVersion = await db.Database
-            .SqlQuery<int?>($"""
-                SELECT MAX(policy_version) AS Value
-                FROM prism.field_export_policy WITH (UPDLOCK, HOLDLOCK)
-                WHERE tenant_id = {tenantId} AND template_id = {templateId}
-                """)
-            .SingleAsync(cancellationToken) ?? 0;
+        var currentVersion = await LockVersionAsync(tenantId, templateId, cancellationToken);
+        var defaultMode = (await ExportPolicyReader.GetDefaultAsync(db, tenantId, templateId, cancellationToken)).Mode;
 
         var existing = await db.FieldExportPolicies
             .Where(p => p.TenantId == tenantId && p.TemplateId == templateId)
@@ -135,12 +167,134 @@ public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
 
         if (changed == 0)
         {
-            return new ApplyResult(ApplyStatus.Unchanged, currentVersion, 0, [], Warnings(existing.Values));
+            return new ApplyResult(ApplyStatus.Unchanged, currentVersion, 0, [], Warnings(existing.Values, defaultMode));
         }
 
         await db.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
-        return new ApplyResult(ApplyStatus.Applied, nextVersion, changed, [], Warnings(existing.Values));
+        return new ApplyResult(ApplyStatus.Applied, nextVersion, changed, [], Warnings(existing.Values, defaultMode));
+    }
+
+    /// <summary>The tenant-wide default when <paramref name="templateId"/> is null, otherwise the template's.</summary>
+    public async Task<ExportDefaultView> GetDefaultAsync(Guid tenantId, Guid? templateId, CancellationToken cancellationToken)
+    {
+        var rows = await db.ExportDefaults.AsNoTracking()
+            .Where(d => d.TenantId == tenantId && (d.TemplateId == Guid.Empty || d.TemplateId == templateId))
+            .ToListAsync(cancellationToken);
+        return View(tenantId, templateId, rows);
+    }
+
+    /// <summary>
+    /// Sets the tenant-wide default when <paramref name="templateId"/> is null, otherwise the template's. A tenant
+    /// change takes a version above every template's, so all of them re-project.
+    /// </summary>
+    public async Task<DefaultChangeResult> SetDefaultAsync(
+        Guid tenantId,
+        Guid? templateId,
+        ExportDefaultRequest request,
+        string decidedBy,
+        CancellationToken cancellationToken)
+    {
+        if (request.Mode is not { } choice || !Enum.IsDefined(choice))
+        {
+            return new DefaultChangeResult(ApplyStatus.Invalid, 0, null, ["Mode must be Inherit, ApproveFirst or ExportAll."]);
+        }
+
+        if (templateId == Guid.Empty)
+        {
+            return new DefaultChangeResult(ApplyStatus.Invalid, 0, null, ["The empty template id is reserved for the tenant default."]);
+        }
+
+        var rowTemplateId = templateId ?? Guid.Empty;
+        var mode = choice switch
+        {
+            ExportDefaultChoice.ApproveFirst => DefaultExportMode.ApproveFirst,
+            ExportDefaultChoice.ExportAll => DefaultExportMode.ExportAll,
+            _ => (DefaultExportMode?)null,
+        };
+
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        var currentVersion = await LockVersionAsync(tenantId, templateId, cancellationToken);
+
+        var rows = await db.ExportDefaults
+            .Where(d => d.TenantId == tenantId && (d.TemplateId == Guid.Empty || d.TemplateId == rowTemplateId))
+            .ToListAsync(cancellationToken);
+        var row = rows.SingleOrDefault(r => r.TemplateId == rowTemplateId);
+
+        if (row is null ? mode is null : row.Mode == mode && row.Reason == request.Reason)
+        {
+            return new DefaultChangeResult(ApplyStatus.Unchanged, currentVersion, View(tenantId, templateId, rows), []);
+        }
+
+        if (row is null)
+        {
+            row = new ExportDefault { TenantId = tenantId, TemplateId = rowTemplateId };
+            db.ExportDefaults.Add(row);
+            rows.Add(row);
+        }
+
+        var nextVersion = currentVersion + 1;
+        row.Mode = mode;
+        row.Reason = request.Reason;
+        row.PolicyVersion = nextVersion;
+        row.DecidedBy = decidedBy;
+        row.DecidedAt = clock.GetUtcNow().UtcDateTime;
+
+        await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return new DefaultChangeResult(ApplyStatus.Applied, nextVersion, View(tenantId, templateId, rows), []);
+    }
+
+    /// <summary>
+    /// The highest policy version in scope: one template's decisions and the defaults that apply to it, or with a
+    /// null <paramref name="templateId"/> every policy row of the tenant. The rows are range-locked so concurrent
+    /// changes get distinct, increasing versions.
+    /// </summary>
+    private async Task<int> LockVersionAsync(Guid tenantId, Guid? templateId, CancellationToken cancellationToken)
+    {
+        var query = templateId is { } id
+            ? db.Database.SqlQuery<int?>($"""
+                SELECT MAX(v) AS Value FROM (
+                    SELECT policy_version AS v FROM prism.field_export_policy WITH (UPDLOCK, HOLDLOCK)
+                    WHERE tenant_id = {tenantId} AND template_id = {id}
+                    UNION ALL
+                    SELECT policy_version FROM prism.export_defaults WITH (UPDLOCK, HOLDLOCK)
+                    WHERE tenant_id = {tenantId} AND template_id IN ({id}, {Guid.Empty})
+                ) AS versions
+                """)
+            : db.Database.SqlQuery<int?>($"""
+                SELECT MAX(v) AS Value FROM (
+                    SELECT policy_version AS v FROM prism.field_export_policy WITH (UPDLOCK, HOLDLOCK)
+                    WHERE tenant_id = {tenantId}
+                    UNION ALL
+                    SELECT policy_version FROM prism.export_defaults WITH (UPDLOCK, HOLDLOCK)
+                    WHERE tenant_id = {tenantId}
+                ) AS versions
+                """);
+        return await query.SingleAsync(cancellationToken) ?? 0;
+    }
+
+    private static ExportDefaultView View(Guid tenantId, Guid? templateId, IReadOnlyCollection<ExportDefault> rows)
+    {
+        var tenantRow = rows.SingleOrDefault(r => r.TemplateId == Guid.Empty);
+        var templateRow = templateId is null ? null : rows.SingleOrDefault(r => r.TemplateId == templateId);
+        var own = templateId is null ? tenantRow : templateRow;
+        var resolved = ExportPolicyReader.Resolve(tenantRow, templateRow);
+        return new ExportDefaultView(
+            tenantId,
+            templateId,
+            own?.Mode switch
+            {
+                DefaultExportMode.ApproveFirst => ExportDefaultChoice.ApproveFirst,
+                DefaultExportMode.ExportAll => ExportDefaultChoice.ExportAll,
+                _ => ExportDefaultChoice.Inherit,
+            },
+            resolved.Mode,
+            resolved.Source,
+            own?.Reason,
+            own?.DecidedBy,
+            own?.DecidedAt,
+            own?.PolicyVersion);
     }
 
     private static List<string> Validate(IReadOnlyList<ExportDecisionRequest> requested)
@@ -168,16 +322,14 @@ public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
         return problems;
     }
 
-    /// <summary>A nested field is only exported when its collection is allowed too.</summary>
-    private static List<string> Warnings(IEnumerable<FieldExportPolicy> policy)
+    /// <summary>A nested field is only exported when its collection is exported too.</summary>
+    private static List<string> Warnings(IEnumerable<FieldExportPolicy> decisions, DefaultExportMode defaultMode)
     {
-        var rows = policy.ToList();
-        var allowedTopLevel = rows
-            .Where(r => r.ParentFieldId.Length == 0 && r.Decision == ExportDecision.Allowed)
-            .Select(r => r.FieldId)
-            .ToHashSet();
+        var rows = decisions.ToList();
+        var policy = new ExportPolicy(0, rows.Select(r => new ExportRule(r.ParentFieldId, r.FieldId, r.Decision)), defaultMode);
         return rows
-            .Where(r => r.ParentFieldId.Length > 0 && r.Decision == ExportDecision.Allowed && !allowedTopLevel.Contains(r.ParentFieldId))
+            .Where(r => r.ParentFieldId.Length > 0 && r.Decision == ExportDecision.Allowed
+                && policy.StatusOf(string.Empty, r.ParentFieldId) is not (ExportStatus.Allowed or ExportStatus.AllowedByDefault))
             .Select(r => $"{Key(r.ParentFieldId, r.FieldId)} is allowed but its collection {r.ParentFieldId} is not, so it will not be exported.")
             .ToList();
     }
@@ -196,7 +348,8 @@ public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
             .ToList();
     }
 
-    private static FieldClassification Classify(string parentFieldId, string fieldId, FieldCatalogEntry? catalogued, FieldExportPolicy? decision) => new(
+    private static FieldClassification Classify(
+        string parentFieldId, string fieldId, FieldCatalogEntry? catalogued, FieldExportPolicy? decision, ExportPolicy policy) => new(
         parentFieldId,
         fieldId,
         catalogued?.Label,
@@ -205,12 +358,7 @@ public sealed class ExportPolicyService(PrismDbContext db, TimeProvider clock)
         catalogued?.TaskName,
         catalogued?.PageTitle,
         catalogued?.TemplateVersionNumber,
-        decision?.Decision switch
-        {
-            ExportDecision.Allowed => ExportStatus.Allowed,
-            ExportDecision.Denied => ExportStatus.Denied,
-            _ => ExportStatus.Unclassified,
-        },
+        policy.StatusOf(parentFieldId, fieldId),
         decision?.Reason,
         decision?.DecidedBy,
         decision?.DecidedAt,

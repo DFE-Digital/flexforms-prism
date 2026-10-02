@@ -147,6 +147,7 @@ Deployments apply migrations with a self-contained bundle (`prism-migrations` CI
 | `GenerationCleanupFunction` | 03:30 UTC daily | Deletes unreferenced superseded generations past retention |
 | `CreateBackfill`, `CreateReconciliation`, `GetBackfill`, `CancelBackfill` | HTTP, `/api/control/...` | Control plane |
 | `GetExportPolicy`, `ChangeExportPolicy` | HTTP, `/api/control/tenants/{tenantId}/templates/{templateId}/export-policy` | Field classification; a change starts a tenant backfill |
+| `Get`/`ChangeTenantExportDefault`, `Get`/`ChangeTemplateExportDefault` | HTTP, `/api/control/tenants/{tenantId}[/templates/{templateId}]/export-default` | Whether undecided fields are exported (`ExportAll`) or withheld (`ApproveFirst`); a change starts a tenant backfill |
 
 The projection function completes a message on success or skip. It dead-letters permanent failures straight
 away, with the failure reason as the dead-letter reason. Transient failures are abandoned, so Service Bus

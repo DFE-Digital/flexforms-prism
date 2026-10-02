@@ -61,4 +61,31 @@ public class ExportPolicyTests
         Assert.Equal(ExportStatus.Unclassified, policy.StatusOf("", "startDate"));
         Assert.Equal(ExportStatus.Unclassified, policy.StatusOf("members", "name"));
     }
+
+    [Fact]
+    public void Export_all_exports_every_field_that_is_not_denied()
+    {
+        var policy = new ExportPolicy(1, [new ExportRule("", "phone", ExportDecision.Denied)], DefaultExportMode.ExportAll);
+
+        var result = TestSupport.Flatten(Body, policy: policy);
+
+        Assert.Equal(["joined", "memberName", "name"], result.Facts.Select(f => f.FieldId).Order());
+        Assert.Equal(1, result.WithheldAnswerCount);
+        Assert.Equal(ExportStatus.AllowedByDefault, policy.StatusOf("", "name"));
+        Assert.Equal(ExportStatus.Denied, policy.StatusOf("", "phone"));
+    }
+
+    [Fact]
+    public void Export_all_still_withholds_the_fields_of_a_denied_collection()
+    {
+        var policy = new ExportPolicy(1,
+        [
+            new ExportRule("", "members", ExportDecision.Denied),
+            new ExportRule("members", "memberName", ExportDecision.Allowed),
+        ], DefaultExportMode.ExportAll);
+
+        var result = TestSupport.Flatten(Body, policy: policy);
+
+        Assert.Equal(["name", "phone"], result.Facts.Select(f => f.FieldId).Order());
+    }
 }

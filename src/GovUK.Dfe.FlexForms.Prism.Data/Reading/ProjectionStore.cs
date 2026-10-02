@@ -87,16 +87,6 @@ public sealed class ProjectionStore(PrismDbContext db) : IProjectionStore
                 new ProjectionVersions(snapshot.ProjectorVersion, snapshot.ContractVersion, snapshot.ExportPolicyVersion));
     }
 
-    public async Task<ExportPolicy> GetExportPolicyAsync(Guid tenantId, Guid templateId, CancellationToken cancellationToken)
-    {
-        var decisions = await db.FieldExportPolicies
-            .AsNoTracking()
-            .Where(p => p.TenantId == tenantId && p.TemplateId == templateId)
-            .Select(p => new { p.ParentFieldId, p.FieldId, p.Decision, p.PolicyVersion })
-            .ToListAsync(cancellationToken);
-
-        return new ExportPolicy(
-            decisions.Count == 0 ? 0 : decisions.Max(d => d.PolicyVersion),
-            decisions.Select(d => new ExportRule(d.ParentFieldId, d.FieldId, d.Decision)));
-    }
+    public Task<ExportPolicy> GetExportPolicyAsync(Guid tenantId, Guid templateId, CancellationToken cancellationToken)
+        => ExportPolicyReader.GetPolicyAsync(db, tenantId, templateId, cancellationToken);
 }

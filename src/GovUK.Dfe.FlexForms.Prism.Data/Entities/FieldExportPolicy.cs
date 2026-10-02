@@ -4,7 +4,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Entities;
 
 /// <summary>
 /// An explicit export decision for a field, scoped to the template so it carries across template versions.
-/// Fields without a decision are denied.
+/// Fields without a decision follow the template's <see cref="ExportDefault"/>.
 /// </summary>
 public class FieldExportPolicy
 {

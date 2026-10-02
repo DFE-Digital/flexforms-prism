@@ -98,6 +98,45 @@ public sealed class ProjectionStoreTests(SqlServerFixture sql)
         Assert.False(policy.IsExported(new CatalogField { FieldId = "secret" }));
     }
 
+    [Fact]
+    public async Task Export_default_comes_from_the_template_then_the_tenant_then_approve_first()
+    {
+        var overridden = Guid.NewGuid();
+        var inheriting = Guid.NewGuid();
+        var explicitInherit = Guid.NewGuid();
+        await using (var db = sql.CreateContext())
+        {
+            db.ExportDefaults.AddRange(
+                Default(Guid.Empty, DefaultExportMode.ExportAll, 3),
+                Default(overridden, DefaultExportMode.ApproveFirst, 5),
+                Default(explicitInherit, null, 4));
+            db.FieldExportPolicies.Add(Decision(inheriting, "secret", ExportDecision.Denied, 2));
+            await db.SaveChangesAsync();
+        }
+
+        var templateWins = await WithStore(s => s.GetExportPolicyAsync(_tenant, overridden, default));
+        var tenantApplies = await WithStore(s => s.GetExportPolicyAsync(_tenant, inheriting, default));
+        var nullInherits = await WithStore(s => s.GetExportPolicyAsync(_tenant, explicitInherit, default));
+        var builtIn = await WithStore(s => s.GetExportPolicyAsync(Guid.NewGuid(), inheriting, default));
+
+        Assert.Equal((DefaultExportMode.ApproveFirst, 5), (templateWins.DefaultMode, templateWins.Version));
+        Assert.Equal((DefaultExportMode.ExportAll, 3), (tenantApplies.DefaultMode, tenantApplies.Version));
+        Assert.True(tenantApplies.IsExported(new CatalogField { FieldId = "name" }));
+        Assert.False(tenantApplies.IsExported(new CatalogField { FieldId = "secret" }));
+        Assert.Equal((DefaultExportMode.ExportAll, 4), (nullInherits.DefaultMode, nullInherits.Version));
+        Assert.Equal((DefaultExportMode.ApproveFirst, 0), (builtIn.DefaultMode, builtIn.Version));
+    }
+
+    private ExportDefault Default(Guid templateId, DefaultExportMode? mode, int version) => new()
+    {
+        TenantId = _tenant,
+        TemplateId = templateId,
+        Mode = mode,
+        PolicyVersion = version,
+        DecidedBy = "test",
+        DecidedAt = DateTime.UtcNow,
+    };
+
     private FieldExportPolicy Decision(Guid templateId, string fieldId, ExportDecision decision, int version) => new()
     {
         TenantId = _tenant,

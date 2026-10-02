@@ -124,10 +124,19 @@ internal sealed class ScenarioHarness
         return await new ExportPolicyService(db, TimeProvider.System).ApplyAsync(TenantId, Source.TemplateId, decisions, "scenario", default);
     }
 
+    /// <summary>Sets the tenant default, or the template's with <paramref name="forTemplate"/>, the way the admin endpoint does.</summary>
+    public async Task<DefaultChangeResult> SetDefaultAsync(ExportDefaultChoice mode, bool forTemplate = false)
+    {
+        await using var db = sql.CreateContext();
+        return await new ExportPolicyService(db, TimeProvider.System)
+            .SetDefaultAsync(TenantId, forTemplate ? Source.TemplateId : null, new ExportDefaultRequest(mode, null), "scenario", default);
+    }
+
     public async Task ClearPolicyAsync()
     {
         await using var db = sql.CreateContext();
         await db.FieldExportPolicies.Where(p => p.TenantId == TenantId).ExecuteDeleteAsync();
+        await db.ExportDefaults.Where(p => p.TenantId == TenantId).ExecuteDeleteAsync();
     }
 
     /// <summary>Delivers a message the way the function would, through the Service Bus wire format.</summary>

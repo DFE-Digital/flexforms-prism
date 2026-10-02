@@ -164,20 +164,23 @@ as one `Removed` and one `Added` row.
 | `change_type` | `Added`, `Removed` or `Changed`. |
 | `label_changed`, `type_changed`, `required_changed`, `choices_changed`, `location_changed` | For `Changed` rows, what changed. `type_changed` covers data type, control type and collection; `location_changed` covers task, page and flow. Labels and choices are compared case-sensitively. |
 | `previous_label`, `label`, `previous_data_type`, `data_type`, `previous_control_type`, `control_type`, `previous_is_required`, `is_required`, `previous_choices_json`, `choices_json`, `previous_task_name`, `task_name`, `previous_page_title`, `page_title` | Before and after. |
-| `export_decision` | The field's current decision for the template: `Allowed`, `Denied` or `Unclassified`. |
+| `export_decision` | The field's current decision for the template: `Allowed`, `Denied`, or for an undecided field `AllowedByDefault` (export default `ExportAll`) or `Unclassified`. |
 | `contract_version` | The catalogue contract version compared. Only the current one is shown. |
 
-A new field is always `Unclassified` until someone decides, so it is never exported by accident. A relabelled field
-keeps its decision, because decisions are per field ID; review `label_changed` rows in case the meaning changed.
+Under the built-in `ApproveFirst` default a new field is `Unclassified` until someone decides, so it is never
+exported by accident. A tenant or template set to `ExportAll` exports it straight away as `AllowedByDefault`. A
+relabelled field keeps its decision, because decisions are per field ID; review `label_changed` rows in case the
+meaning changed.
 
 ### Guarantees
 
 - **Atomic generations.** A generation's facts become visible in one transaction. Readers never see a partly written
   generation, and never see facts from two generations of the same application at the same time.
-- **Fails closed.** Only fields with an explicit Allowed decision appear (see [export-policy.md](export-policy.md)).
+- **Fails closed by default.** Only `Allowed` fields appear, plus undecided fields where the tenant or template
+  opted into `ExportAll`; `Denied` fields never appear (see [export-policy.md](export-policy.md)).
   `field_catalog` lists every field, including unclassified and denied ones, without values. New template versions
-  are catalogued when published, so their new fields show up there (and in `v_template_field_changes`) as
-  `Unclassified` before any answers exist.
+  are catalogued when published, so their new fields show up there (and in `v_template_field_changes`) before any
+  answers exist.
 - **Eventual consistency.** The views follow FlexForms within seconds normally. Reconciliation repairs any drift
   every night.
 

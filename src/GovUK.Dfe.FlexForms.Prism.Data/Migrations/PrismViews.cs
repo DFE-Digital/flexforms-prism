@@ -107,8 +107,54 @@ internal static class PrismViews
     /// created before it. Every field of a template's first catalogued version is Added. Fields are matched by
     /// (parent_field_id, field_id); labels and choices are compared case-sensitively.
     /// </summary>
-    public const string CreateTemplateFieldChanges = """
+    public const string CreateTemplateFieldChanges = $"""
         CREATE VIEW prism.v_template_field_changes AS
+        {TemplateFieldChangesDiffs}
+        SELECT
+            d.*,
+            COALESCE(fep.decision, 'Unclassified') AS export_decision
+        FROM diffs d
+        {TemplateFieldChangesDecisionJoin}
+        {TemplateFieldChangesFilter}
+        """;
+
+    /// <summary>
+    /// <see cref="CreateTemplateFieldChanges"/> with export_decision following the export default for undecided
+    /// fields: AllowedByDefault when the template's (or else the tenant's) default is ExportAll.
+    /// </summary>
+    public const string CreateTemplateFieldChangesWithDefaults = $"""
+        CREATE VIEW prism.v_template_field_changes AS
+        {TemplateFieldChangesDiffs}
+        SELECT
+            d.*,
+            COALESCE(
+                fep.decision,
+                CASE WHEN COALESCE(tpl.mode, ten.mode) = 'ExportAll' THEN 'AllowedByDefault' ELSE 'Unclassified' END) AS export_decision
+        FROM diffs d
+        {TemplateFieldChangesDecisionJoin}
+        LEFT JOIN prism.export_defaults tpl
+            ON tpl.tenant_id = d.tenant_id
+           AND tpl.template_id = d.template_id
+        LEFT JOIN prism.export_defaults ten
+            ON ten.tenant_id = d.tenant_id
+           AND ten.template_id = '00000000-0000-0000-0000-000000000000'
+        {TemplateFieldChangesFilter}
+        """;
+
+    private const string TemplateFieldChangesDecisionJoin = """
+        LEFT JOIN prism.field_export_policy fep
+            ON fep.tenant_id = d.tenant_id
+           AND fep.template_id = d.template_id
+           AND fep.parent_field_id = d.parent_field_id
+           AND fep.field_id = d.field_id
+        """;
+
+    private const string TemplateFieldChangesFilter = """
+        WHERE d.change_type <> 'Changed'
+           OR d.label_changed = 1 OR d.type_changed = 1 OR d.required_changed = 1 OR d.choices_changed = 1 OR d.location_changed = 1
+        """;
+
+    private const string TemplateFieldChangesDiffs = """
         WITH versions AS (
             SELECT
                 tv.tenant_id,
@@ -188,17 +234,6 @@ internal static class PrismViews
                 j.p_choices_json AS choices_json, j.p_task_id AS task_id, j.p_task_name AS task_name, j.p_page_id AS page_id,
                 j.p_page_title AS page_title, j.p_flow_id AS flow_id, j.p_contract_version AS contract_version) prev
         )
-        SELECT
-            d.*,
-            COALESCE(fep.decision, 'Unclassified') AS export_decision
-        FROM diffs d
-        LEFT JOIN prism.field_export_policy fep
-            ON fep.tenant_id = d.tenant_id
-           AND fep.template_id = d.template_id
-           AND fep.parent_field_id = d.parent_field_id
-           AND fep.field_id = d.field_id
-        WHERE d.change_type <> 'Changed'
-           OR d.label_changed = 1 OR d.type_changed = 1 OR d.required_changed = 1 OR d.choices_changed = 1 OR d.location_changed = 1
         """;
 
     public const string DropTemplateFieldChanges = "DROP VIEW IF EXISTS prism.v_template_field_changes;";

@@ -10,6 +10,7 @@
 | `GenerationCleanupFunction` | 03:30 UTC daily | Deletes superseded generations older than `Prism:Cleanup:RetentionDays` (30 by default). |
 | `CreateBackfill`, `CreateReconciliation`, `GetBackfill`, `CancelBackfill` | HTTP, `Prism.Admin` | Control plane, see below. |
 | `GetExportPolicy`, `ChangeExportPolicy` | HTTP, `Prism.Admin` | See [export-policy.md](export-policy.md). |
+| `Get`/`ChangeTenantExportDefault`, `Get`/`ChangeTemplateExportDefault` | HTTP, `Prism.Admin` | See [export-policy.md](export-policy.md#export-default). |
 
 Backfill and reconciliation never write projections themselves. They only enqueue messages, so all writes go
 through the same ordered, retried and dead-lettered path as live events.

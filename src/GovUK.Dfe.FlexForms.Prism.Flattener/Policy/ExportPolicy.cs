@@ -6,16 +6,18 @@ namespace GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
 public sealed record ExportRule(string ParentFieldId, string FieldId, ExportDecision Decision);
 
 /// <summary>
-/// The export decisions for a template. It fails closed: a field without an explicit Allowed decision never
-/// produces facts. A nested field also needs its collection to be allowed.
+/// The export decisions for a template. An explicit decision always wins; a field without one follows
+/// <see cref="DefaultMode"/>, which fails closed unless the template or tenant opted into
+/// <see cref="DefaultExportMode.ExportAll"/>. A nested field also needs its collection to be exported.
 /// </summary>
 public sealed class ExportPolicy
 {
     private readonly Dictionary<(string Parent, string Field), ExportDecision> decisions;
 
-    public ExportPolicy(int version, IEnumerable<ExportRule> rules)
+    public ExportPolicy(int version, IEnumerable<ExportRule> rules, DefaultExportMode defaultMode = DefaultExportMode.ApproveFirst)
     {
         Version = version;
+        DefaultMode = defaultMode;
         decisions = new Dictionary<(string, string), ExportDecision>(KeyComparer.Instance);
         foreach (var rule in rules)
         {
@@ -29,16 +31,20 @@ public sealed class ExportPolicy
     /// <summary>The policy version, which is part of the fact hash so a policy change re-projects.</summary>
     public int Version { get; }
 
+    public DefaultExportMode DefaultMode { get; }
+
     public ExportStatus StatusOf(string parentFieldId, string fieldId) =>
         decisions.TryGetValue((parentFieldId, fieldId), out var decision)
             ? decision == ExportDecision.Allowed ? ExportStatus.Allowed : ExportStatus.Denied
-            : ExportStatus.Unclassified;
+            : DefaultMode == DefaultExportMode.ExportAll ? ExportStatus.AllowedByDefault : ExportStatus.Unclassified;
 
     public ExportStatus StatusOf(CatalogField field) => StatusOf(field.ParentFieldId, field.FieldId);
 
     public bool IsExported(CatalogField field) =>
-        StatusOf(field) == ExportStatus.Allowed
-        && (field.ParentFieldId.Length == 0 || StatusOf(string.Empty, field.ParentFieldId) == ExportStatus.Allowed);
+        IsExported(StatusOf(field))
+        && (field.ParentFieldId.Length == 0 || IsExported(StatusOf(string.Empty, field.ParentFieldId)));
+
+    private static bool IsExported(ExportStatus status) => status is ExportStatus.Allowed or ExportStatus.AllowedByDefault;
 
     private sealed class KeyComparer : IEqualityComparer<(string Parent, string Field)>
     {

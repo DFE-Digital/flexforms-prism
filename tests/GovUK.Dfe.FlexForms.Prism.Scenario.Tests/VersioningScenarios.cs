@@ -95,4 +95,41 @@ public sealed class VersioningScenarios(SqlServerFixture sql) : ScenarioBase(sql
         Assert.Equal(change.PolicyVersion, (await Prism.StateAsync(app))!.ExportPolicyVersion);
         Assert.Equal(ExportStatus.Denied, (await Prism.CatalogAsync()).Single(c => c.FieldId == "name").ExportStatus);
     }
+
+    [Fact]
+    public async Task Export_all_default_exports_undecided_fields_but_not_denied_ones_after_the_backfill()
+    {
+        await Prism.ClearPolicyAsync();
+        var app = Guid.NewGuid();
+        await Prism.DeliverAsync(Source.Save(app, Named("Ada")));
+        Assert.Empty(await Prism.CurrentFactsAsync(app));
+
+        await Prism.ChangePolicyAsync(new ExportDecisionRequest(null, "secret", ExportDecision.Denied, "Personal data"));
+        var change = await Prism.SetDefaultAsync(ExportDefaultChoice.ExportAll);
+        await Prism.RunOperationAsync(OperationKind.Backfill);
+
+        Assert.Equal((ApplyStatus.Applied, 2), (change.Status, change.PolicyVersion));
+        var facts = await Prism.CurrentFactsAsync(app);
+        Assert.Equal("Ada", NameIn(facts));
+        Assert.Contains(facts, f => f.FieldId == "pupils");
+        Assert.DoesNotContain(facts, f => f.FieldId == "secret");
+        Assert.Equal(2, (await Prism.StateAsync(app))!.ExportPolicyVersion);
+        var catalog = await Prism.CatalogAsync();
+        Assert.Equal(ExportStatus.AllowedByDefault, catalog.Single(c => c.FieldId == "name").ExportStatus);
+        Assert.Equal(ExportStatus.Denied, catalog.Single(c => c.FieldId == "secret").ExportStatus);
+    }
+
+    [Fact]
+    public async Task Template_override_wins_over_the_tenant_default()
+    {
+        await Prism.ClearPolicyAsync();
+        var app = Guid.NewGuid();
+        await Prism.SetDefaultAsync(ExportDefaultChoice.ExportAll);
+        await Prism.SetDefaultAsync(ExportDefaultChoice.ApproveFirst, forTemplate: true);
+
+        await Prism.DeliverAsync(Source.Save(app, Named("Ada")));
+
+        Assert.Empty(await Prism.CurrentFactsAsync(app));
+        Assert.All(await Prism.CatalogAsync(), c => Assert.Equal(ExportStatus.Unclassified, c.ExportStatus));
+    }
 }
