@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GovUK.Dfe.CoreLibs.Messaging.Contracts" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Abstractions" />
   </ItemGroup>
@@ -16,9 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Flattener\GovUK.Dfe.FlexForms.Prism.Flattener.csproj" />
     <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Data\GovUK.Dfe.FlexForms.Prism.Data.csproj" />
-    <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Source\GovUK.Dfe.FlexForms.Prism.Source.csproj" />
-    <!-- TEMPORARY: swap for the GovUK.Dfe.CoreLibs.Messaging.Contracts package once the Prism contract is published. -->
-    <ProjectReference Include="..\..\..\DfE.CoreLibs\src\GovUK.Dfe.CoreLibs.Messaging.Contracts\GovUK.Dfe.CoreLibs.Messaging.Contracts.csproj" />
-  </ItemGroup>
+    <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Source\GovUK.Dfe.FlexForms.Prism.Source.csproj" />  </ItemGroup>
 
 </Project>

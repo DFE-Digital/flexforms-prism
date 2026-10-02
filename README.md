@@ -38,19 +38,19 @@ team can see what changed (`prism.v_template_field_changes`) and classify new fi
 - Docker, for the Data and Scenario tests (Testcontainers starts SQL Server)
 - Azure Functions Core Tools v4, to run the Functions host locally
 
-### Sibling repositories (temporary)
+### Sibling repository (temporary)
 
-Until the Prism contract and endpoints are published as packages, Prism references these projects directly.
-Clone them next to this repository:
+The Prism contracts come from nuget.org (`GovUK.Dfe.CoreLibs.Messaging.Contracts`, and
+`GovUK.Dfe.CoreLibs.Contracts` through the API client). Until the API client with the Prism endpoints is published
+as a package, Prism references it as a project. Clone flexforms-api next to this repository:
 
 ```text
 repos/
   flexforms-prism/      this repository
   flexforms-api/        branch feature/prism (GovUK.Dfe.FlexForms.Api.Client)
-  DfE.CoreLibs/         rsd-core-libs, branch feature/prism (Contracts, Messaging.Contracts)
 ```
 
-CI checks out the same layout; the branches are set in `.github/workflows/ci.yml`.
+CI checks out the same layout; the branch is set in `.github/workflows/ci.yml`.
 
 ## Build and test
 

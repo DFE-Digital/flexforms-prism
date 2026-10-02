@@ -30,6 +30,7 @@
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.1.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
     <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
+    <PackageVersion Include="GovUK.Dfe.CoreLibs.Messaging.Contracts" Version="0.1.6" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.22.0" />
     <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.22.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
