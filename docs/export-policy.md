@@ -45,7 +45,7 @@ Every change is audit-logged with the caller.
 ### See the fields of a template
 
 ```http
-GET /api/admin/tenants/{tenantId}/templates/{templateId}/export-policy
+GET /api/control/tenants/{tenantId}/templates/{templateId}/export-policy
 Authorization: Bearer <token>
 ```
 
@@ -78,7 +78,7 @@ Every template change is a new template version. When one is published:
 ### Change decisions
 
 ```http
-PUT /api/admin/tenants/{tenantId}/templates/{templateId}/export-policy
+PUT /api/control/tenants/{tenantId}/templates/{templateId}/export-policy
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -100,7 +100,7 @@ Content-Type: application/json
 - Repeating decisions that are already in place changes nothing, so the version stays the same and no backfill starts.
 
 When something changes, the policy version goes up by one and **a backfill for the tenant starts automatically**.
-The response includes it (`backfill.operationId`). Follow it with `GET /api/admin/backfill/{operationId}`.
+The response includes it (`backfill.operationId`). Follow it with `GET /api/control/backfill/{operationId}`.
 Until it finishes, the views can still show answers classified under the previous policy:
 
 - **Newly allowed** fields appear as each application is re-projected.

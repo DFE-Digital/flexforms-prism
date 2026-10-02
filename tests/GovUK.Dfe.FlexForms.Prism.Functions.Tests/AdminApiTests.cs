@@ -69,7 +69,7 @@ public sealed class AdminApiTests(SqlServerFixture sql)
         var operation = Assert.IsType<OperationView>(result.Value);
         Assert.Equal((OperationKind.Backfill, tenant, "ada@example.org (1)", BackfillStatus.Pending),
             (operation.Kind, operation.TenantId, operation.RequestedBy, operation.Status));
-        Assert.Equal($"/api/admin/backfill/{operation.OperationId}", request.HttpContext.Response.Headers.Location.ToString());
+        Assert.Equal($"/api/control/backfill/{operation.OperationId}", request.HttpContext.Response.Headers.Location.ToString());
 
         var fetched = Assert.IsType<JsonResult>(await Api(db).Get(Request(), operation.OperationId, default));
         Assert.Equal(operation, fetched.Value);

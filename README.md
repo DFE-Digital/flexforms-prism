@@ -145,8 +145,8 @@ Deployments apply migrations with a self-contained bundle (`prism-migrations` CI
 | `OperationWorkerFunction` | Every minute | Advances pending and running backfill and reconciliation operations |
 | `ReconciliationFunction` | 02:00 UTC daily | Records a reconciliation operation for every tenant |
 | `GenerationCleanupFunction` | 03:30 UTC daily | Deletes unreferenced superseded generations past retention |
-| `CreateBackfill`, `CreateReconciliation`, `GetBackfill`, `CancelBackfill` | HTTP, `/api/admin/...` | Control plane |
-| `GetExportPolicy`, `ChangeExportPolicy` | HTTP, `/api/admin/tenants/{tenantId}/templates/{templateId}/export-policy` | Field classification; a change starts a tenant backfill |
+| `CreateBackfill`, `CreateReconciliation`, `GetBackfill`, `CancelBackfill` | HTTP, `/api/control/...` | Control plane |
+| `GetExportPolicy`, `ChangeExportPolicy` | HTTP, `/api/control/tenants/{tenantId}/templates/{templateId}/export-policy` | Field classification; a change starts a tenant backfill |
 
 The projection function completes a message on success or skip. It dead-letters permanent failures straight
 away, with the failure reason as the dead-letter reason. Transient failures are abandoned, so Service Bus
@@ -167,12 +167,12 @@ Every admin call needs an Entra ID token for the Prism app registration with the
 Calls are audit-logged with the caller, who is also stored as `requested_by` or `cancelled_by`.
 
 ```http
-POST /api/admin/backfill            { "tenantId": "<optional>", "modifiedSince": "<optional>" }
-POST /api/admin/reconciliation      { "tenantId": "<optional>" }
-GET  /api/admin/backfill/{operationId}
-POST /api/admin/backfill/{operationId}/cancel
-GET  /api/admin/tenants/{tenantId}/templates/{templateId}/export-policy
-PUT  /api/admin/tenants/{tenantId}/templates/{templateId}/export-policy   { "decisions": [ ... ] }
+POST /api/control/backfill            { "tenantId": "<optional>", "modifiedSince": "<optional>" }
+POST /api/control/reconciliation      { "tenantId": "<optional>" }
+GET  /api/control/backfill/{operationId}
+POST /api/control/backfill/{operationId}/cancel
+GET  /api/control/tenants/{tenantId}/templates/{templateId}/export-policy
+PUT  /api/control/tenants/{tenantId}/templates/{templateId}/export-policy   { "decisions": [ ... ] }
 ```
 
 ### Configuration

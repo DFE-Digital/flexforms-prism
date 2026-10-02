@@ -77,15 +77,15 @@ PRISM=https://<function-app>.azurewebsites.net/api
 
 ```bash
 # One tenant, optionally only applications modified since a date
-curl -X POST "$PRISM/admin/backfill" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+curl -X POST "$PRISM/control/backfill" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
      -d '{ "tenantId": "<tenant-id>", "modifiedSince": "2026-01-01T00:00:00Z" }'
 
 # Every tenant
-curl -X POST "$PRISM/admin/backfill" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
+curl -X POST "$PRISM/control/backfill" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
 
 # Progress, then cancel if needed
-curl "$PRISM/admin/backfill/<operation-id>" -H "Authorization: Bearer $TOKEN"
-curl -X POST "$PRISM/admin/backfill/<operation-id>/cancel" -H "Authorization: Bearer $TOKEN"
+curl "$PRISM/control/backfill/<operation-id>" -H "Authorization: Bearer $TOKEN"
+curl -X POST "$PRISM/control/backfill/<operation-id>/cancel" -H "Authorization: Bearer $TOKEN"
 ```
 
 A backfill re-sends every application in scope. Applications that are already up to date are skipped cheaply.
@@ -95,7 +95,7 @@ picks up where it left off after a restart. Only one operation runs at a time; t
 ### Reconciliation on demand
 
 ```bash
-curl -X POST "$PRISM/admin/reconciliation" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
+curl -X POST "$PRISM/control/reconciliation" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
 ```
 
 Reconciliation compares every FlexForms application with Prism and only enqueues the ones that drifted.

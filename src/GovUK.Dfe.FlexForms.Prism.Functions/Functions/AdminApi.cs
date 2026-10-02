@@ -17,23 +17,23 @@ public sealed record CreateOperationRequest(Guid? TenantId, DateTime? ModifiedSi
 /// </summary>
 public sealed partial class AdminApi(IAdminAuthenticator authenticator, OperationService operations, ISourceClient source, ILogger<AdminApi> logger)
 {
-    private const string BasePath = "/api/admin/backfill";
+    private const string BasePath = "/api/control/backfill";
 
     [Function("CreateBackfill")]
     public Task<IActionResult> CreateBackfill(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/backfill")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "control/backfill")] HttpRequest request,
         CancellationToken cancellationToken)
         => CreateAsync(OperationKind.Backfill, request, cancellationToken);
 
     [Function("CreateReconciliation")]
     public Task<IActionResult> CreateReconciliation(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/reconciliation")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "control/reconciliation")] HttpRequest request,
         CancellationToken cancellationToken)
         => CreateAsync(OperationKind.Reconciliation, request, cancellationToken);
 
     [Function("GetBackfill")]
     public async Task<IActionResult> Get(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "admin/backfill/{operationId:guid}")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "control/backfill/{operationId:guid}")] HttpRequest request,
         Guid operationId,
         CancellationToken cancellationToken)
     {
@@ -49,7 +49,7 @@ public sealed partial class AdminApi(IAdminAuthenticator authenticator, Operatio
 
     [Function("CancelBackfill")]
     public async Task<IActionResult> Cancel(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "admin/backfill/{operationId:guid}/cancel")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "control/backfill/{operationId:guid}/cancel")] HttpRequest request,
         Guid operationId,
         CancellationToken cancellationToken)
     {

@@ -22,7 +22,7 @@ public sealed partial class ExportPolicyApi(
     OperationService operations,
     ILogger<ExportPolicyApi> logger)
 {
-    private const string Route = "admin/tenants/{tenantId:guid}/templates/{templateId:guid}/export-policy";
+    private const string Route = "control/tenants/{tenantId:guid}/templates/{templateId:guid}/export-policy";
 
     [Function("GetExportPolicy")]
     public async Task<IActionResult> Get(
