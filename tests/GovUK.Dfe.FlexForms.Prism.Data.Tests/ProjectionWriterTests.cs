@@ -286,4 +286,35 @@ public sealed class ProjectionWriterTests(SqlServerFixture sql)
         Assert.Single(generations, g => g.Status == GenerationStatus.Active);
         Assert.DoesNotContain(generations, g => g.Status == GenerationStatus.Building);
     }
+
+    [Fact]
+    public async Task Write_chosen_as_deadlock_victim_is_retried_and_applied()
+    {
+        await WriteCurrent(Current(_tenant, _application, 1), "before");
+
+        await using var rival = new SqlConnection(sql.ConnectionString);
+        await rival.OpenAsync();
+        await using var rivalTransaction = (SqlTransaction)await rival.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        await RivalExecuteAsync("SET DEADLOCK_PRIORITY HIGH");
+        await RivalExecuteAsync("SELECT TOP (0) id FROM prism.answer_facts WITH (TABLOCKX, HOLDLOCK)");
+
+        var write = Task.Run(() => WriteCurrent(Current(_tenant, _application, 2), "after"));
+
+        while (!write.IsCompleted && (int)(await RivalScalarAsync("SELECT COUNT(*) FROM sys.dm_exec_requests WHERE blocking_session_id = @@SPID"))! == 0)
+        {
+            await Task.Delay(50);
+        }
+
+        await RivalScalarAsync(
+            $"SELECT source_revision FROM prism.application_projection_state WITH (UPDLOCK) WHERE tenant_id = '{_tenant}' AND application_id = '{_application}'");
+        await rivalTransaction.RollbackAsync();
+
+        var result = await write;
+        Assert.Equal(WriteOutcome.Applied, result.Outcome);
+        Assert.Equal(["after"], await CurrentValues());
+        Assert.DoesNotContain(await Generations(), g => g.Status == GenerationStatus.Building);
+
+        Task RivalExecuteAsync(string text) => new SqlCommand(text, rival, rivalTransaction).ExecuteNonQueryAsync();
+        Task<object?> RivalScalarAsync(string text) => new SqlCommand(text, rival, rivalTransaction).ExecuteScalarAsync();
+    }
 }

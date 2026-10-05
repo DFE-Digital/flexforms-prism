@@ -14,6 +14,9 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Writing;
 public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IProjectionWriter
 {
     private const int BulkCopyBatchSize = 5000;
+    private const int DeadlockVictim = 1205;
+    private const int MaxDeadlockAttempts = 5;
+    private static readonly TimeSpan DeadlockBackoff = TimeSpan.FromMilliseconds(100);
 
     public Task<WriteResult> WriteCurrentAsync(CurrentProjection projection, IReadOnlyCollection<AnswerFact> facts, CancellationToken cancellationToken)
         => InTransactionAsync(async (connection, transaction) =>
@@ -171,7 +174,28 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
             return new WriteResult(WriteOutcome.Applied, state?.ActiveGenerationId);
         }, cancellationToken);
 
+    /// <summary>
+    /// Runs <paramref name="work"/> in its own transaction, re-running it from the start if SQL Server picks it as a
+    /// deadlock victim. Concurrent sessions bulk-inserting into answer_facts (for example during a policy refresh)
+    /// can deadlock on shared index pages; the victim's transaction is already rolled back, so re-running is safe.
+    /// </summary>
     private async Task<WriteResult> InTransactionAsync(Func<SqlConnection, SqlTransaction, Task<WriteResult>> work, CancellationToken cancellationToken)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return await RunTransactionAsync(work, cancellationToken);
+            }
+            catch (SqlException ex) when (ex.Number == DeadlockVictim && attempt < MaxDeadlockAttempts)
+            {
+                var delay = TimeSpan.FromMilliseconds(DeadlockBackoff.TotalMilliseconds * attempt * (0.5 + Random.Shared.NextDouble()));
+                await Task.Delay(delay, cancellationToken);
+            }
+        }
+    }
+
+    private async Task<WriteResult> RunTransactionAsync(Func<SqlConnection, SqlTransaction, Task<WriteResult>> work, CancellationToken cancellationToken)
     {
         await db.Database.OpenConnectionAsync(cancellationToken);
         try
