@@ -155,3 +155,29 @@ call Prism without Entra. It is ignored (with a warning) in any other environmen
 
 The outbox tables must exist in every tenant's EA database (part of the outbox migrations), along with the new
 `SourceRevision` columns from the Prism migration.
+
+The tenant admin "Reporting export" screens call Prism's export endpoints through the API, using the API's
+managed identity:
+
+| Setting | Value |
+|---|---|
+| `Prism__ControlApi__BaseUrl` | `https://<prism-function-host>/`. Without it the screens say reporting export isn't set up. |
+| `Prism__ControlApi__Scope` | `api://<prism-client-id>/.default` |
+| `Prism__ControlApi__ManagedIdentityClientId` | The API's user-assigned identity client ID. Leave unset for a system-assigned identity. |
+| `Prism__ControlApi__Timeout` | Optional, default `00:00:30` |
+
+`Prism__ControlApi__DevelopmentKey` is for local development only. Never set it in Azure.
+
+Managed identity tokens are v1 tokens unless the Prism app registration's manifest sets
+`"requestedAccessTokenVersion": 2`. Either set that, or set `Prism__Admin__ValidIssuers__0` on the Function, otherwise
+every call from the API is rejected as an invalid token.
+
+## Checking the connection
+
+1. **API to Prism:** open a template's "Reporting export" screen as a tenant admin. It should list the fields.
+   The Function logs `Prism admin audit` entries when a decision is saved. A 401 or 403 in the API logs means the
+   token audience, issuer or the `Prism.Admin`/`Prism.Delegate` assignments are wrong.
+2. **API to Service Bus to Prism:** save an application. The Function logs a projection for it within seconds,
+   and `prism.application_projection_state` has a row for it.
+3. **Prism to API:** start a backfill for one tenant (see the runbook). Failures with `Missing Prism.Read app role`
+   mean the `Prism.Read` assignment or admin consent is missing.
