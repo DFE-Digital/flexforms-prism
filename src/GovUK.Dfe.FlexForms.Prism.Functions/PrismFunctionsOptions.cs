@@ -50,6 +50,18 @@ public sealed class AdminAuthOptions
     public string[] ValidIssuers { get; set; } = [];
 
     public string RequiredRole { get; set; } = "Prism.Admin";
+
+    /// <summary>
+    /// Lets a trusted caller, such as the FlexForms API, name the person it acts for in the
+    /// <c>X-Prism-Acting-User</c> header, so the audit trail records them.
+    /// </summary>
+    public string DelegateRole { get; set; } = "Prism.Delegate";
+
+    /// <summary>
+    /// A shared key accepted in the <c>X-Prism-Development-Key</c> header instead of a token, with both roles. Only
+    /// honoured when the Functions environment is Development, for running the FlexForms API against Prism locally.
+    /// </summary>
+    public string? DevelopmentKey { get; set; }
 }
 
 public static class PrismTopology

@@ -87,7 +87,11 @@ already accepts tokens for its own app registration.
 
 - Application ID URI: `api://<prism-client-id>`.
 - App role **`Prism.Admin`**, with allowed member types **Users/Groups** and **Applications**. Assign it to the
-  people or group who run backfills and classify fields.
+  people or group who run backfills and classify fields, and to the **FlexForms API's managed identity**, which calls
+  the export endpoints for the tenant admin "Reporting export" screens.
+- App role **`Prism.Delegate`**, allowed member type **Applications**. Assign it only to the FlexForms API's managed
+  identity. It lets the API send `X-Prism-Acting-User` so the audit trail records the tenant admin who made a change
+  (as `person via api-identity`). A caller without it that sends the header is refused.
 - A client secret (kept in Key Vault). Prism uses this registration's client ID and secret to call the FlexForms API.
 
 ## Function App
@@ -135,8 +139,13 @@ Optional, with their defaults:
 | `Prism__Cleanup__RetentionDays` | `30` |
 | `Prism__Cleanup__MaxGenerationsPerRun` | `2000` |
 | `Prism__Admin__RequiredRole` | `Prism.Admin` |
+| `Prism__Admin__DelegateRole` | `Prism.Delegate` |
 
 Without `Prism__Admin__Authority` and `Prism__Admin__Audience`, every admin request is rejected.
+
+`Prism__Admin__DevelopmentKey` is for local development only: when the Functions environment is `Development`,
+a request with the same value in `X-Prism-Development-Key` is accepted with both roles, so the FlexForms API can
+call Prism without Entra. It is ignored (with a warning) in any other environment. Never set it in Azure.
 
 ## FlexForms API
 

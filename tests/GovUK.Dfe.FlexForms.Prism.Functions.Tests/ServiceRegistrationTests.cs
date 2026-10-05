@@ -1,7 +1,9 @@
 using GovUK.Dfe.FlexForms.Prism.Functions.Functions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NSubstitute;
 using OpenTelemetry.Metrics;
 
 namespace GovUK.Dfe.FlexForms.Prism.Functions.Tests;
@@ -24,7 +26,10 @@ public class ServiceRegistrationTests
             })
             .Build();
 
-        var services = new ServiceCollection().AddLogging().AddSingleton<IConfiguration>(configuration);
+        var services = new ServiceCollection()
+            .AddLogging()
+            .AddSingleton<IConfiguration>(configuration)
+            .AddSingleton(Substitute.For<IHostEnvironment>());
         services.AddPrismFunctions(configuration);
         return services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
     }

@@ -98,4 +98,46 @@ public class AdminAuthenticatorTests
 
         Assert.Equal(AdminAuthStatus.Unauthenticated, result.Status);
     }
+
+    [Fact]
+    public async Task A_delegate_caller_is_recorded_as_acting_for_the_named_person()
+    {
+        var request = Request($"Bearer {Token(["Prism.Admin", "Prism.Delegate"])}");
+        request.Headers[AdminAuthenticator.ActingUserHeader] = "jane@school.gov.uk\r\n";
+
+        var result = await authenticator.AuthenticateAsync(request, default);
+
+        Assert.Equal(new AdminAuthResult(AdminAuthStatus.Authorized, "jane@school.gov.uk via ada@example.org (1234)"), result);
+    }
+
+    [Fact]
+    public async Task Naming_an_acting_person_without_the_delegate_role_is_forbidden()
+    {
+        var request = Request($"Bearer {Token(["Prism.Admin"])}");
+        request.Headers[AdminAuthenticator.ActingUserHeader] = "jane@school.gov.uk";
+
+        Assert.Equal(AdminAuthStatus.Forbidden, (await authenticator.AuthenticateAsync(request, default)).Status);
+    }
+
+    [Fact]
+    public async Task The_development_key_is_only_accepted_in_development()
+    {
+        var options = new AdminAuthOptions { DevelopmentKey = "local-key" };
+        var development = new AdminAuthenticator(options, null, developmentKeyAllowed: true, NullLogger<AdminAuthenticator>.Instance);
+        var production = new AdminAuthenticator(options, null, developmentKeyAllowed: false, NullLogger<AdminAuthenticator>.Instance);
+
+        HttpRequest WithKey(string key)
+        {
+            var request = Request(null);
+            request.Headers[AdminAuthenticator.DevelopmentKeyHeader] = key;
+            request.Headers[AdminAuthenticator.ActingUserHeader] = "jane@school.gov.uk";
+            return request;
+        }
+
+        Assert.Equal(
+            new AdminAuthResult(AdminAuthStatus.Authorized, "jane@school.gov.uk via development-key"),
+            await development.AuthenticateAsync(WithKey("local-key"), default));
+        Assert.Equal(AdminAuthStatus.Unauthenticated, (await development.AuthenticateAsync(WithKey("wrong"), default)).Status);
+        Assert.Equal(AdminAuthStatus.Unauthenticated, (await production.AuthenticateAsync(WithKey("local-key"), default)).Status);
+    }
 }

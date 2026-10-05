@@ -18,6 +18,7 @@
     "Prism__Admin__Authority": "https://login.microsoftonline.com/<tenant-id>/v2.0",
     "Prism__Admin__Audience": "api://<prism-client-id>",
     "Prism__Admin__RequiredRole": "Prism.Admin",
+    "Prism__Admin__DevelopmentKey": "<any-random-string-also-set-in-the-api-as-Prism:ControlApi:DevelopmentKey>",
 
     "Prism__Backfill__PageSize": "200",
     "Prism__Cleanup__RetentionDays": "30"
