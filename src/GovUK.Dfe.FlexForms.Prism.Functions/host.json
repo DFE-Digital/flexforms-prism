@@ -4,6 +4,7 @@
   "logging": {
     "logLevel": {
       "default": "Information",
+      "Azure.Core": "Error",
       "Microsoft.EntityFrameworkCore": "Warning",
       "System.Net.Http.HttpClient": "Warning"
     },
