@@ -11,6 +11,13 @@ public sealed record CatalogField
     /// <summary>The collection field that contains this field, or empty for top-level fields.</summary>
     public string ParentFieldId { get; init; } = string.Empty;
 
+    /// <summary>
+    /// The key reports use for this field across template versions: the author's <c>semanticKey</c>, or the field
+    /// id when there is none, prefixed with the collection's key and a slash for nested fields. A renamed field
+    /// keeps the old field's key, so its answers line up with the old ones.
+    /// </summary>
+    public string SemanticKey { get; init; } = string.Empty;
+
     public string? FlowId { get; init; }
     public FlowMode? FlowMode { get; init; }
     public string? TaskGroupId { get; init; }
@@ -38,6 +45,12 @@ public sealed record CatalogField
 }
 
 public sealed record CatalogOption(string Value, string Label);
+
+/// <summary>
+/// A field the template author retired in this version, with the fields that replace it. Empty
+/// <see cref="ParentFieldId"/> for top-level fields and collections.
+/// </summary>
+public sealed record RetiredCatalogField(string FieldId, string ParentFieldId, IReadOnlyList<string> ReplacedBy);
 
 public enum FlowMode
 {

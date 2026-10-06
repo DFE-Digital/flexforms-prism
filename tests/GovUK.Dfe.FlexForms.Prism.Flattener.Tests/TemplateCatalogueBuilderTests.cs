@@ -75,6 +75,57 @@ public class TemplateCatalogueBuilderTests
         Assert.Equal("decl", status.ParentFieldId);
     }
 
+    private const string KeyedTemplate = """
+        {
+          "templateId": "tpl",
+          "retiredFields": [
+            { "fieldId": "name", "replacedBy": ["fullName", " ", "FULLNAME"] },
+            { "fieldId": "attendees" },
+            { "fieldId": "role", "parentFieldId": "visitors" },
+            { "fieldId": "name" },
+            { "parentFieldId": "visitors" }
+          ],
+          "taskGroups": [{ "groupId": "g", "groupOrder": 1, "tasks": [{
+            "taskId": "t", "taskOrder": 1,
+            "pages": [{ "pageId": "p", "pageOrder": 1, "fields": [
+              { "fieldId": "fullName", "type": "text", "semanticKey": " name ", "order": 1 },
+              { "fieldId": "email", "type": "email", "order": 2 }
+            ]}],
+            "summary": {
+              "flows": [{ "flowId": "f", "fieldId": "visitors", "semanticKey": "attendees", "pages": [{ "pageId": "v", "fields": [
+                { "fieldId": "visitorName", "type": "text", "semanticKey": "attendeeName" },
+                { "fieldId": "phone", "type": "text" }
+              ]}]}],
+              "derivedFlows": [{ "flowId": "d", "fieldId": "decl", "pages": [] }]
+            }
+          }]}]
+        }
+        """;
+
+    [Fact]
+    public void Semantic_keys_default_to_the_field_id_and_nest_under_the_collection_key()
+    {
+        var keys = TemplateCatalogueBuilder.Build(KeyedTemplate).Fields.ToDictionary(f => (f.ParentFieldId, f.FieldId), f => f.SemanticKey);
+
+        Assert.Equal("name", keys[("", "fullName")]);
+        Assert.Equal("email", keys[("", "email")]);
+        Assert.Equal("attendees", keys[("", "visitors")]);
+        Assert.Equal("attendees/attendeeName", keys[("visitors", "visitorName")]);
+        Assert.Equal("attendees/phone", keys[("visitors", "phone")]);
+        Assert.Equal("decl", keys[("", "decl")]);
+        Assert.Equal("decl/status", keys[("decl", "status")]);
+    }
+
+    [Fact]
+    public void Retired_fields_are_read_once_each_with_their_replacements()
+    {
+        var retired = TemplateCatalogueBuilder.Build(KeyedTemplate).RetiredFields;
+
+        Assert.Equal(
+            ["/name:fullName", "/attendees:", "visitors/role:"],
+            retired.Select(r => $"{r.ParentFieldId}/{r.FieldId}:{string.Join(",", r.ReplacedBy)}"));
+    }
+
     [Fact]
     public void Field_order_follows_display_order_across_the_template()
     {

@@ -145,7 +145,8 @@ never alter these rows. They disappear only if the application is deleted.
 | `interpretation_status` | `Ok`, `Null`, `Empty`, `ParseFailed` (only `raw_value` is reliable) or `Unsupported` (the value is in `value_json`). |
 | `value_string`, `value_decimal`, `value_bool`, `value_date`, `value_date_time`, `value_json` | The typed value. Only the column for the interpreted type is set. |
 | `raw_value` | The stored value before interpretation, HTML-decoded. |
-| `label`, `task_group_*`, `task_*`, `page_*`, `semantic_key` | Field metadata from `field_catalog`. |
+| `label`, `task_group_*`, `task_*`, `page_*` | Field metadata from `field_catalog`. |
+| `semantic_key` | The field's reporting key across template versions, from `field_catalog`. It's the template author's `semanticKey`, or the field ID when there is none. Nested fields are prefixed with their collection's key and a `/`, for example `attendees/attendeeName`. When an author renames a field they keep its `semanticKey`, so group or pivot on `semantic_key` rather than `field_id` to report across versions. FlexForms refuses template versions that change a field's key, reuse a dropped key, or let a new field take over a key without declaring it as a replacement. |
 
 Within one generation, `(field_id, parent_field_id, occurrence_path, nested_path)` is unique.
 
@@ -153,16 +154,20 @@ Within one generation, `(field_id, parent_field_id, occurrence_path, nested_path
 
 What each template version changed compared with the version created before it, so the data team can review new,
 removed and altered fields. There is one row per field that changed. Every field of a template's first catalogued
-version appears as `Added`. Fields are matched by `(parent_field_id, field_id)`, so a field whose ID changed shows
-as one `Removed` and one `Added` row.
+version appears as `Added`. Fields are matched by `semantic_key`, so a field the author renamed while keeping its
+key is one `Changed` row with `field_id_changed` set. A field retired without a successor that keeps its key shows as
+`Removed`, with the author's declared replacements in `replaced_by`.
 
 | Column | Meaning |
 |---|---|
 | `tenant_id`, `template_id`, `template_version_id`, `version_number`, `version_created_on` | The version. Always filter on `tenant_id`. |
 | `previous_template_version_id`, `previous_version_number` | The version it is compared with, by creation time. Null for the first version. |
-| `parent_field_id`, `field_id` | The field. |
+| `parent_field_id`, `field_id` | The field: its IDs in this version, or in the previous version for `Removed` rows. |
+| `previous_parent_field_id`, `previous_field_id` | The field's IDs in the previous version. Null for `Added` rows. |
+| `semantic_key` | The reporting key the two versions were matched on. |
 | `change_type` | `Added`, `Removed` or `Changed`. |
-| `label_changed`, `type_changed`, `required_changed`, `choices_changed`, `location_changed` | For `Changed` rows, what changed. `type_changed` covers data type, control type and collection; `location_changed` covers task, page and flow. Labels and choices are compared case-sensitively. |
+| `field_id_changed`, `label_changed`, `type_changed`, `required_changed`, `choices_changed`, `location_changed` | For `Changed` rows, what changed. `field_id_changed` means the field (or its collection) was renamed. `type_changed` covers data type, control type and collection; `location_changed` covers task, page and flow. IDs, labels and choices are compared case-sensitively. |
+| `replaced_by` | For `Removed` rows, the replacing field IDs the author declared in the version's `retiredFields`, comma separated. Null when none were declared. |
 | `previous_label`, `label`, `previous_data_type`, `data_type`, `previous_control_type`, `control_type`, `previous_is_required`, `is_required`, `previous_choices_json`, `choices_json`, `previous_task_name`, `task_name`, `previous_page_title`, `page_title` | Before and after. |
 | `export_decision` | The field's current decision for the template: `Allowed`, `Denied`, or for an undecided field `AllowedByDefault` (export default `ExportAll`) or `Unclassified`. |
 | `contract_version` | The catalogue contract version compared. Only the current one is shown. |
@@ -170,7 +175,11 @@ as one `Removed` and one `Added` row.
 Under the built-in `ApproveFirst` default a new field is `Unclassified` until someone decides, so it is never
 exported by accident. A tenant or template set to `ExportAll` exports it straight away as `AllowedByDefault`. A
 relabelled field keeps its decision, because decisions are per field ID; review `label_changed` rows in case the
-meaning changed.
+meaning changed. A renamed field has a new ID, so it needs its own decision; review `field_id_changed` rows.
+
+Catalogues written before semantic keys were recorded have no `semantic_key`; the view falls back to the key the
+field ID implies, which is correct for every field without an authored `semanticKey`. Run a backfill after
+deploying so existing catalogues pick up authored keys and retirements.
 
 ### Guarantees
 

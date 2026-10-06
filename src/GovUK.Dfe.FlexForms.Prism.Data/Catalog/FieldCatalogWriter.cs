@@ -83,13 +83,44 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
             if (existing.TryGetValue((field.ParentFieldId, field.FieldId), out var entry))
             {
                 entry.ExportStatus = status;
+                entry.SemanticKey = Truncate(field.SemanticKey, 200);
                 continue;
             }
 
             db.FieldCatalog.Add(ToEntry(source, field, status, now));
         }
 
+        await UpsertRetirementsAsync(source, catalogue, now, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task UpsertRetirementsAsync(CatalogueSource source, TemplateCatalogue catalogue, DateTime now, CancellationToken cancellationToken)
+    {
+        var existing = (await db.TemplateFieldRetirements
+                .Where(r => r.TenantId == source.TenantId && r.TemplateVersionId == source.TemplateVersionId)
+                .ToListAsync(cancellationToken))
+            .ToDictionary(r => (r.ParentFieldId, r.FieldId), KeyComparer.Instance);
+
+        foreach (var retired in catalogue.RetiredFields)
+        {
+            var replacedBy = retired.ReplacedBy.Count == 0 ? null : Truncate(string.Join(", ", retired.ReplacedBy), 2000);
+            if (existing.TryGetValue((retired.ParentFieldId, retired.FieldId), out var entry))
+            {
+                entry.ReplacedBy = replacedBy;
+                continue;
+            }
+
+            db.TemplateFieldRetirements.Add(new TemplateFieldRetirement
+            {
+                TenantId = source.TenantId,
+                TemplateVersionId = source.TemplateVersionId,
+                ParentFieldId = Truncate(retired.ParentFieldId, 200)!,
+                FieldId = Truncate(retired.FieldId, 200)!,
+                TemplateId = source.TemplateId,
+                ReplacedBy = replacedBy,
+                CreatedAt = now,
+            });
+        }
     }
 
     private static FieldCatalogEntry ToEntry(CatalogueSource source, CatalogField field, ExportStatus status, DateTime now) => new()
@@ -118,6 +149,7 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
         ChoicesJson = field.Options.Count == 0
             ? null
             : JsonSerializer.Serialize(field.Options.Select(o => new { value = o.Value, label = o.Label })),
+        SemanticKey = Truncate(field.SemanticKey, 200),
         ExportStatus = status,
         CreatedAt = now,
     };

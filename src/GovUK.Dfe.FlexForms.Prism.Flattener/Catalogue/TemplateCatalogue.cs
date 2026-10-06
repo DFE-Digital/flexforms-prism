@@ -16,11 +16,13 @@ public sealed class TemplateCatalogue
         IReadOnlyList<CatalogField> fields,
         IReadOnlyList<CatalogCollection> collectionList,
         IEnumerable<string> taskIdList,
+        IReadOnlyList<RetiredCatalogField> retiredFields,
         IReadOnlyList<string> warnings)
     {
         TemplateId = templateId;
         Fields = fields;
         Collections = collectionList;
+        RetiredFields = retiredFields;
         Warnings = warnings;
 
         topLevel = fields
@@ -39,6 +41,9 @@ public sealed class TemplateCatalogue
     public IReadOnlyList<CatalogField> Fields { get; }
 
     public IReadOnlyList<CatalogCollection> Collections { get; }
+
+    /// <summary>The fields the template author retired in this version, as declared under <c>retiredFields</c>.</summary>
+    public IReadOnlyList<RetiredCatalogField> RetiredFields { get; }
 
     /// <summary>Problems found while building the catalogue, such as duplicate field ids that were ignored.</summary>
     public IReadOnlyList<string> Warnings { get; }

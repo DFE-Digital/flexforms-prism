@@ -75,18 +75,53 @@ public static class TemplateCatalogueBuilder
 
                     foreach (var flow in task.Summary?.Flows ?? [])
                     {
-                        AddCollection(flow.FieldId, flow.FlowId, flow.Title, FlowMode.MultiCollection, flow.Pages, null, context);
+                        AddCollection(flow.FieldId, flow.SemanticKey, flow.FlowId, flow.Title, FlowMode.MultiCollection, flow.Pages, null, context);
                     }
 
                     foreach (var flow in task.Summary?.DerivedFlows ?? [])
                     {
                         var statusField = string.IsNullOrWhiteSpace(flow.StatusField) ? DefaultStatusField : flow.StatusField.Trim();
-                        AddCollection(flow.FieldId, flow.FlowId, flow.Title, FlowMode.DerivedCollection, flow.Pages, statusField, context);
+                        AddCollection(flow.FieldId, flow.SemanticKey, flow.FlowId, flow.Title, FlowMode.DerivedCollection, flow.Pages, statusField, context);
                     }
                 }
             }
 
-            return new TemplateCatalogue(template.TemplateId, fields, collections, taskIds, warnings);
+            return new TemplateCatalogue(template.TemplateId, fields, collections, taskIds, RetiredFields(), warnings);
+        }
+
+        private List<RetiredCatalogField> RetiredFields()
+        {
+            var retired = new List<RetiredCatalogField>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var declaration in template.RetiredFields ?? [])
+            {
+                if (string.IsNullOrWhiteSpace(declaration?.FieldId))
+                {
+                    continue;
+                }
+
+                var fieldId = declaration.FieldId.Trim();
+                var parentFieldId = declaration.ParentFieldId?.Trim() ?? string.Empty;
+                if (!seen.Add($"{parentFieldId}\n{fieldId}"))
+                {
+                    continue;
+                }
+
+                var replacedBy = (declaration.ReplacedBy ?? [])
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .Select(id => id!.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                retired.Add(new RetiredCatalogField(fieldId, parentFieldId, replacedBy));
+            }
+
+            return retired;
+        }
+
+        private static string KeyOf(string? semanticKey, string fieldId, string parentKey)
+        {
+            var key = string.IsNullOrWhiteSpace(semanticKey) ? fieldId : semanticKey.Trim();
+            return parentKey.Length == 0 ? key : $"{parentKey}/{key}";
         }
 
         private void AddTopLevelPages(List<PageModel>? pages, CatalogField context)
@@ -99,12 +134,13 @@ public static class TemplateCatalogueBuilder
                     continue;
                 }
 
-                fields.Add(ToCatalogField(field, page, context, string.Empty));
+                fields.Add(ToCatalogField(field, page, context, string.Empty, string.Empty));
             }
         }
 
         private void AddCollection(
             string? storageFieldId,
+            string? semanticKey,
             string? flowId,
             string? title,
             FlowMode mode,
@@ -129,6 +165,7 @@ public static class TemplateCatalogueBuilder
             var collectionField = context with
             {
                 FieldId = storageFieldId,
+                SemanticKey = KeyOf(semanticKey, storageFieldId, string.Empty),
                 FlowId = flowId,
                 FlowMode = mode,
                 FieldOrder = ++order,
@@ -150,7 +187,7 @@ public static class TemplateCatalogueBuilder
                     continue;
                 }
 
-                nested.Add(ToCatalogField(field, page, nestedContext, storageFieldId));
+                nested.Add(ToCatalogField(field, page, nestedContext, storageFieldId, collectionField.SemanticKey));
             }
 
             if (statusFieldId is not null && nestedIds.Add(statusFieldId))
@@ -159,6 +196,7 @@ public static class TemplateCatalogueBuilder
                 {
                     FieldId = statusFieldId,
                     ParentFieldId = storageFieldId,
+                    SemanticKey = KeyOf(null, statusFieldId, collectionField.SemanticKey),
                     FieldOrder = ++order,
                     Label = "Status",
                     DataType = FieldDataTypes.String,
@@ -170,11 +208,12 @@ public static class TemplateCatalogueBuilder
             collections.Add(new CatalogCollection(collectionField, mode, nested, statusFieldId));
         }
 
-        private CatalogField ToCatalogField(FieldModel field, PageModel page, CatalogField context, string parentFieldId) =>
+        private CatalogField ToCatalogField(FieldModel field, PageModel page, CatalogField context, string parentFieldId, string parentKey) =>
             context with
             {
                 FieldId = field.FieldId!,
                 ParentFieldId = parentFieldId,
+                SemanticKey = KeyOf(field.SemanticKey, field.FieldId!, parentKey),
                 PageId = page.PageId,
                 PageTitle = page.Title,
                 FieldOrder = ++order,

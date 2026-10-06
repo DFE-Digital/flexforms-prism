@@ -86,17 +86,20 @@ Every template change is a new template version. When one is published:
 2. Review what changed in `prism.v_template_field_changes`:
 
    ```sql
-   SELECT version_number, change_type, parent_field_id, field_id, previous_label, label,
-          label_changed, type_changed, required_changed, choices_changed, export_decision
+   SELECT version_number, change_type, semantic_key, parent_field_id, field_id, previous_field_id, previous_label, label,
+          field_id_changed, label_changed, type_changed, required_changed, choices_changed, replaced_by, export_decision
    FROM prism.v_template_field_changes
    WHERE tenant_id = @tenant AND template_id = @template
    ORDER BY version_created_on DESC, change_type, parent_field_id, field_id;
    ```
 
 3. Classify `Added` fields with the `PUT` below.
-4. Check `Changed` rows with `label_changed` or `type_changed`. Their existing decision carries over, so set it to
+4. Classify `Changed` rows with `field_id_changed`: the author renamed the field, and decisions are per field ID, so
+   the new ID starts undecided. Give it the same decision as `previous_field_id` unless its meaning changed.
+5. Check `Changed` rows with `label_changed` or `type_changed`. Their existing decision carries over, so set it to
    `Denied` if the field now collects something that shouldn't leave FlexForms.
-5. `Removed` fields keep their decision for older versions' applications; nothing needs doing.
+6. `Removed` fields keep their decision for older versions' applications; nothing needs doing. `replaced_by` names
+   the fields the author says replace them, which are `Added` rows to classify.
 
 ### Change decisions
 

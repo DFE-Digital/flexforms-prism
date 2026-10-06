@@ -9,6 +9,14 @@ internal sealed class TemplateModel
     public string? TemplateName { get; set; }
     public List<TaskGroupModel>? TaskGroups { get; set; }
     public string? DefaultFieldRequirementPolicy { get; set; }
+    public List<RetiredFieldModel?>? RetiredFields { get; set; }
+}
+
+internal sealed class RetiredFieldModel
+{
+    public string? FieldId { get; set; }
+    public string? ParentFieldId { get; set; }
+    public List<string?>? ReplacedBy { get; set; }
 }
 
 internal sealed class TaskGroupModel
@@ -40,6 +48,7 @@ internal sealed class MultiCollectionFlowModel
     public string? FlowId { get; set; }
     public string? Title { get; set; }
     public string? FieldId { get; set; }
+    public string? SemanticKey { get; set; }
     public List<PageModel>? Pages { get; set; }
 }
 
@@ -49,6 +58,7 @@ internal sealed class DerivedCollectionFlowModel
     public string? Title { get; set; }
     public string? SourceFieldId { get; set; }
     public string? FieldId { get; set; }
+    public string? SemanticKey { get; set; }
     public string? StatusField { get; set; }
     public List<PageModel>? Pages { get; set; }
 }
@@ -64,6 +74,7 @@ internal sealed class PageModel
 internal sealed class FieldModel
 {
     public string? FieldId { get; set; }
+    public string? SemanticKey { get; set; }
     public string? Type { get; set; }
     public LabelModel? Label { get; set; }
     public bool? Required { get; set; }
