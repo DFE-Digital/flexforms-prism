@@ -60,6 +60,7 @@ ALTER ROLE db_owner ADD MEMBER [<prism-migration-identity>];
 -- Data team readers: the views only (plus the catalogue, which has no answer values).
 -- An existing database only needs the v_template_field_changes grant after the AddTemplateVersionsAndFieldChanges migration.
 CREATE ROLE prism_reader;
+GRANT SELECT ON prism.v_applications TO prism_reader;
 GRANT SELECT ON prism.v_current_answer_facts TO prism_reader;
 GRANT SELECT ON prism.v_submission_answer_facts TO prism_reader;
 GRANT SELECT ON prism.field_catalog TO prism_reader;

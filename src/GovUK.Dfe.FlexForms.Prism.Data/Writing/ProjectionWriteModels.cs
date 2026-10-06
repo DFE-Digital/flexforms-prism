@@ -45,7 +45,12 @@ public sealed record CurrentProjection(
     ApplicationLifecycle Lifecycle,
     byte[] SourceHash,
     ProjectionVersions Versions,
-    DateTime? SourceOccurredAt);
+    DateTime? SourceOccurredAt,
+    ApplicationDetails? Details = null);
+
+/// <summary>Application-level facts that aren't answers, published through <c>v_applications</c>.</summary>
+/// <param name="LastModifiedOn">Null when the application was never modified.</param>
+public sealed record ApplicationDetails(string? Reference, DateTime CreatedOn, DateTime? LastModifiedOn);
 
 public sealed record SubmissionProjection(
     Guid TenantId,

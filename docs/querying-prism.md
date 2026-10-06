@@ -53,6 +53,7 @@ shape. You decide the shape of each report in the query.
 
 | View | Use it for |
 |---|---|
+| `prism.v_applications` | One row per application: reference, lifecycle, created, last modified and last submitted dates. Join it on `application_id`. |
 | `prism.v_current_answer_facts` | The latest answers of every application, drafts and submitted. `lifecycle` says which. |
 | `prism.v_submission_answer_facts` | Answers exactly as submitted, frozen at submission. Use it for "what did they submit" reports. |
 | `prism.v_template_field_changes` | What each template version added, removed, renamed or changed. |
@@ -115,6 +116,29 @@ GROUP BY f.application_id;
 ```
 
 Applications that haven't answered a question get `NULL` in that column; the column is always there.
+
+To add the application reference and dates, join `v_applications`:
+
+```sql
+SELECT
+    a.application_reference,
+    a.lifecycle,
+    a.created_on,
+    a.last_modified_on,
+    MAX(CASE WHEN f.semantic_key = 'trustName' THEN f.value_string END) AS trust_name,
+    MAX(CASE WHEN f.semantic_key = 'visitDate' THEN f.value_date END)   AS visit_date
+FROM prism.v_applications a
+LEFT JOIN prism.v_current_answer_facts f
+    ON f.tenant_id = a.tenant_id
+   AND f.application_id = a.application_id
+   AND f.parent_field_id = ''
+   AND f.nested_path = ''
+WHERE a.tenant_id = @tenant
+  AND a.template_id = @template
+GROUP BY a.application_id, a.application_reference, a.lifecycle, a.created_on, a.last_modified_on;
+```
+
+Starting from `v_applications` keeps applications with no exported answers in the report.
 
 To generate the columns from the catalogue, so new questions appear without editing the query:
 
@@ -189,8 +213,9 @@ COALESCE(
         MAX(CASE WHEN f.semantic_key = 'lastName' THEN f.value_string END)), '')) AS full_name
 ```
 
-**Before the post-deployment backfill.** Catalogues written before semantic keys existed have `semantic_key` set
-to `NULL` until the Prism admin runs a backfill. If you query before then, use this instead of `semantic_key`.
+**Before re-projection after deployment.** Catalogues written before semantic keys existed have `semantic_key`
+set to `NULL` until nightly reconciliation (or a backfill run by the Prism admin) re-projects the template's
+applications. If you query before then, use this instead of `semantic_key`.
 It gives the same key for any question that has never been renamed.
 
 ```sql

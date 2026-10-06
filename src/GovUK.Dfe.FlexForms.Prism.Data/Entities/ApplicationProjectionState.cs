@@ -14,6 +14,11 @@ public class ApplicationProjectionState
     public ApplicationLifecycle Lifecycle { get; set; }
     public Guid? TemplateId { get; set; }
     public Guid? TemplateVersionId { get; set; }
+    public string? ApplicationReference { get; set; }
+
+    /// <summary>When the application was created in FlexForms (not when Prism first projected it).</summary>
+    public DateTime? ApplicationCreatedOn { get; set; }
+    public DateTime? ApplicationLastModifiedOn { get; set; }
     public byte[]? SourceHash { get; set; }
     public int ProjectorVersion { get; set; }
     public int ContractVersion { get; set; }

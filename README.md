@@ -122,6 +122,7 @@ Insights with OpenTelemetry when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set;
 The Prism database lives in schema `prism` and is owned by EF Core migrations in
 `src/GovUK.Dfe.FlexForms.Prism.Data/Migrations`. Consumers read only the views:
 
+- `prism.v_applications`: one row per application with its reference, lifecycle and dates, excluding deleted applications.
 - `prism.v_current_answer_facts`: facts of each application's active generation, excluding deleted applications.
 - `prism.v_submission_answer_facts`: facts of each submission's selected generation, excluding deleted applications.
 - `prism.v_template_field_changes`: fields added, removed or changed by each template version, with their export decision.

@@ -5,6 +5,7 @@ using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Writing;
+using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Catalogue;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Facts;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
@@ -32,8 +33,9 @@ public class ProjectionServiceTests
                 p.SourceRevision == 3
                 && p.ResponseId == state.ResponseId
                 && p.Lifecycle == ApplicationLifecycle.Draft
-                && p.Versions == new ProjectionVersions(1, 1, 1)
-                && p.SourceHash.Length == 32),
+                && p.Versions == new ProjectionVersions(PrismVersions.ProjectorVersion, PrismVersions.ContractVersion, 1)
+                && p.SourceHash.Length == 32
+                && p.Details == new ApplicationDetails("APP-1", state.CreatedOn, state.LastModifiedOn)),
             Arg.Is<IReadOnlyCollection<AnswerFact>>(facts => facts.Count == 1 && facts.First().FieldId == "name" && facts.First().ValueString == "Ada"),
             Arg.Any<CancellationToken>());
         await h.CatalogWriter.Received(1).EnsureAsync(
@@ -183,7 +185,7 @@ public class ProjectionServiceTests
         var submissionId = Guid.NewGuid();
         h.SourceReturns(h.State(4, ProjectorHarness.Body("Ada"), ApplicationStatus.Submitted));
         h.Store.GetSubmissionAsync(h.TenantId, submissionId, Arg.Any<CancellationToken>())
-            .Returns(new StoredSubmission(Guid.NewGuid(), 4, new ProjectionVersions(1, 1, 1)));
+            .Returns(new StoredSubmission(Guid.NewGuid(), 4, new ProjectionVersions(PrismVersions.ProjectorVersion, PrismVersions.ContractVersion, 1)));
 
         await h.Service.ProjectAsync(h.Message(ProjectionReason.Submitted, 4, submissionId: submissionId), default);
 

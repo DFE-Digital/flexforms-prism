@@ -111,6 +111,26 @@ otherwise reconciliation can't find lost deletes.
 
 Read **only** the views in schema `prism`. The tables and their columns may change between projector versions.
 
+### `prism.v_applications`
+
+One row per application that isn't deleted, with what isn't an answer. Join it to the fact views on
+`(tenant_id, application_id)`.
+
+| Column | Meaning |
+|---|---|
+| `tenant_id`, `application_id` | Identity. Always filter on `tenant_id`. |
+| `application_reference` | The application reference users see in FlexForms. |
+| `lifecycle` | `Draft` or `Submitted`. Deleted applications never appear. |
+| `template_id`, `template_version_id` | The template version of the latest response. |
+| `created_on` | When the application was created in FlexForms (UTC). |
+| `last_modified_on` | When it was last changed in FlexForms (UTC); `created_on` if it never was. |
+| `last_submitted_at` | When it was last submitted, from the submission snapshots. Null if it never was. |
+| `source_revision`, `response_id`, `projected_at` | As in `v_current_answer_facts`. |
+
+`application_reference`, `created_on` and `last_modified_on` are null for an application until it is projected at
+projector version 2 or later; after deploying, nightly reconciliation does that, or run a backfill.
+Who created the application isn't published.
+
 ### `prism.v_current_answer_facts`
 
 The latest projected answers of every application that isn't deleted. There is one row per fact.
@@ -178,8 +198,9 @@ relabelled field keeps its decision, because decisions are per field ID; review 
 meaning changed. A renamed field has a new ID, so it needs its own decision; review `field_id_changed` rows.
 
 Catalogues written before semantic keys were recorded have no `semantic_key`; the view falls back to the key the
-field ID implies, which is correct for every field without an authored `semanticKey`. Run a backfill after
-deploying so existing catalogues pick up authored keys and retirements.
+field ID implies, which is correct for every field without an authored `semanticKey`. Projector version 2 records
+them, so after deploying it nightly reconciliation (or a backfill) re-projects each application, which re-catalogues
+its template version with authored keys and retirements.
 
 ### Guarantees
 

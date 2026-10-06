@@ -297,11 +297,13 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         => ExecuteAsync(connection, transaction, """
             INSERT INTO prism.application_projection_state
                 (tenant_id, application_id, active_generation_id, response_id, source_revision, lifecycle,
-                 template_id, template_version_id, source_hash, projector_version, contract_version,
+                 template_id, template_version_id, application_reference, application_created_on,
+                 application_last_modified_on, source_hash, projector_version, contract_version,
                  export_policy_version, source_occurred_at, created_at, projected_at)
             VALUES
                 (@tenant, @application, @generation, @response, @revision, @lifecycle,
-                 @template, @templateVersion, @hash, @projectorVersion, @contractVersion,
+                 @template, @templateVersion, @reference, @applicationCreatedOn,
+                 @applicationLastModifiedOn, @hash, @projectorVersion, @contractVersion,
                  @exportPolicyVersion, @occurredAt, @now, @now)
             """, cancellationToken, StateParameters(projection, generationId, now));
 
@@ -315,6 +317,9 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
                 lifecycle = @lifecycle,
                 template_id = @template,
                 template_version_id = @templateVersion,
+                application_reference = @reference,
+                application_created_on = @applicationCreatedOn,
+                application_last_modified_on = @applicationLastModifiedOn,
                 source_hash = @hash,
                 projector_version = @projectorVersion,
                 contract_version = @contractVersion,
@@ -339,6 +344,8 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         ("@tenant", projection.TenantId), ("@application", projection.ApplicationId), ("@generation", generationId),
         ("@response", projection.ResponseId), ("@revision", projection.SourceRevision), ("@lifecycle", projection.Lifecycle.ToString()),
         ("@template", projection.TemplateId), ("@templateVersion", projection.TemplateVersionId), ("@hash", projection.SourceHash),
+        ("@reference", projection.Details?.Reference),
+        ("@applicationCreatedOn", projection.Details?.CreatedOn), ("@applicationLastModifiedOn", projection.Details?.LastModifiedOn),
         ("@projectorVersion", projection.Versions.ProjectorVersion), ("@contractVersion", projection.Versions.ContractVersion),
         ("@exportPolicyVersion", projection.Versions.ExportPolicyVersion), ("@occurredAt", projection.SourceOccurredAt), ("@now", now)
     ];

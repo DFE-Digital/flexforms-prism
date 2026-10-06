@@ -55,6 +55,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.ToTable("application_projection_state");
             e.HasKey(x => new { x.TenantId, x.ApplicationId });
             e.Property(x => x.SourceHash).HasMaxLength(32).IsFixedLength();
+            e.Property(x => x.ApplicationReference).HasMaxLength(100);
             e.HasOne(x => x.ActiveGeneration)
                 .WithMany()
                 .HasForeignKey(x => x.ActiveGenerationId)

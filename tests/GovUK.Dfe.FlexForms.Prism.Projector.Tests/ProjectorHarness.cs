@@ -7,6 +7,7 @@ using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events;
 using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Writing;
+using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Facts;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
 using GovUK.Dfe.FlexForms.Prism.Source;
@@ -112,7 +113,7 @@ internal sealed class ProjectorHarness
     public void Stored(long revision, int policyVersion = 1, byte[]? hash = null, Guid? activeGenerationId = null) =>
         Store.GetStateAsync(TenantId, ApplicationId, Arg.Any<CancellationToken>()).Returns(new StoredProjectionState(
             revision, Data.Entities.ApplicationLifecycle.Draft, activeGenerationId ?? Guid.NewGuid(), hash ?? [1, 2, 3], TemplateId,
-            new ProjectionVersions(1, 1, policyVersion)));
+            new ProjectionVersions(PrismVersions.ProjectorVersion, PrismVersions.ContractVersion, policyVersion)));
 
     private sealed class TestMeterFactory : IMeterFactory
     {
