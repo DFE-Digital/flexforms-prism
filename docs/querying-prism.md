@@ -8,6 +8,30 @@ lookups and one-to-many reports.
 The SQL is T-SQL (Azure SQL). Field IDs in the examples (`trustName`, `externalAttendees` and so on) are
 illustrative; take the real ones from `prism.field_catalog`.
 
+## Who maps template changes
+
+**The template author does, not the data team.** Once any application uses a template, FlexForms refuses to save
+a new version that would break reporting across versions. Each refusal tells the author exactly what to fix. So:
+
+- **Renaming a question:** the author retires the old ID in `retiredFields`, names the new one in `replacedBy`,
+  and gives the new question the old reporting key as its `semanticKey`. Answers from both versions come out under
+  the same `semantic_key`, and reports keep working with no mapping.
+- **Removing, splitting or merging questions:** the author must retire the old question and name its replacements.
+  Prism shows them in `replaced_by` in `v_template_field_changes`, so you can see the relationship rather than
+  guess it.
+- **Changing what a question stores** (text to number, one choice to many, one lookup to another): this isn't
+  allowed under the same ID, so a column never silently changes type.
+- **Reusing an old ID or reporting key for something else:** this isn't allowed either.
+
+Prism reads what the author declared and publishes it as written. The data team doesn't keep a mapping table. It
+only has two jobs:
+- approve new or renamed questions for export (see [export-policy.md](export-policy.md));
+- decide how to combine questions that were genuinely split or merged, if a report needs them as one (see
+  recipe 2).
+
+The authors' rules are in the FlexForms Form Template Designer Manual, section 15.1 "Changing fields once a
+template is in use".
+
 ## How the data is laid out
 
 Prism stores **one row per answer**, not one row per application. Each row says which application, which question,

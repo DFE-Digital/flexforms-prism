@@ -12,6 +12,12 @@ The API also publishes a `TemplateVersionPublishedEvent` to the same topic whene
 (sessioned by `{tenantId}:template:{templateId}`). Prism catalogues that version's fields straight away, so the data
 team can see what changed (`prism.v_template_field_changes`) and classify new fields before any application uses them.
 
+Template authors are responsible for mapping field changes. Once a template is in use, FlexForms only accepts a new
+version that declares every removed or renamed field (`retiredFields` with `replacedBy`, plus `semanticKey` for a
+rename). Prism reads those declarations into `semantic_key` and `replaced_by`, so reports carry on across versions
+without a mapping maintained by the data team. See
+[docs/querying-prism.md](docs/querying-prism.md#who-maps-template-changes).
+
 ## Documentation
 
 | Document | For |
