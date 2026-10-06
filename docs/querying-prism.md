@@ -179,7 +179,7 @@ EXEC sp_executesql @sql, N'@tenant uniqueidentifier, @template uniqueidentifier'
 `QUOTENAME` only accepts up to 128 characters, which covers any sensible question ID.
 
 In Power BI you can skip the pivot altogether: load the long view as the fact table and the catalogue as the
-question dimension, and let the matrix visual do the pivot.
+question dimension, and let the matrix visual do the pivot. [power-bi-guide.md](power-bi-guide.md) walks through it.
 
 ### 2. One table across every template version
 

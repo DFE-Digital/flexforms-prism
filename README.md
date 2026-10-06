@@ -23,6 +23,7 @@ without a mapping maintained by the data team. See
 | Document | For |
 | --- | --- |
 | [docs/prism-contract-v1.md](docs/prism-contract-v1.md) | The events, the internal API and the SQL views consumers read |
+| [docs/power-bi-guide.md](docs/power-bi-guide.md) | Step-by-step Power BI tutorials, from a first chart to pivoted matrices, checkboxes, lookups and repeating sections |
 | [docs/querying-prism.md](docs/querying-prism.md) | Worked queries for the data team: pivots, reporting across versions, collections and lookups |
 | [docs/export-policy.md](docs/export-policy.md) | Classifying which fields may be exported, and reviewing template changes |
 | [docs/runbook.md](docs/runbook.md) | Operating Prism: telemetry, backfills, incidents, upgrades and rollout |
