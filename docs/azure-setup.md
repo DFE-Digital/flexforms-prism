@@ -128,7 +128,7 @@ Deploy the `prism-functions` artifact from CI (`prism-functions.zip`).
 | `ExternalApplicationsApiClient__Scope` | `api://<flexforms-api-client-id>/.default` |
 | `Prism__Admin__Authority` | `https://login.microsoftonline.com/<entra-tenant-id>/v2.0` |
 | `Prism__Admin__Audience` | `api://<prism-client-id>` |
-| `Prism__Admin__ValidIssuers__0` | `https://sts.windows.net/<entra-tenant-id>/` (only if v1 tokens are used) |
+| `Prism__Admin__ValidIssuers__0` | `https://sts.windows.net/<entra-tenant-id>/` (for v1 tokens, the default for managed identities) |
 
 Optional, with their defaults:
 
@@ -169,8 +169,9 @@ managed identity:
 `Prism__ControlApi__DevelopmentKey` is for local development only. Never set it in Azure.
 
 Managed identity tokens are v1 tokens unless the Prism app registration's manifest sets
-`"requestedAccessTokenVersion": 2`. Either set that, or set `Prism__Admin__ValidIssuers__0` on the Function, otherwise
-every call from the API is rejected as an invalid token.
+`"requestedAccessTokenVersion": 2`. Keep v1 and set `Prism__Admin__ValidIssuers__0` on the Function, otherwise every
+call from the API is rejected as an invalid token. If you switch the manifest to v2 instead, the token's audience
+becomes the bare Prism client ID, so `Prism__Admin__Audience` must change to `<prism-client-id>` as well.
 
 ## Checking the connection
 
