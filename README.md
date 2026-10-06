@@ -17,6 +17,7 @@ team can see what changed (`prism.v_template_field_changes`) and classify new fi
 | Document | For |
 | --- | --- |
 | [docs/prism-contract-v1.md](docs/prism-contract-v1.md) | The events, the internal API and the SQL views consumers read |
+| [docs/querying-prism.md](docs/querying-prism.md) | Worked queries for the data team: pivots, reporting across versions, collections and lookups |
 | [docs/export-policy.md](docs/export-policy.md) | Classifying which fields may be exported, and reviewing template changes |
 | [docs/runbook.md](docs/runbook.md) | Operating Prism: telemetry, backfills, incidents, upgrades and rollout |
 | [docs/azure-setup.md](docs/azure-setup.md) | The Azure resources, roles and app settings Prism needs |
