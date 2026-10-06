@@ -68,3 +68,5 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+/.azurite
+/src/GovUK.Dfe.FlexForms.Prism.Functions/.azurite
