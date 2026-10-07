@@ -144,7 +144,9 @@ PRISM_DB_CONNECTION="Server=localhost,1433;Database=prism;User Id=sa;Password=..
 ```
 
 Deployments apply migrations with a self-contained bundle (`prism-migrations` CI artifact, or
-`Dockerfile.migrations`) through `script/migrate-prism-db.sh`, which reads `PRISM_DB_CONNECTION`.
+`Dockerfile.migrations`) through `script/migrate-prism-db.sh`, which reads `PRISM_DB_CONNECTION`. Every push to
+`main` runs them in Azure through a Container Apps Job (`.github/workflows/migrate.yml`); see
+[Azure setup](docs/azure-setup.md#migration-job).
 
 ## Functions
 

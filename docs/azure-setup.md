@@ -72,7 +72,40 @@ ALTER ROLE prism_reader ADD MEMBER [<data-team-identity-or-group>];
 The `prism` schema is created by the first migration. Run the grants on the schema after the first migration, or
 create the schema first with `CREATE SCHEMA prism;`.
 
-The schema is applied by the `prism-migrations` artifact from CI (`migrate-prism-db.sh`). See the runbook.
+The schema is applied by the migration job below, or by hand with the `prism-migrations` artifact from CI
+(`migrate-prism-db.sh`).
+
+## Migration job
+
+The `Migrate Prism database` workflow (`.github/workflows/migrate.yml`) runs on every push to `main`
+(environment `development`), or by hand for any environment. It works like the FlexForms API's init container:
+
+1. It builds `Dockerfile.migrations` and imports it into ACR as `flexformsprism:migrations-sha-<commit>`.
+2. It points a Container Apps Job at that image and starts it.
+3. It waits for the execution to succeed, and fails the workflow if it fails.
+
+The job runs inside Azure, so it reaches SQL over the private network. The connection string lives on the job,
+never in GitHub. Create the job once per environment:
+
+| Setting | Value |
+|---|---|
+| Type | Container Apps Job, trigger type **Manual**, in the same environment as the FlexForms API |
+| Image | Any `flexformsprism:migrations-*` tag (the workflow replaces it on each run) |
+| Replica timeout | `1800` seconds. Replica retry limit `0`, parallelism `1` |
+| Identity | A user-assigned managed identity: the `<prism-migration-identity>` above, plus `AcrPull` on the registry |
+| Secret `prism-db-connection` | `Server=tcp:<server>.database.windows.net,1433;Database=<db>;Authentication=Active Directory Managed Identity;User Id=<identity-client-id>;Encrypt=True` |
+| Environment variable | `PRISM_DB_CONNECTION` = `secretref:prism-db-connection` |
+
+The workflow uses these GitHub environment secrets:
+
+| Secret | Value |
+|---|---|
+| `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `ACR_NAME`, `ACR_CLIENT_ID`, `ACA_CLIENT_ID` | Same as the FlexForms API |
+| `PRISM_MIGRATION_JOB_NAME` | The job's name |
+| `PRISM_MIGRATION_JOB_RESOURCE_GROUP` | The job's resource group |
+
+The `ACA_CLIENT_ID` identity needs `Contributor` on the job, to update its image and start it. A failed run's
+output is in the job's execution history and the environment's Log Analytics workspace.
 
 ## Entra ID
 

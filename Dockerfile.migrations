@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet tool restore \
+ && dotnet restore src/GovUK.Dfe.FlexForms.Prism.Data -r linux-x64 \
  && dotnet ef migrations bundle \
       --project src/GovUK.Dfe.FlexForms.Prism.Data \
       --startup-project src/GovUK.Dfe.FlexForms.Prism.Data \
