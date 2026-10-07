@@ -174,6 +174,16 @@ Optional, with their defaults:
 | `Prism__Cleanup__MaxGenerationsPerRun` | `2000` |
 | `Prism__Admin__RequiredRole` | `Prism.Admin` |
 | `Prism__Admin__DelegateRole` | `Prism.Delegate` |
+| `Prism__ExcludedTenantIds__0`, `__1`, ... | the Playwright tenant, from `appsettings.json` |
+
+`Prism:ExcludedTenantIds` lists tenants Prism never reports on, such as test and Playwright tenants. Their messages
+are completed without projecting, and backfills and reconciliations skip them. Rows already projected for an excluded
+tenant stay in the database until you delete them. The shared list lives in the Functions project's `appsettings.json`
+and deploys with the code. App settings override it entry by entry, so `Prism__ExcludedTenantIds__0` replaces the
+first entry; use `__1` and up to add tenants for one environment.
+
+Worker log levels come from `Program.cs` (Entity Framework and HttpClient at Warning). Override them with
+`Logging__LogLevel__<category>` app settings; `host.json` only controls the host's own logs.
 
 Without `Prism__Admin__Authority` and `Prism__Admin__Audience`, every admin request is rejected.
 

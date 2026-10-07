@@ -90,6 +90,7 @@ public sealed partial class OperationProcessor(
         var tenants = operation.TenantId is { } tenantId
             ? [tenantId]
             : (await source.GetTenantsAsync(cancellationToken)).Select(t => t.TenantId).Distinct().Order().ToList();
+        tenants = [.. tenants.Where(t => !options.Value.IsExcluded(t))];
 
         var (cursor, page) = (operation.CurrentTenantId, operation.NextPage);
         foreach (var tenant in tenants.Where(t => cursor is null || t.CompareTo(cursor.Value) >= 0))

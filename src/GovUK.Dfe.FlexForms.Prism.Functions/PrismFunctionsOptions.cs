@@ -13,6 +13,14 @@ public sealed class PrismFunctionsOptions
     /// <summary>AMQP over WebSockets by default, matching the other platform services on this network.</summary>
     public ServiceBusTransportType ServiceBusTransport { get; set; } = ServiceBusTransportType.AmqpWebSockets;
 
+    /// <summary>
+    /// Tenants Prism never reports on, such as test and Playwright tenants. Their messages are completed without
+    /// projecting, and backfills and reconciliations skip them. Data already projected for them is not removed.
+    /// </summary>
+    public Guid[] ExcludedTenantIds { get; set; } = [];
+
+    public bool IsExcluded(Guid tenantId) => ExcludedTenantIds.Contains(tenantId);
+
     public BackfillOptions Backfill { get; set; } = new();
 
     public CleanupOptions Cleanup { get; set; } = new();

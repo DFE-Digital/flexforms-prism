@@ -4,6 +4,7 @@ using GovUK.Dfe.FlexForms.Prism.Functions.Messaging;
 using GovUK.Dfe.FlexForms.Prism.Projector;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GovUK.Dfe.FlexForms.Prism.Functions.Functions;
 
@@ -11,9 +12,13 @@ namespace GovUK.Dfe.FlexForms.Prism.Functions.Functions;
 /// Projects one application per message, or catalogues a newly published template version. Sessions keep every
 /// message for an application (or a template) in order. Messages are
 /// completed on success or skip, dead-lettered on permanent failures, and abandoned on transient failures so
-/// Service Bus redelivers them until <c>MaxDeliveryCount</c>.
+/// Service Bus redelivers them until <c>MaxDeliveryCount</c>. Messages for excluded tenants are completed unread.
 /// </summary>
-public sealed partial class ProjectionFunction(IProjectionService projector, PrismMetrics metrics, ILogger<ProjectionFunction> logger)
+public sealed partial class ProjectionFunction(
+    IProjectionService projector,
+    PrismMetrics metrics,
+    IOptions<PrismFunctionsOptions> options,
+    ILogger<ProjectionFunction> logger)
 {
     private const int MaxDeadLetterDescriptionLength = 1024;
 
@@ -35,6 +40,10 @@ public sealed partial class ProjectionFunction(IProjectionService projector, Pri
         {
             switch (ProjectionMessages.Read(message.Body))
             {
+                case ApplicationProjectionRequestedEvent request when options.Value.IsExcluded(request.TenantId):
+                    LogExcludedTenant(request.TenantId);
+                    break;
+
                 case ApplicationProjectionRequestedEvent request:
                     if (message.DeliveryCount > 1)
                     {
@@ -42,6 +51,10 @@ public sealed partial class ProjectionFunction(IProjectionService projector, Pri
                     }
 
                     await projector.ProjectAsync(request, cancellationToken);
+                    break;
+
+                case TemplateVersionPublishedEvent published when options.Value.IsExcluded(published.TenantId):
+                    LogExcludedTenant(published.TenantId);
                     break;
 
                 case TemplateVersionPublishedEvent published:
@@ -72,4 +85,7 @@ public sealed partial class ProjectionFunction(IProjectionService projector, Pri
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Dead-lettering message: {FailureReason}")]
     private partial void LogDeadLettering(string failureReason);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Ignoring message for excluded tenant {TenantId}")]
+    private partial void LogExcludedTenant(Guid tenantId);
 }

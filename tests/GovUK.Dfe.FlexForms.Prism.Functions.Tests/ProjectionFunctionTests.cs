@@ -6,6 +6,7 @@ using GovUK.Dfe.FlexForms.Prism.Projector;
 using GovUK.Dfe.FlexForms.Prism.Source;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
@@ -15,11 +16,13 @@ public class ProjectionFunctionTests
 {
     private readonly IProjectionService projector = Substitute.For<IProjectionService>();
     private readonly ServiceBusMessageActions actions = Substitute.For<ServiceBusMessageActions>();
+    private readonly PrismFunctionsOptions options = new();
     private readonly ProjectionFunction function;
 
     public ProjectionFunctionTests()
     {
-        function = new ProjectionFunction(projector, new PrismMetrics(new TestMeterFactory()), NullLogger<ProjectionFunction>.Instance);
+        function = new ProjectionFunction(
+            projector, new PrismMetrics(new TestMeterFactory()), Options.Create(options), NullLogger<ProjectionFunction>.Instance);
     }
 
     private static ServiceBusReceivedMessage Received(BinaryData body, int deliveryCount = 1) =>
@@ -48,6 +51,32 @@ public class ProjectionFunctionTests
 
         await projector.Received(1).CatalogueTemplateVersionAsync(published, Arg.Any<CancellationToken>());
         await projector.DidNotReceiveWithAnyArgs().ProjectAsync(default!, default);
+        await actions.Received(1).CompleteMessageAsync(message, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_message_for_an_excluded_tenant_is_completed_without_projecting()
+    {
+        var request = TestSupport.Event();
+        options.ExcludedTenantIds = [request.TenantId];
+        var message = Received(ProjectionMessages.Create(request).Body);
+
+        await function.Run(message, actions, default);
+
+        await projector.DidNotReceiveWithAnyArgs().ProjectAsync(default!, default);
+        await actions.Received(1).CompleteMessageAsync(message, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_template_version_for_an_excluded_tenant_is_completed_without_cataloguing()
+    {
+        var published = TestSupport.TemplateVersionPublished();
+        options.ExcludedTenantIds = [published.TenantId];
+        var message = Received(ProjectionMessages.Create(published).Body);
+
+        await function.Run(message, actions, default);
+
+        await projector.DidNotReceiveWithAnyArgs().CatalogueTemplateVersionAsync(default!, default);
         await actions.Received(1).CompleteMessageAsync(message, Arg.Any<CancellationToken>());
     }
 

@@ -5,6 +5,7 @@
     "logLevel": {
       "default": "Information",
       "Azure.Core": "Error",
+      "Azure.Messaging.ServiceBus": "Warning",
       "Microsoft.EntityFrameworkCore": "Warning",
       "System.Net.Http.HttpClient": "Warning"
     },

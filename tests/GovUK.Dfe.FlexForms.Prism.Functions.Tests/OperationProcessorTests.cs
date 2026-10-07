@@ -27,6 +27,7 @@ public sealed class OperationProcessorTests : IAsyncLifetime
     private readonly List<ApplicationProjectionRequestedEvent> sent = [];
     private readonly ManualClock clock = new();
     private readonly Guid tenant = Guid.NewGuid();
+    private Guid[] excludedTenants = [];
 
     public OperationProcessorTests(SqlServerFixture sql)
     {
@@ -49,7 +50,11 @@ public sealed class OperationProcessorTests : IAsyncLifetime
         sender.SendAsync(Arg.Do<IReadOnlyCollection<ApplicationProjectionRequestedEvent>>(sent.AddRange), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
-        var options = Options.Create(new PrismFunctionsOptions { Backfill = { PageSize = 2, TimeBudget = TimeSpan.FromMinutes(1) } });
+        var options = Options.Create(new PrismFunctionsOptions
+        {
+            ExcludedTenantIds = excludedTenants,
+            Backfill = { PageSize = 2, TimeBudget = TimeSpan.FromMinutes(1) },
+        });
         await new OperationProcessor(
                 db, source, new ProjectionStore(db), sender, new ControlPlaneMetrics(new TestMeterFactory()), clock, options,
                 NullLogger<OperationProcessor>.Instance)
@@ -115,6 +120,25 @@ public sealed class OperationProcessorTests : IAsyncLifetime
         await Run();
 
         Assert.Equal(new[] { tenant, other }.Order(), sent.Select(m => m.TenantId).Order());
+    }
+
+    [Fact]
+    public async Task Excluded_tenants_are_skipped()
+    {
+        var other = Guid.NewGuid();
+        excludedTenants = [other];
+        source.GetTenantsAsync(Arg.Any<CancellationToken>()).Returns([new PrismTenantDto(tenant, "A"), new PrismTenantDto(other, "B")]);
+        Pages(tenant, [App(1)]);
+        Pages(other, [App(1)]);
+        var all = await Create(OperationKind.Backfill);
+        var single = await Create(OperationKind.Backfill, other);
+
+        await Run();
+
+        Assert.Equal([tenant], sent.Select(m => m.TenantId));
+        Assert.Equal(BackfillStatus.Completed, (await Load(all.OperationId)).Status);
+        Assert.Equal(BackfillStatus.Completed, (await Load(single.OperationId)).Status);
+        await source.DidNotReceive().ListApplicationsAsync(other, Arg.Any<DateTime?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
