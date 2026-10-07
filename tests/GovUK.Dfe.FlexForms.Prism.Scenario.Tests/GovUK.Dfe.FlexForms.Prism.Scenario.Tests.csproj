@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Testcontainers.MsSql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GovUK.Dfe.FlexForms.Prism.Functions\GovUK.Dfe.FlexForms.Prism.Functions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GovUK.Dfe.FlexForms.Prism.Data.Tests\SqlServerFixture.cs" Link="SqlServerFixture.cs" />
+  </ItemGroup>
+
+</Project>

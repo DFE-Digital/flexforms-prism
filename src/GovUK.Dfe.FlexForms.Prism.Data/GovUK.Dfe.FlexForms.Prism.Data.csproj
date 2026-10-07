@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Prism database: PrismDbContext, migrations and the projection writer.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GovUK.Dfe.FlexForms.Prism.Flattener\GovUK.Dfe.FlexForms.Prism.Flattener.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Testcontainers.MsSql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GovUK.Dfe.FlexForms.Prism.Data\GovUK.Dfe.FlexForms.Prism.Data.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,23 @@
+# Builds an image that applies the Prism database migrations.
+#   docker build -f Dockerfile.migrations -t prism-migrations .
+#   docker run --rm -e PRISM_DB_CONNECTION="..." prism-migrations
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet tool restore \
+ && dotnet restore src/GovUK.Dfe.FlexForms.Prism.Data -r linux-x64 \
+ && dotnet ef migrations bundle \
+      --project src/GovUK.Dfe.FlexForms.Prism.Data \
+      --startup-project src/GovUK.Dfe.FlexForms.Prism.Data \
+      --self-contained -r linux-x64 \
+      -o /out/efbundle
+
+FROM mcr.microsoft.com/dotnet/runtime-deps:10.0
+WORKDIR /app
+COPY --from=build /out/efbundle ./efbundle
+COPY script/migrate-prism-db.sh ./migrate-prism-db.sh
+RUN chmod +x ./efbundle ./migrate-prism-db.sh
+ENV PRISM_EFBUNDLE=/app/efbundle
+USER $APP_UID
+ENTRYPOINT ["/app/migrate-prism-db.sh"]

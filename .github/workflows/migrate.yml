@@ -1,0 +1,145 @@
+name: Migrate Prism database
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        description: "Choose an environment to migrate"
+        required: true
+
+# Never run two migrations against the same database at once.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.inputs.environment || 'development' }}
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: flexformsprism
+  TAG_PREFIX: migrations-
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  set-env:
+    name: Preflight
+    runs-on: ubuntu-24.04
+    outputs:
+      environment: ${{ steps.var.outputs.environment }}
+      checked-out-sha: ${{ steps.var.outputs.checked-out-sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - id: var
+        run: |
+          INPUT="${{ github.event.inputs.environment }}"
+          ENVIRONMENT=${INPUT:-"development"}
+          CHECKED_OUT_SHA="$(git log -1 '--format=format:%H')"
+          echo "environment=${ENVIRONMENT}" >> $GITHUB_OUTPUT
+          echo "checked-out-sha=${CHECKED_OUT_SHA}" >> $GITHUB_OUTPUT
+
+  build-import:
+    name: Build & import migrations image → ${{ needs.set-env.outputs.environment }}
+    runs-on: ubuntu-24.04
+    needs: [ set-env ]
+    environment: ${{ needs.set-env.outputs.environment }}
+    permissions:
+      attestations: write
+      packages: write
+      id-token: write
+    steps:
+      - name: Build
+        uses: DFE-Digital/deploy-azure-container-apps-action/.github/actions/build@8e72e403f05ff9da09668207eef1d79e1ce9d1a7 # v5.2.1
+        with:
+          image-name: ${{ env.IMAGE_NAME }}
+          build-file-name: Dockerfile.migrations
+          tag-prefix: ${{ env.TAG_PREFIX }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Import
+        uses: DFE-Digital/deploy-azure-container-apps-action/.github/actions/import@8e72e403f05ff9da09668207eef1d79e1ce9d1a7 # v5.2.1
+        with:
+          image-name: ${{ env.IMAGE_NAME }}
+          tag-prefix: ${{ env.TAG_PREFIX }}
+          azure-acr-name: ${{ secrets.ACR_NAME }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-acr-client-id: ${{ secrets.ACR_CLIENT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID || '' }}
+          AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION_ID || '' }}
+          AZURE_ACR_CLIENT_ID: ${{ secrets.ACR_CLIENT_ID || '' }}
+
+  migrate:
+    name: Migrate → ${{ needs.set-env.outputs.environment }}
+    runs-on: ubuntu-24.04
+    needs: [ set-env, build-import ]
+    environment: ${{ needs.set-env.outputs.environment }}
+    permissions:
+      id-token: write
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ACA_CLIENT_ID }}
+
+      # The connection string is a secret on the Container Apps Job itself, never in GitHub.
+      - name: Run migration job
+        uses: azure/cli@v2
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          JOB_NAME: ${{ secrets.PRISM_MIGRATION_JOB_NAME }}
+          RESOURCE_GROUP: ${{ secrets.PRISM_MIGRATION_JOB_RESOURCE_GROUP }}
+          IMAGE_TAG: ${{ env.TAG_PREFIX }}sha-${{ needs.set-env.outputs.checked-out-sha }}
+          TIMEOUT_SECONDS: 1200
+        with:
+          azcliversion: 2.72.0
+          inlineScript: |
+            set -euo pipefail
+            az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+            IMAGE="${ACR_NAME}.azurecr.io/${IMAGE_NAME}:${IMAGE_TAG}"
+
+            az containerapp job update \
+              --name "$JOB_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --image "$IMAGE" \
+              --only-show-errors --output none
+
+            EXECUTION=$(az containerapp job start \
+              --name "$JOB_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --query name --output tsv --only-show-errors)
+            echo "[i] Started execution $EXECUTION with $IMAGE"
+
+            DEADLINE=$(( $(date +%s) + TIMEOUT_SECONDS ))
+            while true; do
+              STATUS=$(az containerapp job execution show \
+                --name "$JOB_NAME" \
+                --resource-group "$RESOURCE_GROUP" \
+                --job-execution-name "$EXECUTION" \
+                --query properties.status --output tsv --only-show-errors)
+              case "$STATUS" in
+                Succeeded)
+                  echo "### Prism migrated ✅" >> $GITHUB_STEP_SUMMARY
+                  echo "- Execution \`$EXECUTION\` with \`$IMAGE\`" >> $GITHUB_STEP_SUMMARY
+                  exit 0
+                  ;;
+                Failed|Stopped|Degraded)
+                  echo "::error::Migration execution $EXECUTION ended with status $STATUS. See the job's execution logs in Azure."
+                  exit 1
+                  ;;
+              esac
+              if (( $(date +%s) > DEADLINE )); then
+                echo "::error::Migration execution $EXECUTION was still $STATUS after ${TIMEOUT_SECONDS}s."
+                exit 1
+              fi
+              sleep 15
+            done

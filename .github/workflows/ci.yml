@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # TEMPORARY: Prism references flexforms-api (Api.Client) as a project until the client with the Prism
+  # endpoints is published as a package. It is checked out as a sibling folder.
+  FLEXFORMS_API_REF: feature/prism
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-test:
+    name: Build and test
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: flexforms-prism
+    steps:
+      - name: Checkout flexforms-prism
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          path: flexforms-prism
+
+      - name: Checkout flexforms-api
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: DFE-Digital/flexforms-api
+          ref: ${{ env.FLEXFORMS_API_REF }}
+          path: flexforms-api
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: flexforms-prism/global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('flexforms-prism/**/*.csproj', 'flexforms-prism/Directory.Packages.props', 'flexforms-prism/Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore GovUK.Dfe.FlexForms.Prism.slnx
+
+      - name: Build
+        run: dotnet build GovUK.Dfe.FlexForms.Prism.slnx --no-restore -c Release
+
+      # Data and Scenario tests use Testcontainers (SQL Server); the hosted runner provides Docker.
+      - name: Test
+        run: >
+          dotnet test GovUK.Dfe.FlexForms.Prism.slnx --no-build -c Release
+          --collect:"XPlat Code Coverage"
+          --logger trx
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: flexforms-prism/TestResults
+          if-no-files-found: ignore
+
+  publish:
+    name: Publish Function package
+    needs: build-test
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: flexforms-prism
+    steps:
+      - name: Checkout flexforms-prism
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          path: flexforms-prism
+
+      - name: Checkout flexforms-api
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: DFE-Digital/flexforms-api
+          ref: ${{ env.FLEXFORMS_API_REF }}
+          path: flexforms-api
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: flexforms-prism/global.json
+
+      - name: Publish Functions
+        run: dotnet publish src/GovUK.Dfe.FlexForms.Prism.Functions -c Release -o ../artifacts/functions
+
+      - name: Zip Functions
+        working-directory: artifacts/functions
+        run: zip -r ../prism-functions.zip .
+
+      - name: Upload Function package
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-functions
+          path: artifacts/prism-functions.zip
+
+      - name: Build migration bundle
+        run: |
+          dotnet tool restore
+          dotnet ef migrations bundle \
+            --project src/GovUK.Dfe.FlexForms.Prism.Data \
+            --startup-project src/GovUK.Dfe.FlexForms.Prism.Data \
+            --self-contained -r linux-x64 \
+            -o ../artifacts/migrations/efbundle
+          cp script/migrate-prism-db.sh ../artifacts/migrations/
+
+      - name: Upload migration bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-migrations
+          path: artifacts/migrations

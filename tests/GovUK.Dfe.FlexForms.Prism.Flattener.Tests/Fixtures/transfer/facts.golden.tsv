@@ -1,0 +1,118 @@
+# facts=96 hash=b1a1982a9887e4951c79c760f8595fc0c430b8b5cefa74220b4a98c29d0bc38e
+# warning NestedFieldAtTopLevel chairName-joining
+# warning NestedFieldAtTopLevel chairName-leaving
+# warning NestedFieldAtTopLevel dateSigned-joining
+# warning NestedFieldAtTopLevel dateSigned-leaving
+# warning NestedFieldAtTopLevel equalities-duties-decision
+# warning NestedFieldAtTopLevel equalities-duties-decision-leaving
+# warning NestedFieldAtTopLevel outgoingTrustUploadBoardResolution
+# warning NoiseKey IsTaskCompleted
+# warning NoiseKey TaskId
+# warning NoiseKey __RequestVerificationToken
+# warning NoiseKey detailsOfOutgoingTrusts.CurrentPageId
+# warning NoiseKey detailsOfOutgoingTrusts.CurrentTask.TaskName
+# warning NoiseKey detailsOfOutgoingTrusts.Data[trustsSearch-field-flow]
+# warning NoiseKey detailsOfOutgoingTrusts.Data[trustsSearch-field-flow_query]
+# warning NoiseKey detailsOfOutgoingTrusts.FlowId
+# warning NoiseKey detailsOfOutgoingTrusts.InstanceId
+# warning NoiseKey detailsOfOutgoingTrusts.TaskId
+# warning NoiseKey detailsOfOutgoingTrusts.__RequestVerificationToken
+# warning NoiseKey detailsOfOutgoingTrusts.handler
+# warning NoiseKey detailsOfOutgoingTrusts.trustsSearch-field-flow_query
+parent	occurrence	field	nested	item_id	ordinal	data_type	completed	status	string	decimal	bool	date	datetime	json	raw
+		financeAndOperationsHaveGrowthPlanNext3Years		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		financeAndOperationsHaveSAPAcademies		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		financeAndOperationsPolicyOnChargesMadeToItsAcademies		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		governanceStructureAfterTheTransferPploadDocuments	ca185d94-392d-4b85-9dd6-0e8e1c140a05	\N	\N	string	True	Ok	Screenshot 2025-07-16 092802.png	\N	\N	\N	\N	{"fileSize":40251,"id":"ca185d94-392d-4b85-9dd6-0e8e1c140a05","name":"Screenshot 2025-07-16 092802.png","originalFileName":"Screenshot 2025-07-16 092802.png","uploadedOn":"2025-12-16T15:06:00.3620015"}	\N
+		governanceTeamConfirmation		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		governanceTeamExplanation		\N	\N	string	True	Ok	wer	\N	\N	\N	\N	\N	wer
+		highQualityAndInclusiveEducationImpact		\N	\N	string	True	Ok	werwer	\N	\N	\N	\N	\N	werwer
+		highQualityAndInclusiveEducationQuality		\N	\N	string	True	Ok	asdasd	\N	\N	\N	\N	\N	asdasd
+		leadershipAndWorkForceWillTheLeadershipCentralTeamChange		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		reasonAndBenefitsAcademiesMaintainImprove		\N	\N	string	True	Ok	sdfsdf	\N	\N	\N	\N	\N	sdfsdf
+		reasonAndBenefitsAcademiesStrategicNeeds		\N	\N	string	True	Ok	sdfsdf	\N	\N	\N	\N	\N	sdfsdf
+		reasonAndBenefitsTrustAcademiesTrustsWorkedTogether		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		reasonAndBenefitsTrustDevelopmentalNeeds		\N	\N	string	True	Ok	werwer	\N	\N	\N	\N	\N	werwer
+		reasonAndBenefitsTrustStrategicNeeds		\N	\N	string	True	Ok	sdfsdf	\N	\N	\N	\N	\N	sdfsdf
+		risksDueDiligence		\N	\N	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+		risksOtherRisks		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		risksPupilNumbers		\N	\N	string	True	Ok	no	\N	\N	\N	\N	\N	no
+		risksTransferType		\N	\N	string	True	Ok	MATs that want to add an academy or academies from SATs	\N	\N	\N	\N	\N	MATs that want to add an academy or academies from SATs
+		schoolImprovementModel	3ac46d4f-50fb-44ad-9a3a-70552dd261ce	\N	\N	string	True	Ok	Screenshot 2025-06-27 170427.png	\N	\N	\N	\N	{"fileSize":41416,"id":"3ac46d4f-50fb-44ad-9a3a-70552dd261ce","name":"Screenshot 2025-06-27 170427.png","originalFileName":"Screenshot 2025-06-27 170427.png","uploadedOn":"2025-12-15T14:33:34.7911934"}	\N
+		schoolImprovementModel	76f4ab6a-9448-4af9-9d22-a739d8ff6ff1	\N	\N	string	True	Ok	Screenshot 2025-06-25 143046.png	\N	\N	\N	\N	{"fileSize":136517,"id":"76f4ab6a-9448-4af9-9d22-a739d8ff6ff1","name":"Screenshot 2025-06-25 143046.png","originalFileName":"Screenshot 2025-06-25 143046.png","uploadedOn":"2025-12-15T14:19:39.6905838"}	\N
+		schoolImprovementModel	a173c0df-2ccf-4ff6-b050-5e8a4ac903d6	\N	\N	string	True	Ok	Screenshot 2025-06-25 144853.png	\N	\N	\N	\N	{"fileSize":27561,"id":"a173c0df-2ccf-4ff6-b050-5e8a4ac903d6","name":"Screenshot 2025-06-25 144853.png","originalFileName":"Screenshot 2025-06-25 144853.png","uploadedOn":"2025-12-15T14:23:25.6120156"}	\N
+		schoolImprovementModel	ac667c91-cac7-416c-9a23-e0e76b7c1207	\N	\N	string	True	Ok	Screenshot 2025-06-27 170427.png	\N	\N	\N	\N	{"fileSize":41416,"id":"ac667c91-cac7-416c-9a23-e0e76b7c1207","name":"Screenshot 2025-06-27 170427.png","originalFileName":"Screenshot 2025-06-27 170427.png","uploadedOn":"2025-12-15T14:32:38.9743105"}	\N
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academiesSearch		c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	Brookhill Nursery School	\N	\N	\N	\N	{"gor":"London","localAuthorityName":"Barnet","name":"Brookhill Nursery School","ukprn":"10052623","urn":"101251"}	{&quot;name&quot;:&quot;Brookhill Nursery School&quot;,&quot;ukprn&quot;:&quot;10052623&quot;,&quot;urn&quot;:&quot;101251&quot;,&quot;localAuthorityName&quot;:&quot;Barnet&quot;,&quot;gor&quot;:&quot;London&quot;}
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academiesSearch	gor	c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	London	\N	\N	\N	\N	\N	\N
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academiesSearch	localAuthorityName	c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	Barnet	\N	\N	\N	\N	\N	\N
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academiesSearch	name	c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	Brookhill Nursery School	\N	\N	\N	\N	\N	\N
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academiesSearch	ukprn	c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	10052623	\N	\N	\N	\N	\N	\N
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academiesSearch	urn	c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	101251	\N	\N	\N	\N	\N	\N
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academyFunding		c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	No	\N	\N	\N	\N	\N	No
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	academyOperatingDifferently		c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	detailsOfAcademiesDiocesanConsent		c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	string	True	Ok	No	\N	\N	\N	\N	\N	No
+detailsOfAcademies	detailsOfAcademies/c075b428-fb38-42f4-a0c8-09a8dc40a7b5	proposedTransferDate		c075b428-fb38-42f4-a0c8-09a8dc40a7b5	0	DateTime	True	Ok	\N	\N	\N	2025-04-03	\N	\N	2025-04-03
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustAccountingOfficerEmailAddress		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	tester2@test.com	\N	\N	\N	\N	\N	tester2@test.com
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustAccountingOfficerFullName		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	Tester2	\N	\N	\N	\N	\N	Tester2
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustAccountingOfficerPhoneNumber		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	01632 960 001	\N	\N	\N	\N	\N	01632 960 001
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustChairOfTrusteeEmailAddress		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	tester2@test.com	\N	\N	\N	\N	\N	tester2@test.com
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustChairOfTrusteeFullName		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	Tester2	\N	\N	\N	\N	\N	Tester2
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustChairOfTrusteePhoneNumber		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	01632 960 001	\N	\N	\N	\N	\N	01632 960 001
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustChiefFinancialOfficerEmailAddress		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	tester2@test.com	\N	\N	\N	\N	\N	tester2@test.com
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustChiefFinancialOfficerFullName		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	Tester2	\N	\N	\N	\N	\N	Tester2
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustChiefFinancialOfficerPhoneNumber		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	01632 960 001	\N	\N	\N	\N	\N	01632 960 001
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustMainContactEmailAddress		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	tester2@test.com	\N	\N	\N	\N	\N	tester2@test.com
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustMainContactFullName		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	Tester2	\N	\N	\N	\N	\N	Tester2
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustMainContactPhoneNumber		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	01632 960 001	\N	\N	\N	\N	\N	01632 960 001
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustMainContactRole		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	aSas	\N	\N	\N	\N	\N	aSas
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustTypeOfTrust		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	Single academy trust	\N	\N	\N	\N	\N	Single academy trust
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustUploadBoardResolution	0ff78a76-d4ae-4c1e-b86b-042b91df8afb	5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	Screenshot 2025-07-16 113125.png	\N	\N	\N	\N	{"fileSize":50072,"id":"0ff78a76-d4ae-4c1e-b86b-042b91df8afb","name":"Screenshot 2025-07-16 113125.png","originalFileName":"Screenshot 2025-07-16 113125.png","uploadedOn":"2026-01-13T16:12:25.2690335"}	\N
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustsSearch-field-flow		5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	WEBSTER PRIMARY SCHOOL	\N	\N	\N	\N	{"companiesHouseNumber":"08403949","name":"WEBSTER PRIMARY SCHOOL","ukprn":"10060323"}	{&quot;name&quot;:&quot;WEBSTER PRIMARY SCHOOL&quot;,&quot;ukprn&quot;:&quot;10060323&quot;,&quot;companiesHouseNumber&quot;:&quot;08403949&quot;}
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustsSearch-field-flow	companiesHouseNumber	5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	08403949	\N	\N	\N	\N	\N	\N
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustsSearch-field-flow	name	5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	WEBSTER PRIMARY SCHOOL	\N	\N	\N	\N	\N	\N
+detailsOfIncomingTrust	detailsOfIncomingTrust/5fc83504-eb3f-47b5-92fd-024ccdabcbe6	incomingTrustsSearch-field-flow	ukprn	5fc83504-eb3f-47b5-92fd-024ccdabcbe6	0	string	True	Ok	10060323	\N	\N	\N	\N	\N	\N
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	outgoingTrustContactDetailsEmailAddress		3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	tester2@test.com	\N	\N	\N	\N	\N	tester2@test.com
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	outgoingTrustContactDetailsFullName		3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	Tester2	\N	\N	\N	\N	\N	Tester2
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	outgoingTrustContactDetailsPhoneNumber		3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	01632 960 001	\N	\N	\N	\N	\N	01632 960 001
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	outgoingTrustContactDetailsRole		3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	aSas	\N	\N	\N	\N	\N	aSas
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	outgoingTrustUploadBoardResolution	0ad73ae5-55ec-4cbc-9751-98ad60542d0b	3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	Screenshot 2025-07-29 091750.png	\N	\N	\N	\N	{"fileSize":249207,"id":"0ad73ae5-55ec-4cbc-9751-98ad60542d0b","name":"Screenshot 2025-07-29 091750.png","originalFileName":"Screenshot 2025-07-29 091750.png","uploadedOn":"2026-01-14T12:03:11.7818768"}	\N
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	trustsSearch-field-flow		3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	BARNSBURY PRIMARY SCHOOL AND NURSERY	\N	\N	\N	\N	{"companiesHouseNumber":"08798425","name":"BARNSBURY PRIMARY SCHOOL AND NURSERY","ukprn":"10060685"}	{&quot;name&quot;:&quot;BARNSBURY PRIMARY SCHOOL AND NURSERY&quot;,&quot;ukprn&quot;:&quot;10060685&quot;,&quot;companiesHouseNumber&quot;:&quot;08798425&quot;}
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	trustsSearch-field-flow	companiesHouseNumber	3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	08798425	\N	\N	\N	\N	\N	\N
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	trustsSearch-field-flow	name	3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	BARNSBURY PRIMARY SCHOOL AND NURSERY	\N	\N	\N	\N	\N	\N
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	trustsSearch-field-flow	ukprn	3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	10060685	\N	\N	\N	\N	\N	\N
+detailsOfOutgoingTrusts	detailsOfOutgoingTrusts/3c0b79dd-ab0f-4723-a51e-9fa6950b9365	willTrustClose		3c0b79dd-ab0f-4723-a51e-9fa6950b9365	0	string	True	Ok	No	\N	\N	\N	\N	\N	No
+membersAfterTransfer	membersAfterTransfer/5354e9a3-13dc-49c7-85ee-c414459e02a6	additionalRoles		5354e9a3-13dc-49c7-85ee-c414459e02a6	2	string	True	Ok	None of these	\N	\N	\N	\N	\N	None of these
+membersAfterTransfer	membersAfterTransfer/5354e9a3-13dc-49c7-85ee-c414459e02a6	existingMember		5354e9a3-13dc-49c7-85ee-c414459e02a6	2	string	True	Ok	New	\N	\N	\N	\N	\N	New
+membersAfterTransfer	membersAfterTransfer/5354e9a3-13dc-49c7-85ee-c414459e02a6	memberName		5354e9a3-13dc-49c7-85ee-c414459e02a6	2	string	True	Ok	farshad	\N	\N	\N	\N	\N	farshad
+membersAfterTransfer	membersAfterTransfer/5354e9a3-13dc-49c7-85ee-c414459e02a6	pastRoles		5354e9a3-13dc-49c7-85ee-c414459e02a6	2	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+membersAfterTransfer	membersAfterTransfer/c2ba5c01-462f-4825-9ad2-3b5ad2bfdfe0	additionalRoles		c2ba5c01-462f-4825-9ad2-3b5ad2bfdfe0	0	string	True	Ok	Part of a local governing body	\N	\N	\N	\N	\N	Part of a local governing body
+membersAfterTransfer	membersAfterTransfer/c2ba5c01-462f-4825-9ad2-3b5ad2bfdfe0	existingMember		c2ba5c01-462f-4825-9ad2-3b5ad2bfdfe0	0	string	True	Ok	Existing	\N	\N	\N	\N	\N	Existing
+membersAfterTransfer	membersAfterTransfer/c2ba5c01-462f-4825-9ad2-3b5ad2bfdfe0	memberName		c2ba5c01-462f-4825-9ad2-3b5ad2bfdfe0	0	string	True	Ok	test	\N	\N	\N	\N	\N	test
+membersAfterTransfer	membersAfterTransfer/d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	additionalRoles		d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	1	string	True	Ok	Part of a local governing body	\N	\N	\N	\N	\N	Part of a local governing body
+membersAfterTransfer	membersAfterTransfer/d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	existingMember		d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	1	string	True	Ok	New	\N	\N	\N	\N	\N	New
+membersAfterTransfer	membersAfterTransfer/d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	memberName		d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	1	string	True	Ok	farshad	\N	\N	\N	\N	\N	farshad
+membersAfterTransfer	membersAfterTransfer/d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	pastRoles		d3bc2947-68b3-4a2b-a8c5-e5765e88d49e	1	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+membersLeaving	membersLeaving/4d69b42b-d642-461d-ac65-0d9484d079cc	memberLeavingName		4d69b42b-d642-461d-ac65-0d9484d079cc	0	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trustDeclarations	trustDeclarations/webster-primary-school	chairName-joining		webster-primary-school	\N	string	True	Ok	dfsdf55555555	\N	\N	\N	\N	\N	dfsdf55555555
+trustDeclarations	trustDeclarations/webster-primary-school	dateSigned-joining		webster-primary-school	\N	DateTime	True	Ok	\N	\N	\N	2025-07-03	\N	\N	2025-07-03
+trustDeclarations	trustDeclarations/webster-primary-school	equalities-duties-decision		webster-primary-school	\N	string	True	Ok	The Secretary of State's decision is unlikely to disproportionately affect any particular person or group who share protected characteristics	\N	\N	\N	\N	\N	The Secretary of State&#x27;s decision is unlikely to disproportionately affect any particular person or group who share protected characteristics
+trustDeclarations	trustDeclarations/webster-primary-school	status		webster-primary-school	\N	string	True	Ok	Signed	\N	\N	\N	\N	\N	Signed
+trustDeclarations-leaving	trustDeclarations-leaving/bower-park-academy	chairName-leaving		bower-park-academy	\N	string	True	Ok	dfsdf	\N	\N	\N	\N	\N	dfsdf
+trustDeclarations-leaving	trustDeclarations-leaving/bower-park-academy	dateSigned-leaving		bower-park-academy	\N	DateTime	True	Ok	\N	\N	\N	2025-04-03	\N	\N	2025-04-03
+trustDeclarations-leaving	trustDeclarations-leaving/bower-park-academy	equalities-duties-decision-leaving		bower-park-academy	\N	string	True	Ok	There are some impacts, but on balance the changes will not disproportionately affect any particular person or group who share protected characteristics	\N	\N	\N	\N	\N	There are some impacts, but on balance the changes will not disproportionately affect any particular person or group who share protected characteristics
+trustDeclarations-leaving	trustDeclarations-leaving/bower-park-academy	status		bower-park-academy	\N	string	True	Ok	Signed	\N	\N	\N	\N	\N	Signed
+trusteesAfterTransfer	trusteesAfterTransfer/3d451b64-3482-4384-b1e4-a0049192904a	existingTrustee		3d451b64-3482-4384-b1e4-a0049192904a	2	string	True	Ok	New	\N	\N	\N	\N	\N	New
+trusteesAfterTransfer	trusteesAfterTransfer/3d451b64-3482-4384-b1e4-a0049192904a	trusteeFutureRoles		3d451b64-3482-4384-b1e4-a0049192904a	2	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trusteesAfterTransfer	trusteesAfterTransfer/3d451b64-3482-4384-b1e4-a0049192904a	trusteeLocalGoverningBody		3d451b64-3482-4384-b1e4-a0049192904a	2	string	True	Ok	No	\N	\N	\N	\N	\N	No
+trusteesAfterTransfer	trusteesAfterTransfer/3d451b64-3482-4384-b1e4-a0049192904a	trusteeName		3d451b64-3482-4384-b1e4-a0049192904a	2	string	True	Ok	werwer	\N	\N	\N	\N	\N	werwer
+trusteesAfterTransfer	trusteesAfterTransfer/3d451b64-3482-4384-b1e4-a0049192904a	trusteePastRoles		3d451b64-3482-4384-b1e4-a0049192904a	2	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trusteesAfterTransfer	trusteesAfterTransfer/59e5ebd1-1732-4a0c-8362-6e9162d17b6d	existingTrustee		59e5ebd1-1732-4a0c-8362-6e9162d17b6d	0	string	True	Ok	New	\N	\N	\N	\N	\N	New
+trusteesAfterTransfer	trusteesAfterTransfer/59e5ebd1-1732-4a0c-8362-6e9162d17b6d	trusteeFutureRoles		59e5ebd1-1732-4a0c-8362-6e9162d17b6d	0	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trusteesAfterTransfer	trusteesAfterTransfer/59e5ebd1-1732-4a0c-8362-6e9162d17b6d	trusteeLocalGoverningBody		59e5ebd1-1732-4a0c-8362-6e9162d17b6d	0	string	True	Ok	No	\N	\N	\N	\N	\N	No
+trusteesAfterTransfer	trusteesAfterTransfer/59e5ebd1-1732-4a0c-8362-6e9162d17b6d	trusteeName		59e5ebd1-1732-4a0c-8362-6e9162d17b6d	0	string	True	Ok	werwer	\N	\N	\N	\N	\N	werwer
+trusteesAfterTransfer	trusteesAfterTransfer/59e5ebd1-1732-4a0c-8362-6e9162d17b6d	trusteePastRoles		59e5ebd1-1732-4a0c-8362-6e9162d17b6d	0	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trusteesAfterTransfer	trusteesAfterTransfer/970f97ef-1da5-4c32-86da-67f93b9167e2	existingTrustee		970f97ef-1da5-4c32-86da-67f93b9167e2	1	string	True	Ok	Existing	\N	\N	\N	\N	\N	Existing
+trusteesAfterTransfer	trusteesAfterTransfer/970f97ef-1da5-4c32-86da-67f93b9167e2	trusteeFutureRoles		970f97ef-1da5-4c32-86da-67f93b9167e2	1	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trusteesAfterTransfer	trusteesAfterTransfer/970f97ef-1da5-4c32-86da-67f93b9167e2	trusteeLocalGoverningBody		970f97ef-1da5-4c32-86da-67f93b9167e2	1	string	True	Ok	Yes	\N	\N	\N	\N	\N	Yes
+trusteesAfterTransfer	trusteesAfterTransfer/970f97ef-1da5-4c32-86da-67f93b9167e2	trusteeName		970f97ef-1da5-4c32-86da-67f93b9167e2	1	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe
+trusteesLeaving	trusteesLeaving/6fb94b93-1799-4877-b507-4dbbfb409cd4	trusteeLeavingName		6fb94b93-1799-4877-b507-4dbbfb409cd4	0	string	True	Ok	qweqwe	\N	\N	\N	\N	\N	qweqwe

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Reads FlexForms source state through the internal Prism endpoints of the FlexForms API.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GovUK.Dfe.FlexForms.Api.Client" />
+    <PackageReference Include="Polly.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="GovUK.Dfe.FlexForms.Prism.Projector.Tests" />
+  </ItemGroup>
+
+</Project>

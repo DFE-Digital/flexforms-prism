@@ -39,6 +39,19 @@ ScaffoldingReadMe.txt
 # dotenv environment variables file
 .env
 
+# IDE
+.vs/
+.idea/
+*.user
+
+# Azure Functions local settings
+local.settings.json
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
 # Others
 ~$*
 *~

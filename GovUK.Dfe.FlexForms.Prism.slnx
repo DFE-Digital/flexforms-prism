@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/GovUK.Dfe.FlexForms.Prism.Flattener/GovUK.Dfe.FlexForms.Prism.Flattener.csproj" />
+    <Project Path="src/GovUK.Dfe.FlexForms.Prism.Data/GovUK.Dfe.FlexForms.Prism.Data.csproj" />
+    <Project Path="src/GovUK.Dfe.FlexForms.Prism.Source/GovUK.Dfe.FlexForms.Prism.Source.csproj" />
+    <Project Path="src/GovUK.Dfe.FlexForms.Prism.Projector/GovUK.Dfe.FlexForms.Prism.Projector.csproj" />
+    <Project Path="src/GovUK.Dfe.FlexForms.Prism.Functions/GovUK.Dfe.FlexForms.Prism.Functions.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GovUK.Dfe.FlexForms.Prism.Flattener.Tests/GovUK.Dfe.FlexForms.Prism.Flattener.Tests.csproj" />
+    <Project Path="tests/GovUK.Dfe.FlexForms.Prism.Data.Tests/GovUK.Dfe.FlexForms.Prism.Data.Tests.csproj" />
+    <Project Path="tests/GovUK.Dfe.FlexForms.Prism.Projector.Tests/GovUK.Dfe.FlexForms.Prism.Projector.Tests.csproj" />
+    <Project Path="tests/GovUK.Dfe.FlexForms.Prism.Functions.Tests/GovUK.Dfe.FlexForms.Prism.Functions.Tests.csproj" />
+    <Project Path="tests/GovUK.Dfe.FlexForms.Prism.Scenario.Tests/GovUK.Dfe.FlexForms.Prism.Scenario.Tests.csproj" />
+  </Folder>
+</Solution>
