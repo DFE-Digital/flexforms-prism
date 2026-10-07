@@ -23,7 +23,7 @@
       "autoCompleteMessages": false,
       "maxConcurrentSessions": 4,
       "maxAutoLockRenewalDuration": "00:10:00",
-      "sessionIdleTimeout": "00:00:30",
+      "sessionIdleTimeout": "00:00:02",
       "clientRetryOptions": {
         "mode": "exponential",
         "maxRetries": 3,

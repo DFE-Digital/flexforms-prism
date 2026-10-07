@@ -141,7 +141,9 @@ classify any `Added` fields. The steps are in [export-policy.md](export-policy.m
 4. Throughput scales with sessions (`maxConcurrentSessions` in `host.json`) and Function instances. One
    application is always processed one message at a time. Don't raise either without checking the database's
    concurrent request limit (30 on Basic): going over it resets connections and fails every projection in flight.
-   See the scale-out limit in [azure-setup.md](azure-setup.md#function-app).
+   See the scale-out limit in [azure-setup.md](azure-setup.md#function-app). `sessionIdleTimeout` (2 seconds) is
+   how long a slot waits for more messages for the same application before moving on; most applications have only
+   one or two, so a long timeout leaves slots idle.
 5. A backfill drains at `Prism__Backfill__MaxMessagesPerMinute` (240 by default). Raise it only if the database has
    headroom.
 
