@@ -11,8 +11,9 @@ namespace GovUK.Dfe.FlexForms.Prism.Functions.Functions;
 /// <summary>
 /// Projects one application per message, or catalogues a newly published template version. Sessions keep every
 /// message for an application (or a template) in order. Messages are
-/// completed on success or skip, dead-lettered on permanent failures, and abandoned on transient failures so
-/// Service Bus redelivers them until <c>MaxDeliveryCount</c>. Messages for excluded tenants are completed unread.
+/// completed on success or skip, dead-lettered on permanent failures, and abandoned on transient failures after a
+/// growing delay so Service Bus redelivers them until <c>MaxDeliveryCount</c>. Messages for excluded tenants are
+/// completed unread.
 /// </summary>
 public sealed partial class ProjectionFunction(
     IProjectionService projector,
@@ -76,8 +77,28 @@ public sealed partial class ProjectionFunction(
         }
         catch (Exception)
         {
+            await BackOffAsync(message.DeliveryCount, cancellationToken);
             await actions.AbandonMessageAsync(message, cancellationToken: CancellationToken.None);
             throw;
+        }
+    }
+
+    /// <summary>Holds the session, and with it one concurrency slot, so retries slow down while the database recovers.</summary>
+    private async Task BackOffAsync(int deliveryCount, CancellationToken cancellationToken)
+    {
+        var delay = options.Value.Projection.RetryDelayFor(deliveryCount);
+        if (delay <= TimeSpan.Zero || cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        LogRetryingAfter(delay);
+        try
+        {
+            await Task.Delay(delay, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
         }
     }
 
@@ -85,6 +106,9 @@ public sealed partial class ProjectionFunction(
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Dead-lettering message: {FailureReason}")]
     private partial void LogDeadLettering(string failureReason);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Abandoning for redelivery after {Delay}")]
+    private partial void LogRetryingAfter(TimeSpan delay);
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Ignoring message for excluded tenant {TenantId}")]
     private partial void LogExcludedTenant(Guid tenantId);

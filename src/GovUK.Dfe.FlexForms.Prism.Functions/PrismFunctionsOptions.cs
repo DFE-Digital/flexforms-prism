@@ -23,6 +23,8 @@ public sealed class PrismFunctionsOptions
 
     public BackfillOptions Backfill { get; set; } = new();
 
+    public ProjectionOptions Projection { get; set; } = new();
+
     public CleanupOptions Cleanup { get; set; } = new();
 
     public AdminAuthOptions Admin { get; set; } = new();
@@ -35,6 +37,30 @@ public sealed class BackfillOptions
 
     /// <summary>How long one worker run may page before stopping and resuming on the next tick.</summary>
     public TimeSpan TimeBudget { get; set; } = TimeSpan.FromMinutes(4);
+
+    /// <summary>
+    /// The most Resync messages the worker enqueues per minute, sent in small slices every few seconds, so a large
+    /// backfill drains steadily instead of landing on the database at once. Zero means no limit.
+    /// </summary>
+    public int MaxMessagesPerMinute { get; set; } = 240;
+}
+
+public sealed class ProjectionOptions
+{
+    /// <summary>
+    /// How long a transient failure waits before the message is abandoned, doubled on each delivery up to
+    /// <see cref="MaxRetryDelay"/>. Without it redeliveries are immediate and use up <c>MaxDeliveryCount</c> in seconds
+    /// while the database is still overloaded.
+    /// </summary>
+    public TimeSpan RetryDelay { get; set; } = TimeSpan.FromSeconds(5);
+
+    public TimeSpan MaxRetryDelay { get; set; } = TimeSpan.FromMinutes(2);
+
+    public TimeSpan RetryDelayFor(int deliveryCount)
+    {
+        var doublings = Math.Clamp(deliveryCount - 1, 0, 30);
+        return TimeSpan.FromTicks((long)Math.Min(RetryDelay.Ticks * Math.Pow(2, doublings), MaxRetryDelay.Ticks));
+    }
 }
 
 public sealed class CleanupOptions

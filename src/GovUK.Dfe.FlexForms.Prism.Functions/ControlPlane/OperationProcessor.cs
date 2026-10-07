@@ -112,8 +112,7 @@ public sealed partial class OperationProcessor(
                     ? result.Items
                     : await DriftedAsync(tenant, result.Items, cancellationToken);
 
-                var now = clock.GetUtcNow().UtcDateTime;
-                await sender.SendAsync([.. selected.Select(a => Resync(operation.OperationId, tenant, a, now))], cancellationToken);
+                await SendPacedAsync(operation.OperationId, tenant, selected, cancellationToken);
                 metrics.Enqueued(operation.Kind, selected.Count);
 
                 page++;
@@ -132,6 +131,25 @@ public sealed partial class OperationProcessor(
 
         await FinishAsync(operation, BackfillStatus.Completed, null, cancellationToken);
         return true;
+    }
+
+    /// <summary>
+    /// Sends the page in slices of about five seconds' worth at <see cref="BackfillOptions.MaxMessagesPerMinute"/>,
+    /// waiting after each. A page is always finished, so a run can overrun its budget by one page.
+    /// </summary>
+    private async Task SendPacedAsync(Guid operationId, Guid tenantId, IReadOnlyList<PrismApplicationSummaryDto> applications, CancellationToken cancellationToken)
+    {
+        var rate = Settings.MaxMessagesPerMinute;
+        var sliceSize = rate > 0 ? Math.Max(1, rate / 12) : Math.Max(1, applications.Count);
+        foreach (var slice in applications.Chunk(sliceSize))
+        {
+            var now = clock.GetUtcNow().UtcDateTime;
+            await sender.SendAsync([.. slice.Select(a => Resync(operationId, tenantId, a, now))], cancellationToken);
+            if (rate > 0)
+            {
+                await Task.Delay(TimeSpan.FromMinutes((double)slice.Length / rate), clock, cancellationToken);
+            }
+        }
     }
 
     private async Task<IReadOnlyList<PrismApplicationSummaryDto>> DriftedAsync(

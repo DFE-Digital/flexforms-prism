@@ -182,7 +182,7 @@ internal sealed class ScenarioHarness
         await using (var db = sql.CreateContext())
         {
             var created = await new OperationService(db, TimeProvider.System).CreateAsync(kind, TenantId, null, "scenario", default);
-            var options = Options.Create(new PrismFunctionsOptions { Backfill = { PageSize = 2 } });
+            var options = Options.Create(new PrismFunctionsOptions { Backfill = { PageSize = 2, MaxMessagesPerMinute = 0 } });
             await new OperationProcessor(
                     db, Source, new ProjectionStore(db), bus, new ControlPlaneMetrics(meters), TimeProvider.System, options,
                     NullLogger<OperationProcessor>.Instance)

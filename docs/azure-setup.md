@@ -138,6 +138,20 @@ already accepts tokens for its own app registration.
 | Storage | A storage account for the Functions host (the identity needs Storage Blob Data Owner, Storage Queue Data Contributor and Storage Table Data Contributor) |
 | Networking | VNet integration so it can reach the FlexForms API, SQL and Service Bus privately |
 | Monitoring | Application Insights (workspace-based) |
+| Scale-out limit | **Maximum instance count 2** on Flex Consumption (see below) |
+
+Database connections set Prism's throughput ceiling, not the Functions plan. Each instance runs up to
+`maxConcurrentSessions` (4, in `host.json`) projections at once, so the database sees about instances × 4 concurrent
+requests, plus a few for the timers and admin API. A Basic Azure SQL database allows 30 concurrent requests and
+resets connections beyond that, which fails every projection in flight. Flex Consumption scales out on queue length
+up to 100 instances by default, so cap it:
+
+```bash
+az functionapp scale config set -g <resource-group> -n <function-app> --maximum-instance-count 2
+```
+
+Raise the cap together with the database tier (roughly: keep instances × 4 under half the tier's concurrent request
+limit). On Elastic Premium, set the plan's maximum burst instead.
 
 Deploy the `prism-functions` artifact from CI (`prism-functions.zip`).
 
@@ -170,6 +184,9 @@ Optional, with their defaults:
 |---|---|
 | `Prism__Backfill__PageSize` | `200` |
 | `Prism__Backfill__TimeBudget` | `00:04:00` |
+| `Prism__Backfill__MaxMessagesPerMinute` | `240` (`0` for no limit) |
+| `Prism__Projection__RetryDelay` | `00:00:05` |
+| `Prism__Projection__MaxRetryDelay` | `00:02:00` |
 | `Prism__Cleanup__RetentionDays` | `30` |
 | `Prism__Cleanup__MaxGenerationsPerRun` | `2000` |
 | `Prism__Admin__RequiredRole` | `Prism.Admin` |
@@ -181,6 +198,12 @@ are completed without projecting, and backfills and reconciliations skip them. R
 tenant stay in the database until you delete them. The shared list lives in the Functions project's `appsettings.json`
 and deploys with the code. App settings override it entry by entry, so `Prism__ExcludedTenantIds__0` replaces the
 first entry; use `__1` and up to add tenants for one environment.
+
+Backfills and reconciliations enqueue at most `MaxMessagesPerMinute` Resync messages, a few every five seconds, so
+a large tenant drains steadily (240 a minute is about 14,000 applications an hour). Changing a tenant's or template's
+export setting backfills the tenant; saving again before that backfill starts reuses it, and saving while it runs
+replaces it. A projection that fails transiently waits `RetryDelay`, doubling per delivery up to `MaxRetryDelay`,
+before it's redelivered, so the ten deliveries span about ten minutes instead of seconds.
 
 Worker log levels come from `Program.cs` (Entity Framework and HttpClient at Warning). Override them with
 `Logging__LogLevel__<category>` app settings; `host.json` only controls the host's own logs.

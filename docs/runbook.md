@@ -139,7 +139,18 @@ classify any `Added` fields. The steps are in [export-policy.md](export-policy.m
 3. `prism.write.duration` high: the Prism database is under pressure. Check DTU or vCore usage. Large backfills
    compete with live traffic; cancel the backfill and rerun it out of hours if needed.
 4. Throughput scales with sessions (`maxConcurrentSessions` in `host.json`) and Function instances. One
-   application is always processed one message at a time.
+   application is always processed one message at a time. Don't raise either without checking the database's
+   concurrent request limit (30 on Basic): going over it resets connections and fails every projection in flight.
+   See the scale-out limit in [azure-setup.md](azure-setup.md#function-app).
+5. A backfill drains at `Prism__Backfill__MaxMessagesPerMinute` (240 by default). Raise it only if the database has
+   headroom.
+
+### Many messages dead-lettered after a load spike
+
+Mass transport-level errors ("Connection reset by peer") or "The request limit for the database is 30" mean the
+database was overloaded. Check the Function App's maximum instance count, then purge the dead-letter queue and run a
+reconciliation for the affected tenants (`POST /api/control/reconciliation`). It re-queues only applications that are
+still behind, so you don't need to replay the dead-lettered Resync messages.
 
 ### Reconciliation found drift
 

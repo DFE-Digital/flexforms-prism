@@ -21,7 +21,7 @@
     "serviceBus": {
       "transportType": "amqpWebSockets",
       "autoCompleteMessages": false,
-      "maxConcurrentSessions": 16,
+      "maxConcurrentSessions": 4,
       "maxAutoLockRenewalDuration": "00:10:00",
       "sessionIdleTimeout": "00:00:30",
       "clientRetryOptions": {

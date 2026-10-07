@@ -80,7 +80,7 @@ public sealed partial class ExportPolicyApi(
                 return Json(new ExportPolicyChangeResponse(result, null), StatusCodes.Status200OK);
         }
 
-        var backfill = await operations.CreateAsync(OperationKind.Backfill, tenantId, null, auth.Principal!, cancellationToken);
+        var backfill = await operations.RequestTenantBackfillAsync(tenantId, auth.Principal!, cancellationToken);
         return Json(new ExportPolicyChangeResponse(result, backfill), StatusCodes.Status200OK);
     }
 
@@ -150,7 +150,7 @@ public sealed partial class ExportPolicyApi(
                 return Json(new ExportDefaultChangeResponse(result, null), StatusCodes.Status200OK);
         }
 
-        var backfill = await operations.CreateAsync(OperationKind.Backfill, tenantId, null, auth.Principal!, cancellationToken);
+        var backfill = await operations.RequestTenantBackfillAsync(tenantId, auth.Principal!, cancellationToken);
         return Json(new ExportDefaultChangeResponse(result, backfill), StatusCodes.Status200OK);
     }
 

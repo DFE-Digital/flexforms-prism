@@ -76,11 +76,13 @@ flowchart LR
 3. The event is only a notification: Prism always reads the current state back from the API's internal Prism
    endpoints, so duplicate or out-of-order messages end in the same result.
 4. Prism flattens the response into typed answer facts and writes a new generation. Messages that can never succeed
-   go to the dead-letter queue; transient failures are retried by Service Bus.
+   go to the dead-letter queue; transient failures wait a growing delay and are then retried by Service Bus.
 5. The data team reads only the views, which always show the latest complete generation.
 
 Backfills and reconciliations never project anything themselves. They record an operation, and the operation worker
 pages through the API and puts `Resync` messages on the same topic, so every projection goes through the same path.
+The worker paces those messages, and the Function App's instance cap and `maxConcurrentSessions` keep concurrent
+database requests within the database tier's limit (see [docs/azure-setup.md](docs/azure-setup.md#function-app)).
 Tenants in `Prism:ExcludedTenantIds` (test and Playwright tenants) are skipped at both entry points.
 
 ## Documentation

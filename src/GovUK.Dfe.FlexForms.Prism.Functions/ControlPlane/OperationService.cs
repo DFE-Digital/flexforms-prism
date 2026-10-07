@@ -60,6 +60,36 @@ public sealed class OperationService(PrismDbContext db, TimeProvider clock)
         return OperationView.From(operation);
     }
 
+    /// <summary>
+    /// Backfills a tenant after its export settings change. Repeated changes would otherwise each re-project every
+    /// application: a backfill for the tenant that has not started yet is reused, and one already running is cancelled
+    /// because the new one re-projects everything against the latest settings anyway.
+    /// </summary>
+    public async Task<OperationView> RequestTenantBackfillAsync(Guid tenantId, string requestedBy, CancellationToken cancellationToken)
+    {
+        var sameScope = db.BackfillOperations.Where(o => o.Kind == OperationKind.Backfill && o.TenantId == tenantId && o.ModifiedSince == null);
+
+        var pending = await sameScope.AsNoTracking().FirstOrDefaultAsync(o => o.Status == BackfillStatus.Pending, cancellationToken);
+        if (pending is not null)
+        {
+            return OperationView.From(pending);
+        }
+
+        var operation = await CreateAsync(OperationKind.Backfill, tenantId, null, requestedBy, cancellationToken);
+        var now = clock.GetUtcNow().UtcDateTime;
+        await sameScope
+            .Where(o => o.Status == BackfillStatus.Running && o.OperationId != operation.OperationId)
+            .ExecuteUpdateAsync(
+                set => set
+                    .SetProperty(o => o.Status, BackfillStatus.Cancelled)
+                    .SetProperty(o => o.CancelledBy, $"superseded by {operation.OperationId}")
+                    .SetProperty(o => o.CompletedAt, now)
+                    .SetProperty(o => o.UpdatedAt, now),
+                cancellationToken);
+
+        return operation;
+    }
+
     public async Task<OperationView?> GetAsync(Guid operationId, CancellationToken cancellationToken)
     {
         var operation = await db.BackfillOperations.AsNoTracking().SingleOrDefaultAsync(o => o.OperationId == operationId, cancellationToken);

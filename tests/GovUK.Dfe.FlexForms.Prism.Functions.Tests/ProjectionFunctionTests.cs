@@ -16,7 +16,7 @@ public class ProjectionFunctionTests
 {
     private readonly IProjectionService projector = Substitute.For<IProjectionService>();
     private readonly ServiceBusMessageActions actions = Substitute.For<ServiceBusMessageActions>();
-    private readonly PrismFunctionsOptions options = new();
+    private readonly PrismFunctionsOptions options = new() { Projection = { RetryDelay = TimeSpan.Zero } };
     private readonly ProjectionFunction function;
 
     public ProjectionFunctionTests()
@@ -134,5 +134,32 @@ public class ProjectionFunctionTests
 
         await actions.Received(1).AbandonMessageAsync(message, Arg.Any<IDictionary<string, object>>(), Arg.Any<CancellationToken>());
         await actions.DidNotReceiveWithAnyArgs().CompleteMessageAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task A_transient_failure_is_still_abandoned_when_the_backoff_is_cancelled()
+    {
+        options.Projection.RetryDelay = TimeSpan.FromMinutes(1);
+        using var shutdown = new CancellationTokenSource();
+        var message = Received(ProjectionMessages.Create(TestSupport.Event()).Body);
+        projector.ProjectAsync(Arg.Any<ApplicationProjectionRequestedEvent>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new SourceUnavailableException("down", 503));
+
+        var run = function.Run(message, actions, shutdown.Token);
+        await shutdown.CancelAsync();
+
+        await Assert.ThrowsAsync<SourceUnavailableException>(() => run);
+        await actions.Received(1).AbandonMessageAsync(message, Arg.Any<IDictionary<string, object>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(1, 5)]
+    [InlineData(2, 10)]
+    [InlineData(5, 80)]
+    [InlineData(6, 120)]
+    [InlineData(10, 120)]
+    public void The_retry_delay_doubles_per_delivery_up_to_the_maximum(int deliveryCount, int expectedSeconds)
+    {
+        Assert.Equal(TimeSpan.FromSeconds(expectedSeconds), new ProjectionOptions().RetryDelayFor(deliveryCount));
     }
 }

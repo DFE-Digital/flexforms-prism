@@ -28,6 +28,8 @@ public sealed class OperationProcessorTests : IAsyncLifetime
     private readonly ManualClock clock = new();
     private readonly Guid tenant = Guid.NewGuid();
     private Guid[] excludedTenants = [];
+    private int maxMessagesPerMinute;
+    private readonly List<int> sendSizes = [];
 
     public OperationProcessorTests(SqlServerFixture sql)
     {
@@ -47,13 +49,19 @@ public sealed class OperationProcessorTests : IAsyncLifetime
     {
         await using var db = sql.CreateContext();
         var sender = Substitute.For<IProjectionRequestSender>();
-        sender.SendAsync(Arg.Do<IReadOnlyCollection<ApplicationProjectionRequestedEvent>>(sent.AddRange), Arg.Any<CancellationToken>())
+        sender.SendAsync(
+                Arg.Do<IReadOnlyCollection<ApplicationProjectionRequestedEvent>>(m =>
+                {
+                    sent.AddRange(m);
+                    sendSizes.Add(m.Count);
+                }),
+                Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
         var options = Options.Create(new PrismFunctionsOptions
         {
             ExcludedTenantIds = excludedTenants,
-            Backfill = { PageSize = 2, TimeBudget = TimeSpan.FromMinutes(1) },
+            Backfill = { PageSize = 2, TimeBudget = TimeSpan.FromMinutes(1), MaxMessagesPerMinute = maxMessagesPerMinute },
         });
         await new OperationProcessor(
                 db, source, new ProjectionStore(db), sender, new ControlPlaneMetrics(new TestMeterFactory()), clock, options,
@@ -106,6 +114,65 @@ public sealed class OperationProcessorTests : IAsyncLifetime
         Assert.Equal(BackfillStatus.Completed, finished.Status);
         Assert.Equal((2, 3, 3), (finished.PagesProcessed, finished.ApplicationsScanned, finished.MessagesEnqueued));
         Assert.NotNull(finished.CompletedAt);
+    }
+
+    [Fact]
+    public async Task Resyncs_are_sent_in_slices_paced_to_the_configured_rate()
+    {
+        maxMessagesPerMinute = 24;
+        var apps = new[] { App(1), App(1), App(1), App(1), App(1) };
+        Pages(tenant, [apps[0], apps[1]], [apps[2], apps[3]], [apps[4]]);
+        await Create(OperationKind.Backfill, tenant);
+
+        await Run();
+
+        Assert.Equal(apps.Select(a => a.ApplicationId), sent.Select(m => m.ApplicationId));
+        Assert.Equal([2, 2, 1], sendSizes);
+        Assert.Equal([TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(2.5)], clock.Delays);
+    }
+
+    [Fact]
+    public async Task A_tenant_backfill_request_reuses_one_that_has_not_started()
+    {
+        var first = await RequestTenantBackfill();
+        var second = await RequestTenantBackfill();
+
+        Assert.Equal(first.OperationId, second.OperationId);
+    }
+
+    [Fact]
+    public async Task A_tenant_backfill_request_supersedes_a_running_one()
+    {
+        var running = await RequestTenantBackfill();
+        await using (var db = sql.CreateContext())
+        {
+            await db.BackfillOperations.Where(o => o.OperationId == running.OperationId)
+                .ExecuteUpdateAsync(set => set.SetProperty(o => o.Status, BackfillStatus.Running));
+        }
+
+        var replacement = await RequestTenantBackfill();
+
+        Assert.NotEqual(running.OperationId, replacement.OperationId);
+        var superseded = await Load(running.OperationId);
+        Assert.Equal((BackfillStatus.Cancelled, $"superseded by {replacement.OperationId}"), (superseded.Status, superseded.CancelledBy));
+        Assert.Equal(BackfillStatus.Pending, (await Load(replacement.OperationId)).Status);
+    }
+
+    [Fact]
+    public async Task A_tenant_backfill_request_leaves_other_tenants_alone()
+    {
+        var other = await Create(OperationKind.Backfill, Guid.NewGuid());
+
+        var requested = await RequestTenantBackfill();
+
+        Assert.NotEqual(other.OperationId, requested.OperationId);
+        Assert.Equal(BackfillStatus.Pending, (await Load(other.OperationId)).Status);
+    }
+
+    private async Task<OperationView> RequestTenantBackfill()
+    {
+        await using var db = sql.CreateContext();
+        return await new OperationService(db, TimeProvider.System).RequestTenantBackfillAsync(tenant, "test", default);
     }
 
     [Fact]
@@ -255,8 +322,30 @@ public sealed class OperationProcessorTests : IAsyncLifetime
     {
         private DateTimeOffset now = DateTimeOffset.UtcNow;
 
+        public List<TimeSpan> Delays { get; } = [];
+
         public void Advance(TimeSpan by) => now += by;
 
         public override DateTimeOffset GetUtcNow() => now;
+
+        /// <summary>Fires straight away, moving the clock on by the delay, so paced sends run instantly.</summary>
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+            Delays.Add(dueTime);
+            Advance(dueTime);
+            ThreadPool.QueueUserWorkItem(_ => callback(state));
+            return new NoTimer();
+        }
+
+        private sealed class NoTimer : ITimer
+        {
+            public bool Change(TimeSpan dueTime, TimeSpan period) => true;
+
+            public void Dispose()
+            {
+            }
+
+            public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        }
     }
 }
