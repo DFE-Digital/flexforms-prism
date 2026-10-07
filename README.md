@@ -18,6 +18,71 @@ rename). Prism reads those declarations into `semantic_key` and `replaced_by`, s
 without a mapping maintained by the data team. See
 [docs/querying-prism.md](docs/querying-prism.md#who-maps-template-changes).
 
+## How it fits together
+
+```mermaid
+flowchart LR
+    subgraph FF["FlexForms"]
+        WEB["flexforms-web<br/>applicants and tenant admins"]
+        API["flexforms-api"]
+        APIDB[("FlexForms DB<br/>applications, templates,<br/>outbox")]
+        WEB -->|"save, submit, delete,<br/>publish template"| API
+        API --- APIDB
+    end
+
+    subgraph SB["Azure Service Bus"]
+        TOPIC[["Topic: flexforms-prism<br/>subscription: prism-projector<br/>sessions: tenant:application"]]
+        DLQ[["Dead-letter queue"]]
+        TOPIC -.->|"permanent failures"| DLQ
+    end
+
+    subgraph FN["Prism Function App"]
+        PROJ["ProjectionFunction<br/>project an application,<br/>catalogue a template"]
+        WORKER["OperationWorkerFunction<br/>every minute"]
+        RECON["ReconciliationFunction<br/>02:00 daily"]
+        CLEAN["GenerationCleanupFunction<br/>03:30 daily"]
+        ADMIN["Control API<br/>/api/control/...<br/>backfill, reconciliation,<br/>export policy"]
+    end
+
+    subgraph DB["Prism SQL database, schema prism"]
+        TABLES[("Tables<br/>generations, answer facts,<br/>projection state, template catalogue,<br/>export policy, operations")]
+        VIEWS[("Views<br/>v_applications<br/>v_current_answer_facts<br/>v_submission_answer_facts<br/>v_template_field_changes")]
+        TABLES --> VIEWS
+    end
+
+    MIG["Migration job<br/>Container Apps Job,<br/>runs on push to main"]
+    BI["Data team<br/>Power BI, SQL"]
+    OPS["Operators<br/>Entra token, Prism.Admin"]
+
+    API -->|"1. outbox publishes<br/>ApplicationProjectionRequested,<br/>TemplateVersionPublished"| TOPIC
+    TOPIC -->|"2. one message at a time<br/>per session"| PROJ
+    PROJ -->|"3. read current state<br/>/v1/internal/prism"| API
+    PROJ -->|"4. flatten and write<br/>new generation"| TABLES
+    VIEWS -->|"5. read only"| BI
+
+    API -->|"reporting settings<br/>export policy"| ADMIN
+    OPS -->|"backfill, reconciliation"| ADMIN
+    ADMIN -->|"record operation,<br/>save export policy"| TABLES
+    RECON -->|"record nightly<br/>reconciliation"| TABLES
+    WORKER -->|"page through applications"| API
+    WORKER -->|"enqueue Resync messages"| TOPIC
+    CLEAN -->|"delete old generations"| TABLES
+    MIG -->|"apply EF migrations"| DB
+```
+
+1. When an application is saved, submitted or deleted, or a template version is published, flexforms-api writes an
+   event to its outbox and publishes it to the `flexforms-prism` topic.
+2. `ProjectionFunction` receives it. Sessions keep the messages for one application in order.
+3. The event is only a notification: Prism always reads the current state back from the API's internal Prism
+   endpoints, so duplicate or out-of-order messages end in the same result.
+4. Prism flattens the response into typed answer facts and writes a new generation. Messages that can never succeed
+   go to the dead-letter queue; transient failures are retried by Service Bus.
+5. The data team reads only the views, which always show the latest complete generation.
+
+Backfills and reconciliations never project anything themselves. They record an operation, and the operation worker
+pages through the API and puts `Resync` messages on the same topic, so every projection goes through the same path.
+Tenants in `Prism:ExcludedTenantIds` (test and Playwright tenants) are skipped at both entry points.
+
 ## Documentation
 
 | Document | For |
