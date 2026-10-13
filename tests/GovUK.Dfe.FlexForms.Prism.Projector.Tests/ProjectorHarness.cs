@@ -106,7 +106,7 @@ internal sealed class ProjectorHarness
         new(ApplicationId, "APP-1", revision, status, status == ApplicationStatus.Deleted, status == ApplicationStatus.Deleted ? OccurredAt : null,
             TemplateId, TemplateVersionId, OccurredAt.AddDays(-1), OccurredAt,
             body is null ? null : responseId ?? Guid.NewGuid(), body is null ? null : revision, body,
-            submittedRevision, submissionId, submittedResponseId, LeadApplicantUserId);
+            submittedRevision, submissionId, submittedResponseId, LeadApplicantUserId, "Lead Applicant", "lead@example.com");
 
     public void SourceReturns(PrismApplicationStateDto state) =>
         Source.GetApplicationAsync(TenantId, ApplicationId, Arg.Any<CancellationToken>()).Returns(state);

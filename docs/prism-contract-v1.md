@@ -123,14 +123,17 @@ One row per application that isn't deleted, with what isn't an answer. Join it t
 | `lifecycle` | `Draft` or `Submitted`. Deleted applications never appear. |
 | `template_id`, `template_version_id` | The template version of the latest response. |
 | `lead_applicant_user_id` | The FlexForms user id of the lead applicant, who created the application. |
+| `lead_applicant_name`, `lead_applicant_email` | The lead applicant's name and email address. Personal data: handle them accordingly. |
 | `created_on` | When the application was created in FlexForms (UTC). |
 | `last_modified_on` | When it was last changed in FlexForms (UTC); `created_on` if it never was. |
 | `last_submitted_at` | When it was last submitted, from the submission snapshots. Null if it never was. |
 | `source_revision`, `response_id`, `projected_at` | As in `v_current_answer_facts`. |
 
 `application_reference`, `created_on` and `last_modified_on` are null for an application until it is projected at
-projector version 2 or later, and `lead_applicant_user_id` until version 3 or later; after deploying, nightly
-reconciliation does that, or run a backfill. It is an id only: names and email addresses aren't published.
+projector version 2 or later, `lead_applicant_user_id` until version 3 or later, and `lead_applicant_name` and
+`lead_applicant_email` until version 4 or later; after deploying, nightly reconciliation does that, or run a backfill.
+The name and email are copied when the application is projected, so if the user changes them in FlexForms, Prism
+shows the new values only after the application next changes or is re-projected.
 
 ### `prism.v_current_answer_facts`
 

@@ -298,12 +298,14 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
             INSERT INTO prism.application_projection_state
                 (tenant_id, application_id, active_generation_id, response_id, source_revision, lifecycle,
                  template_id, template_version_id, application_reference, application_created_on,
-                 application_last_modified_on, lead_applicant_user_id, source_hash, projector_version, contract_version,
+                 application_last_modified_on, lead_applicant_user_id, lead_applicant_name, lead_applicant_email,
+                 source_hash, projector_version, contract_version,
                  export_policy_version, source_occurred_at, created_at, projected_at)
             VALUES
                 (@tenant, @application, @generation, @response, @revision, @lifecycle,
                  @template, @templateVersion, @reference, @applicationCreatedOn,
-                 @applicationLastModifiedOn, @leadApplicantUserId, @hash, @projectorVersion, @contractVersion,
+                 @applicationLastModifiedOn, @leadApplicantUserId, @leadApplicantName, @leadApplicantEmail,
+                 @hash, @projectorVersion, @contractVersion,
                  @exportPolicyVersion, @occurredAt, @now, @now)
             """, cancellationToken, StateParameters(projection, generationId, now));
 
@@ -321,6 +323,8 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
                 application_created_on = @applicationCreatedOn,
                 application_last_modified_on = @applicationLastModifiedOn,
                 lead_applicant_user_id = @leadApplicantUserId,
+                lead_applicant_name = @leadApplicantName,
+                lead_applicant_email = @leadApplicantEmail,
                 source_hash = @hash,
                 projector_version = @projectorVersion,
                 contract_version = @contractVersion,
@@ -348,6 +352,8 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         ("@reference", projection.Details?.Reference),
         ("@applicationCreatedOn", projection.Details?.CreatedOn), ("@applicationLastModifiedOn", projection.Details?.LastModifiedOn),
         ("@leadApplicantUserId", projection.Details?.LeadApplicantUserId),
+        ("@leadApplicantName", projection.Details?.LeadApplicantName),
+        ("@leadApplicantEmail", projection.Details?.LeadApplicantEmail),
         ("@projectorVersion", projection.Versions.ProjectorVersion), ("@contractVersion", projection.Versions.ContractVersion),
         ("@exportPolicyVersion", projection.Versions.ExportPolicyVersion), ("@occurredAt", projection.SourceOccurredAt), ("@now", now)
     ];

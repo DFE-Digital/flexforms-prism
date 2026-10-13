@@ -177,6 +177,16 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("int")
                         .HasColumnName("export_policy_version");
 
+                    b.Property<string>("LeadApplicantEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("lead_applicant_email");
+
+                    b.Property<string>("LeadApplicantName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("lead_applicant_name");
+
                     b.Property<Guid?>("LeadApplicantUserId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("lead_applicant_user_id");

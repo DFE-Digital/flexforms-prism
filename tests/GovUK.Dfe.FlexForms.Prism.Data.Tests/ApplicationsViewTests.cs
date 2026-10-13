@@ -20,12 +20,14 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
     {
         await WriteCurrent(Current(_tenant, _application, 3, lifecycle: ApplicationLifecycle.Submitted) with
         {
-            Details = new ApplicationDetails("APP-123", CreatedOn, ModifiedOn, LeadApplicant),
+            Details = new ApplicationDetails("APP-123", CreatedOn, ModifiedOn, LeadApplicant, "Lead Applicant", "lead@example.com"),
         });
 
         var row = Assert.Single(await Rows());
         Assert.Equal("APP-123", row.application_reference);
         Assert.Equal(LeadApplicant, row.lead_applicant_user_id);
+        Assert.Equal("Lead Applicant", row.lead_applicant_name);
+        Assert.Equal("lead@example.com", row.lead_applicant_email);
         Assert.Equal("Submitted", row.lifecycle);
         Assert.Equal(CreatedOn, row.created_on);
         Assert.Equal(ModifiedOn, row.last_modified_on);
@@ -86,6 +88,8 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
         var row = Assert.Single(await Rows());
         Assert.Null(row.application_reference);
         Assert.Null(row.lead_applicant_user_id);
+        Assert.Null(row.lead_applicant_name);
+        Assert.Null(row.lead_applicant_email);
         Assert.Null(row.created_on);
         Assert.Null(row.last_modified_on);
     }
@@ -102,7 +106,7 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
         await using var db = sql.CreateContext();
         return await db.Database
             .SqlQuery<ApplicationRow>($"""
-                SELECT application_reference, lead_applicant_user_id, lifecycle, created_on, last_modified_on, last_submitted_at, source_revision
+                SELECT application_reference, lead_applicant_user_id, lead_applicant_name, lead_applicant_email, lifecycle, created_on, last_modified_on, last_submitted_at, source_revision
                 FROM prism.v_applications
                 WHERE tenant_id = {_tenant} AND application_id = {_application}
                 """)
@@ -113,6 +117,8 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
     private sealed record ApplicationRow(
         string? application_reference,
         Guid? lead_applicant_user_id,
+        string? lead_applicant_name,
+        string? lead_applicant_email,
         string lifecycle,
         DateTime? created_on,
         DateTime? last_modified_on,

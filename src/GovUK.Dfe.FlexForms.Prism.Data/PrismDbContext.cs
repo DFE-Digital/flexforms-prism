@@ -56,6 +56,8 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.HasKey(x => new { x.TenantId, x.ApplicationId });
             e.Property(x => x.SourceHash).HasMaxLength(32).IsFixedLength();
             e.Property(x => x.ApplicationReference).HasMaxLength(100);
+            e.Property(x => x.LeadApplicantName).HasMaxLength(100);
+            e.Property(x => x.LeadApplicantEmail).HasMaxLength(256);
             e.HasOne(x => x.ActiveGeneration)
                 .WithMany()
                 .HasForeignKey(x => x.ActiveGenerationId)

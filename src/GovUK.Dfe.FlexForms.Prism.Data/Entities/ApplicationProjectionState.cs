@@ -22,6 +22,12 @@ public class ApplicationProjectionState
 
     /// <summary>The FlexForms user who created the application.</summary>
     public Guid? LeadApplicantUserId { get; set; }
+
+    /// <summary>The lead applicant's name when the application was last projected.</summary>
+    public string? LeadApplicantName { get; set; }
+
+    /// <summary>The lead applicant's email address when the application was last projected.</summary>
+    public string? LeadApplicantEmail { get; set; }
     public byte[]? SourceHash { get; set; }
     public int ProjectorVersion { get; set; }
     public int ContractVersion { get; set; }

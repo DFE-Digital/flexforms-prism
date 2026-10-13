@@ -300,7 +300,13 @@ public sealed partial class ProjectionService(
             flattened.Hash,
             versions,
             state.LastModifiedOn ?? state.CreatedOn,
-            new ApplicationDetails(state.ApplicationReference, state.CreatedOn, state.LastModifiedOn, state.CreatedBy));
+            new ApplicationDetails(
+                state.ApplicationReference,
+                state.CreatedOn,
+                state.LastModifiedOn,
+                state.CreatedBy,
+                state.CreatedByName,
+                state.CreatedByEmail));
 
         if (stored is { ActiveGenerationId: not null, SourceHash: { } storedHash } && storedHash.AsSpan().SequenceEqual(flattened.Hash))
         {
