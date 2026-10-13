@@ -35,7 +35,7 @@ public class ProjectionServiceTests
                 && p.Lifecycle == ApplicationLifecycle.Draft
                 && p.Versions == new ProjectionVersions(PrismVersions.ProjectorVersion, PrismVersions.ContractVersion, 1)
                 && p.SourceHash.Length == 32
-                && p.Details == new ApplicationDetails("APP-1", state.CreatedOn, state.LastModifiedOn)),
+                && p.Details == new ApplicationDetails("APP-1", state.CreatedOn, state.LastModifiedOn, h.LeadApplicantUserId)),
             Arg.Is<IReadOnlyCollection<AnswerFact>>(facts => facts.Count == 1 && facts.First().FieldId == "name" && facts.First().ValueString == "Ada"),
             Arg.Any<CancellationToken>());
         await h.CatalogWriter.Received(1).EnsureAsync(

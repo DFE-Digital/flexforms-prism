@@ -104,6 +104,38 @@ internal static class PrismViews
               WHERE t.tenant_id = s.tenant_id AND t.application_id = s.application_id)
         """;
 
+    /// <summary>
+    /// <see cref="CreateApplications"/> plus lead_applicant_user_id, the FlexForms user who created the application.
+    /// It is null until the application is re-projected at projector version 3 or later.
+    /// </summary>
+    public const string CreateApplicationsWithLeadApplicant = """
+        CREATE VIEW prism.v_applications AS
+        SELECT
+            s.tenant_id,
+            s.application_id,
+            s.application_reference,
+            s.lifecycle,
+            s.template_id,
+            s.template_version_id,
+            s.lead_applicant_user_id,
+            s.application_created_on AS created_on,
+            COALESCE(s.application_last_modified_on, s.application_created_on) AS last_modified_on,
+            last_submission.submitted_at AS last_submitted_at,
+            s.source_revision,
+            s.response_id,
+            s.projected_at
+        FROM prism.application_projection_state s
+        OUTER APPLY (
+            SELECT MAX(ss.submitted_at) AS submitted_at
+            FROM prism.submission_snapshots ss
+            WHERE ss.tenant_id = s.tenant_id AND ss.application_id = s.application_id) last_submission
+        WHERE s.lifecycle <> 'Deleted'
+          AND s.active_generation_id IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM prism.deletion_tombstones t
+              WHERE t.tenant_id = s.tenant_id AND t.application_id = s.application_id)
+        """;
+
     public const string DropApplications = "DROP VIEW IF EXISTS prism.v_applications;";
 
     public const string CreateSubmissionAnswerFacts = $"""

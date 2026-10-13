@@ -177,6 +177,10 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("int")
                         .HasColumnName("export_policy_version");
 
+                    b.Property<Guid?>("LeadApplicantUserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("lead_applicant_user_id");
+
                     b.Property<string>("Lifecycle")
                         .IsRequired()
                         .HasMaxLength(20)

@@ -19,6 +19,9 @@ public class ApplicationProjectionState
     /// <summary>When the application was created in FlexForms (not when Prism first projected it).</summary>
     public DateTime? ApplicationCreatedOn { get; set; }
     public DateTime? ApplicationLastModifiedOn { get; set; }
+
+    /// <summary>The FlexForms user who created the application.</summary>
+    public Guid? LeadApplicantUserId { get; set; }
     public byte[]? SourceHash { get; set; }
     public int ProjectorVersion { get; set; }
     public int ContractVersion { get; set; }

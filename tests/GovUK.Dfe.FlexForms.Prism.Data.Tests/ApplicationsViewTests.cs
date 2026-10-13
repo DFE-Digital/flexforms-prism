@@ -10,6 +10,7 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
 {
     private static readonly DateTime CreatedOn = new(2026, 9, 1, 9, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime ModifiedOn = new(2026, 9, 2, 10, 30, 0, DateTimeKind.Utc);
+    private static readonly Guid LeadApplicant = Guid.NewGuid();
 
     private readonly Guid _tenant = Guid.NewGuid();
     private readonly Guid _application = Guid.NewGuid();
@@ -19,11 +20,12 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
     {
         await WriteCurrent(Current(_tenant, _application, 3, lifecycle: ApplicationLifecycle.Submitted) with
         {
-            Details = new ApplicationDetails("APP-123", CreatedOn, ModifiedOn),
+            Details = new ApplicationDetails("APP-123", CreatedOn, ModifiedOn, LeadApplicant),
         });
 
         var row = Assert.Single(await Rows());
         Assert.Equal("APP-123", row.application_reference);
+        Assert.Equal(LeadApplicant, row.lead_applicant_user_id);
         Assert.Equal("Submitted", row.lifecycle);
         Assert.Equal(CreatedOn, row.created_on);
         Assert.Equal(ModifiedOn, row.last_modified_on);
@@ -83,6 +85,7 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
 
         var row = Assert.Single(await Rows());
         Assert.Null(row.application_reference);
+        Assert.Null(row.lead_applicant_user_id);
         Assert.Null(row.created_on);
         Assert.Null(row.last_modified_on);
     }
@@ -99,7 +102,7 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
         await using var db = sql.CreateContext();
         return await db.Database
             .SqlQuery<ApplicationRow>($"""
-                SELECT application_reference, lifecycle, created_on, last_modified_on, last_submitted_at, source_revision
+                SELECT application_reference, lead_applicant_user_id, lifecycle, created_on, last_modified_on, last_submitted_at, source_revision
                 FROM prism.v_applications
                 WHERE tenant_id = {_tenant} AND application_id = {_application}
                 """)
@@ -109,6 +112,7 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
 #pragma warning disable IDE1006
     private sealed record ApplicationRow(
         string? application_reference,
+        Guid? lead_applicant_user_id,
         string lifecycle,
         DateTime? created_on,
         DateTime? last_modified_on,

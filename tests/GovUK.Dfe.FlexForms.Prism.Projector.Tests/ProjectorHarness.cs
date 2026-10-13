@@ -42,6 +42,7 @@ internal sealed class ProjectorHarness
     public readonly Guid ApplicationId = Guid.NewGuid();
     public readonly Guid TemplateId = Guid.NewGuid();
     public readonly Guid TemplateVersionId = Guid.NewGuid();
+    public readonly Guid LeadApplicantUserId = Guid.NewGuid();
     public readonly DateTime OccurredAt = new(2026, 9, 30, 12, 0, 0, DateTimeKind.Utc);
 
     public ISourceClient Source { get; } = Substitute.For<ISourceClient>();
@@ -105,7 +106,7 @@ internal sealed class ProjectorHarness
         new(ApplicationId, "APP-1", revision, status, status == ApplicationStatus.Deleted, status == ApplicationStatus.Deleted ? OccurredAt : null,
             TemplateId, TemplateVersionId, OccurredAt.AddDays(-1), OccurredAt,
             body is null ? null : responseId ?? Guid.NewGuid(), body is null ? null : revision, body,
-            submittedRevision, submissionId, submittedResponseId);
+            submittedRevision, submissionId, submittedResponseId, LeadApplicantUserId);
 
     public void SourceReturns(PrismApplicationStateDto state) =>
         Source.GetApplicationAsync(TenantId, ApplicationId, Arg.Any<CancellationToken>()).Returns(state);

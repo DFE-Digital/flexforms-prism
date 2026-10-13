@@ -8,6 +8,7 @@ namespace GovUK.Dfe.FlexForms.Prism.Flattener;
 public static class PrismVersions
 {
     // 2: application details on the state row, and semantic keys and retirements in the catalogue.
-    public const int ProjectorVersion = 2;
+    // 3: lead applicant user id on the state row.
+    public const int ProjectorVersion = 3;
     public const int ContractVersion = 1;
 }

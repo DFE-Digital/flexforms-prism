@@ -50,7 +50,8 @@ public sealed record CurrentProjection(
 
 /// <summary>Application-level facts that aren't answers, published through <c>v_applications</c>.</summary>
 /// <param name="LastModifiedOn">Null when the application was never modified.</param>
-public sealed record ApplicationDetails(string? Reference, DateTime CreatedOn, DateTime? LastModifiedOn);
+/// <param name="LeadApplicantUserId">The user who created the application; null when the source doesn't send it.</param>
+public sealed record ApplicationDetails(string? Reference, DateTime CreatedOn, DateTime? LastModifiedOn, Guid? LeadApplicantUserId = null);
 
 public sealed record SubmissionProjection(
     Guid TenantId,

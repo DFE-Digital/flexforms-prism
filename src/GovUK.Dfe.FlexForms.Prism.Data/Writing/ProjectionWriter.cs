@@ -298,12 +298,12 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
             INSERT INTO prism.application_projection_state
                 (tenant_id, application_id, active_generation_id, response_id, source_revision, lifecycle,
                  template_id, template_version_id, application_reference, application_created_on,
-                 application_last_modified_on, source_hash, projector_version, contract_version,
+                 application_last_modified_on, lead_applicant_user_id, source_hash, projector_version, contract_version,
                  export_policy_version, source_occurred_at, created_at, projected_at)
             VALUES
                 (@tenant, @application, @generation, @response, @revision, @lifecycle,
                  @template, @templateVersion, @reference, @applicationCreatedOn,
-                 @applicationLastModifiedOn, @hash, @projectorVersion, @contractVersion,
+                 @applicationLastModifiedOn, @leadApplicantUserId, @hash, @projectorVersion, @contractVersion,
                  @exportPolicyVersion, @occurredAt, @now, @now)
             """, cancellationToken, StateParameters(projection, generationId, now));
 
@@ -320,6 +320,7 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
                 application_reference = @reference,
                 application_created_on = @applicationCreatedOn,
                 application_last_modified_on = @applicationLastModifiedOn,
+                lead_applicant_user_id = @leadApplicantUserId,
                 source_hash = @hash,
                 projector_version = @projectorVersion,
                 contract_version = @contractVersion,
@@ -346,6 +347,7 @@ public sealed class ProjectionWriter(PrismDbContext db, TimeProvider clock) : IP
         ("@template", projection.TemplateId), ("@templateVersion", projection.TemplateVersionId), ("@hash", projection.SourceHash),
         ("@reference", projection.Details?.Reference),
         ("@applicationCreatedOn", projection.Details?.CreatedOn), ("@applicationLastModifiedOn", projection.Details?.LastModifiedOn),
+        ("@leadApplicantUserId", projection.Details?.LeadApplicantUserId),
         ("@projectorVersion", projection.Versions.ProjectorVersion), ("@contractVersion", projection.Versions.ContractVersion),
         ("@exportPolicyVersion", projection.Versions.ExportPolicyVersion), ("@occurredAt", projection.SourceOccurredAt), ("@now", now)
     ];
