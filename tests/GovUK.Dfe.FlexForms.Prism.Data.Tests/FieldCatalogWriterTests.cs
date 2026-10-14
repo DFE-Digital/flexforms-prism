@@ -4,6 +4,7 @@ using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Catalogue;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace GovUK.Dfe.FlexForms.Prism.Data.Tests;
 
@@ -83,10 +84,19 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
     }
 
     [Fact]
-    public async Task Concurrent_ensures_for_one_template_version_both_succeed()
+    public async Task Concurrent_ensures_for_one_template_version_all_succeed_without_failed_saves()
     {
-        await Task.WhenAll(Enumerable.Range(0, 4).Select(_ => Ensure(ExportPolicy.DenyAll)));
+        var failedSaves = new System.Collections.Concurrent.ConcurrentBag<string>();
+        await Task.WhenAll(Enumerable.Range(0, 8).Select(async _ =>
+        {
+            var options = new DbContextOptionsBuilder<PrismDbContext>();
+            PrismDataServiceCollectionExtensions.ConfigureSqlServer(options, sql.ConnectionString);
+            options.LogTo(failedSaves.Add, [CoreEventId.SaveChangesFailed]);
+            await using var db = new PrismDbContext(options.Options);
+            await new FieldCatalogWriter(db, TimeProvider.System).EnsureAsync(_source, Catalogue, ExportPolicy.DenyAll, default);
+        }));
 
+        Assert.Empty(failedSaves);
         Assert.Equal(2, (await Entries()).Count);
         await using var db = sql.CreateContext();
         Assert.Equal(1, await db.TemplateVersions.CountAsync(v => v.TenantId == _source.TenantId));

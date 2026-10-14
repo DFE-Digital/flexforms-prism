@@ -3,7 +3,6 @@ using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Flattener;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Catalogue;
 using GovUK.Dfe.FlexForms.Prism.Flattener.Policy;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUK.Dfe.FlexForms.Prism.Data.Catalog;
@@ -23,27 +22,39 @@ public interface IFieldCatalogWriter
 
 public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : IFieldCatalogWriter
 {
-    private const int UniqueKeyViolation = 2627;
-    private const int UniqueIndexViolation = 2601;
+    private const int LockTimeoutMilliseconds = 30_000;
 
     public async Task EnsureAsync(CatalogueSource source, TemplateCatalogue catalogue, ExportPolicy policy, CancellationToken cancellationToken)
     {
         try
         {
-            try
-            {
-                await UpsertAsync(source, catalogue, policy, cancellationToken);
-            }
-            catch (DbUpdateException ex) when (IsUniqueViolation(ex))
-            {
-                // Another session catalogued the same template version concurrently; its rows are now visible.
-                db.ChangeTracker.Clear();
-                await UpsertAsync(source, catalogue, policy, cancellationToken);
-            }
+            // Many sessions ensure the same template version at once after a cold start or during a backfill;
+            // without the lock their inserts collide on the primary key.
+            await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+            await LockTemplateVersionAsync(source, cancellationToken);
+            await UpsertAsync(source, catalogue, policy, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
         }
         finally
         {
             db.ChangeTracker.Clear();
+        }
+    }
+
+    private async Task LockTemplateVersionAsync(CatalogueSource source, CancellationToken cancellationToken)
+    {
+        var resource = $"prism:catalog:{source.TenantId:N}:{source.TemplateVersionId:N}";
+        var result = await db.Database
+            .SqlQuery<int>($"""
+                DECLARE @result int;
+                EXEC @result = sp_getapplock @Resource = {resource}, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = {LockTimeoutMilliseconds};
+                SELECT @result AS Value;
+                """)
+            .ToListAsync(cancellationToken);
+
+        if (result is not [>= 0])
+        {
+            throw new TimeoutException($"Timed out waiting to catalogue template version {source.TemplateVersionId}.");
         }
     }
 
@@ -156,9 +167,6 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
 
     private static string? Truncate(string? value, int length) =>
         value is null || value.Length <= length ? value : value[..length];
-
-    private static bool IsUniqueViolation(DbUpdateException ex) =>
-        ex.InnerException is SqlException { Number: UniqueKeyViolation or UniqueIndexViolation };
 
     private sealed class KeyComparer : IEqualityComparer<(string Parent, string Field)>
     {
