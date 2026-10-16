@@ -94,6 +94,53 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
         Assert.Null(row.last_modified_on);
     }
 
+    [Fact]
+    public async Task Template_and_tenant_names_come_from_the_catalogued_version_and_tenants_directory()
+    {
+        var projection = Current(_tenant, _application, 1) with
+        {
+            Details = new ApplicationDetails("APP-1", CreatedOn, null),
+        };
+        await WriteCurrent(projection);
+
+        await using (var db = sql.CreateContext())
+        {
+            db.TemplateVersions.Add(new TemplateVersionEntry
+            {
+                TenantId = _tenant,
+                TemplateVersionId = projection.TemplateVersionId,
+                TemplateId = projection.TemplateId,
+                VersionNumber = "1.4.0",
+                TemplateName = "Transfer application",
+                CreatedOn = CreatedOn,
+                CataloguedAt = CreatedOn,
+            });
+            db.Tenants.Add(new TenantEntry
+            {
+                TenantId = _tenant,
+                TenantName = "Academies",
+                UpdatedAt = CreatedOn,
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var row = Assert.Single(await Rows());
+        Assert.Equal("1.4.0", row.template_version_number);
+        Assert.Equal("Transfer application", row.template_name);
+        Assert.Equal("Academies", row.tenant_name);
+    }
+
+    [Fact]
+    public async Task Template_and_tenant_columns_are_null_until_catalogued()
+    {
+        await WriteCurrent(Current(_tenant, _application, 1) with { Details = new ApplicationDetails("APP-1", CreatedOn, null) });
+
+        var row = Assert.Single(await Rows());
+        Assert.Null(row.template_version_number);
+        Assert.Null(row.template_name);
+        Assert.Null(row.tenant_name);
+    }
+
     private async Task WriteCurrent(CurrentProjection projection)
     {
         await using var db = sql.CreateContext();
@@ -106,7 +153,9 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
         await using var db = sql.CreateContext();
         return await db.Database
             .SqlQuery<ApplicationRow>($"""
-                SELECT application_reference, lead_applicant_user_id, lead_applicant_name, lead_applicant_email, lifecycle, created_on, last_modified_on, last_submitted_at, source_revision
+                SELECT application_reference, lead_applicant_user_id, lead_applicant_name, lead_applicant_email,
+                       lifecycle, created_on, last_modified_on, last_submitted_at, source_revision,
+                       template_version_number, template_name, tenant_name
                 FROM prism.v_applications
                 WHERE tenant_id = {_tenant} AND application_id = {_application}
                 """)
@@ -123,6 +172,9 @@ public sealed class ApplicationsViewTests(SqlServerFixture sql)
         DateTime? created_on,
         DateTime? last_modified_on,
         DateTime? last_submitted_at,
-        long source_revision);
+        long source_revision,
+        string? template_version_number,
+        string? template_name,
+        string? tenant_name);
 #pragma warning restore IDE1006
 }

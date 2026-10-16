@@ -1,5 +1,6 @@
 using System.Text;
 using GovUK.Dfe.CoreLibs.Contracts.ExternalApplications.Models.Response;
+using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Tests;
 using GovUK.Dfe.FlexForms.Prism.Functions.ControlPlane;
@@ -8,6 +9,7 @@ using GovUK.Dfe.FlexForms.Prism.Source;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 
@@ -23,7 +25,12 @@ public sealed class AdminApiTests(SqlServerFixture sql)
     private AdminApi Api(Data.PrismDbContext db)
     {
         source.GetTenantsAsync(Arg.Any<CancellationToken>()).Returns([new PrismTenantDto(tenant, "Tenant")]);
-        return new AdminApi(authenticator, new OperationService(db, TimeProvider.System), source, NullLogger<AdminApi>.Instance);
+        return new AdminApi(
+            authenticator,
+            new OperationService(db, TimeProvider.System),
+            source,
+            new TenantDirectoryWriter(db, TimeProvider.System),
+            NullLogger<AdminApi>.Instance);
     }
 
     private void Caller(AdminAuthStatus status) =>
@@ -73,6 +80,7 @@ public sealed class AdminApiTests(SqlServerFixture sql)
 
         var fetched = Assert.IsType<JsonResult>(await Api(db).Get(Request(), operation.OperationId, default));
         Assert.Equal(operation, fetched.Value);
+        Assert.Equal("Tenant", await db.Tenants.AsNoTracking().Where(t => t.TenantId == tenant).Select(t => t.TenantName).SingleAsync());
     }
 
     [Fact]

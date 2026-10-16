@@ -1,3 +1,4 @@
+using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Functions.ControlPlane;
 using GovUK.Dfe.FlexForms.Prism.Source;
@@ -15,7 +16,12 @@ public sealed record CreateOperationRequest(Guid? TenantId, DateTime? ModifiedSi
 /// Control-plane endpoints. They only record operations; the operation worker enqueues the Resync messages.
 /// Every call needs an Entra token with the admin role and is audit-logged with the caller.
 /// </summary>
-public sealed partial class AdminApi(IAdminAuthenticator authenticator, OperationService operations, ISourceClient source, ILogger<AdminApi> logger)
+public sealed partial class AdminApi(
+    IAdminAuthenticator authenticator,
+    OperationService operations,
+    ISourceClient source,
+    ITenantDirectoryWriter tenantDirectory,
+    ILogger<AdminApi> logger)
 {
     private const string BasePath = "/api/control/backfill";
 
@@ -93,6 +99,9 @@ public sealed partial class AdminApi(IAdminAuthenticator authenticator, Operatio
             try
             {
                 var tenants = await source.GetTenantsAsync(cancellationToken);
+                await tenantDirectory.UpsertAsync(
+                    tenants.Select(t => new TenantInfo(t.TenantId, t.TenantName)),
+                    cancellationToken);
                 if (tenants.All(t => t.TenantId != tenantId))
                 {
                     return Problem(StatusCodes.Status400BadRequest, $"Tenant {tenantId} is not a FlexForms tenant.");

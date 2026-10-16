@@ -78,6 +78,7 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
                 TemplateVersionId = source.TemplateVersionId,
                 TemplateId = source.TemplateId,
                 VersionNumber = Truncate(source.TemplateVersionNumber, 50),
+                TemplateName = Truncate(catalogue.TemplateName, 500),
                 CreatedOn = source.CreatedOn,
                 CataloguedAt = now,
             });
@@ -86,6 +87,7 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
         {
             // Versions catalogued before this table existed were backfilled with the catalogue time.
             version.CreatedOn = source.CreatedOn;
+            version.TemplateName = Truncate(catalogue.TemplateName, 500);
         }
 
         foreach (var field in catalogue.Fields)

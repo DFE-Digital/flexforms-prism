@@ -53,7 +53,7 @@ shape. You decide the shape of each report in the query.
 
 | View | Use it for |
 |---|---|
-| `prism.v_applications` | One row per application: reference, lifecycle, created, last modified and last submitted dates. Join it on `application_id`. |
+| `prism.v_applications` | One row per application: reference, lifecycle, template version/name, tenant name, created, last modified and last submitted dates. Join it on `application_id`. |
 | `prism.v_current_answer_facts` | The latest answers of every application, drafts and submitted. `lifecycle` says which. |
 | `prism.v_submission_answer_facts` | Answers exactly as submitted, frozen at submission. Use it for "what did they submit" reports. |
 | `prism.v_template_field_changes` | What each template version added, removed, renamed or changed. |

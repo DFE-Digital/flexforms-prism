@@ -10,6 +10,7 @@ public class TemplateVersionEntry
     public Guid TemplateVersionId { get; set; }
     public Guid TemplateId { get; set; }
     public string? VersionNumber { get; set; }
+    public string? TemplateName { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime CataloguedAt { get; set; }
 }

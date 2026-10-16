@@ -16,6 +16,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
     public DbSet<AnswerFactEntity> AnswerFacts => Set<AnswerFactEntity>();
     public DbSet<FieldCatalogEntry> FieldCatalog => Set<FieldCatalogEntry>();
     public DbSet<TemplateVersionEntry> TemplateVersions => Set<TemplateVersionEntry>();
+    public DbSet<TenantEntry> Tenants => Set<TenantEntry>();
     public DbSet<TemplateFieldRetirement> TemplateFieldRetirements => Set<TemplateFieldRetirement>();
     public DbSet<FieldExportPolicy> FieldExportPolicies => Set<FieldExportPolicy>();
     public DbSet<ExportDefault> ExportDefaults => Set<ExportDefault>();
@@ -128,7 +129,15 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.ToTable("template_versions");
             e.HasKey(x => new { x.TenantId, x.TemplateVersionId });
             e.Property(x => x.VersionNumber).HasMaxLength(50);
+            e.Property(x => x.TemplateName).HasMaxLength(500);
             e.HasIndex(x => new { x.TenantId, x.TemplateId, x.CreatedOn });
+        });
+
+        modelBuilder.Entity<TenantEntry>(e =>
+        {
+            e.ToTable("tenants");
+            e.HasKey(x => x.TenantId);
+            e.Property(x => x.TenantName).HasMaxLength(200).IsRequired();
         });
 
         modelBuilder.Entity<TemplateFieldRetirement>(e =>

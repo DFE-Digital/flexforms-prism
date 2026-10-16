@@ -17,6 +17,7 @@ public static class PrismDataServiceCollectionExtensions
         services.AddScoped<IProjectionWriter, ProjectionWriter>();
         services.AddScoped<IProjectionStore, ProjectionStore>();
         services.AddScoped<IFieldCatalogWriter, FieldCatalogWriter>();
+        services.AddScoped<ITenantDirectoryWriter, TenantDirectoryWriter>();
         services.AddScoped<IGenerationCleaner, GenerationCleaner>();
         services.TryAddSingleton(TimeProvider.System);
         return services;

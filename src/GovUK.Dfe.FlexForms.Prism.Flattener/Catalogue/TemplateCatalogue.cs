@@ -13,6 +13,7 @@ public sealed class TemplateCatalogue
 
     internal TemplateCatalogue(
         string? templateId,
+        string? templateName,
         IReadOnlyList<CatalogField> fields,
         IReadOnlyList<CatalogCollection> collectionList,
         IEnumerable<string> taskIdList,
@@ -20,6 +21,7 @@ public sealed class TemplateCatalogue
         IReadOnlyList<string> warnings)
     {
         TemplateId = templateId;
+        TemplateName = templateName;
         Fields = fields;
         Collections = collectionList;
         RetiredFields = retiredFields;
@@ -36,6 +38,9 @@ public sealed class TemplateCatalogue
     }
 
     public string? TemplateId { get; }
+
+    /// <summary>The display name from the template JSON <c>templateName</c>, when present.</summary>
+    public string? TemplateName { get; }
 
     /// <summary>All fields in display order, including collection fields and their nested fields.</summary>
     public IReadOnlyList<CatalogField> Fields { get; }

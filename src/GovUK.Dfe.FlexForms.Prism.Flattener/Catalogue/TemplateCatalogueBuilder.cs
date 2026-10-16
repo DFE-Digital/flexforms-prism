@@ -86,7 +86,8 @@ public static class TemplateCatalogueBuilder
                 }
             }
 
-            return new TemplateCatalogue(template.TemplateId, fields, collections, taskIds, RetiredFields(), warnings);
+            var templateName = string.IsNullOrWhiteSpace(template.TemplateName) ? null : template.TemplateName.Trim();
+            return new TemplateCatalogue(template.TemplateId, templateName, fields, collections, taskIds, RetiredFields(), warnings);
         }
 
         private List<RetiredCatalogField> RetiredFields()

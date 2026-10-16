@@ -3,6 +3,7 @@ using GovUK.Dfe.CoreLibs.Contracts.ExternalApplications.Models.Response;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Enums;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events;
 using GovUK.Dfe.FlexForms.Prism.Data;
+using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Tests;
@@ -64,7 +65,8 @@ public sealed class OperationProcessorTests : IAsyncLifetime
             Backfill = { PageSize = 2, TimeBudget = TimeSpan.FromMinutes(1), MaxMessagesPerMinute = maxMessagesPerMinute },
         });
         await new OperationProcessor(
-                db, source, new ProjectionStore(db), sender, new ControlPlaneMetrics(new TestMeterFactory()), clock, options,
+                db, source, new ProjectionStore(db), sender, new TenantDirectoryWriter(db, clock),
+                new ControlPlaneMetrics(new TestMeterFactory()), clock, options,
                 NullLogger<OperationProcessor>.Instance)
             .RunAsync(default);
     }
@@ -187,6 +189,13 @@ public sealed class OperationProcessorTests : IAsyncLifetime
         await Run();
 
         Assert.Equal(new[] { tenant, other }.Order(), sent.Select(m => m.TenantId).Order());
+        await using var db = sql.CreateContext();
+        var names = await db.Tenants.AsNoTracking()
+            .Where(t => t.TenantId == tenant || t.TenantId == other)
+            .OrderBy(t => t.TenantName)
+            .Select(t => t.TenantName)
+            .ToListAsync();
+        Assert.Equal(["A", "B"], names);
     }
 
     [Fact]

@@ -44,7 +44,7 @@ Prism gives you five views. Think of them as ready-made tables.
 
 | View | What's in it | One row per |
 |---|---|---|
-| `prism.v_applications` | Reference, status, created, last modified and last submitted dates. | Application |
+| `prism.v_applications` | Reference, status, template version/name, tenant name, created, last modified and last submitted dates. | Application |
 | `prism.v_current_answer_facts` | The latest answers, for drafts and submitted applications. | Answer |
 | `prism.v_submission_answer_facts` | The answers exactly as they were when submitted. They never change afterwards. | Answer in a submission |
 | `prism.field_catalog` | Every question of every form version: its wording, page and type. No answers. | Question in a form version |

@@ -119,9 +119,11 @@ One row per application that isn't deleted, with what isn't an answer. Join it t
 | Column | Meaning |
 |---|---|
 | `tenant_id`, `application_id` | Identity. Always filter on `tenant_id`. |
+| `tenant_name` | The FlexForms tenant display name. Null until a control-plane run has loaded the tenant list. |
 | `application_reference` | The application reference users see in FlexForms. |
 | `lifecycle` | `Draft` or `Submitted`. Deleted applications never appear. |
 | `template_id`, `template_version_id` | The template version of the latest response. |
+| `template_version_number`, `template_name` | From the catalogued template version. Null until that version is catalogued. |
 | `lead_applicant_user_id` | The FlexForms user id of the lead applicant, who created the application. |
 | `lead_applicant_name`, `lead_applicant_email` | The lead applicant's name and email address. Personal data: handle them accordingly. |
 | `created_on` | When the application was created in FlexForms (UTC). |
@@ -134,6 +136,9 @@ projector version 2 or later, `lead_applicant_user_id` until version 3 or later,
 `lead_applicant_email` until version 4 or later; after deploying, nightly reconciliation does that, or run a backfill.
 The name and email are copied when the application is projected, so if the user changes them in FlexForms, Prism
 shows the new values only after the application next changes or is re-projected.
+`template_version_number` and `template_name` appear once the template version is catalogued (on publish or when an
+application that uses it is projected). `tenant_name` appears after the next backfill or reconciliation that loads
+the FlexForms tenant list.
 
 ### `prism.v_current_answer_facts`
 

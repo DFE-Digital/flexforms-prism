@@ -2,6 +2,7 @@ using GovUK.Dfe.CoreLibs.Contracts.ExternalApplications.Models.Response;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Enums;
 using GovUK.Dfe.CoreLibs.Messaging.Contracts.Messages.Events;
 using GovUK.Dfe.FlexForms.Prism.Data;
+using GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 using GovUK.Dfe.FlexForms.Prism.Data.Entities;
 using GovUK.Dfe.FlexForms.Prism.Data.Reading;
 using GovUK.Dfe.FlexForms.Prism.Data.Writing;
@@ -25,6 +26,7 @@ public sealed partial class OperationProcessor(
     ISourceClient source,
     IProjectionStore store,
     IProjectionRequestSender sender,
+    ITenantDirectoryWriter tenantDirectory,
     ControlPlaneMetrics metrics,
     TimeProvider clock,
     IOptions<PrismFunctionsOptions> options,
@@ -87,9 +89,14 @@ public sealed partial class OperationProcessor(
             return true;
         }
 
+        var sourceTenants = await source.GetTenantsAsync(cancellationToken);
+        await tenantDirectory.UpsertAsync(
+            sourceTenants.Select(t => new TenantInfo(t.TenantId, t.TenantName)),
+            cancellationToken);
+
         var tenants = operation.TenantId is { } tenantId
             ? [tenantId]
-            : (await source.GetTenantsAsync(cancellationToken)).Select(t => t.TenantId).Distinct().Order().ToList();
+            : sourceTenants.Select(t => t.TenantId).Distinct().Order().ToList();
         tenants = [.. tenants.Where(t => !options.Value.IsExcluded(t))];
 
         var (cursor, page) = (operation.CurrentTenantId, operation.NextPage);

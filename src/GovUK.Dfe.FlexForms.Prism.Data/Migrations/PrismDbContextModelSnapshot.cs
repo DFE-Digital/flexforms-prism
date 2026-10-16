@@ -829,6 +829,11 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("template_id");
 
+                    b.Property<string>("TemplateName")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("template_name");
+
                     b.Property<string>("VersionNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -839,6 +844,28 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                     b.HasIndex("TenantId", "TemplateId", "CreatedOn");
 
                     b.ToTable("template_versions", "prism");
+                });
+
+            modelBuilder.Entity("GovUK.Dfe.FlexForms.Prism.Data.Entities.TenantEntry", b =>
+                {
+                    b.Property<Guid>("TenantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("TenantName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("tenant_name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("TenantId");
+
+                    b.ToTable("tenants", "prism");
                 });
 
             modelBuilder.Entity("GovUK.Dfe.FlexForms.Prism.Data.Entities.AnswerFactEntity", b =>

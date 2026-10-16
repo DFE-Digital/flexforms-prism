@@ -111,7 +111,27 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
         await using var db = sql.CreateContext();
         var version = await db.TemplateVersions.AsNoTracking().SingleAsync(v => v.TenantId == _source.TenantId);
         Assert.Equal(
-            (_source.TemplateVersionId, _source.TemplateId, "2.1", _source.CreatedOn),
-            (version.TemplateVersionId, version.TemplateId, version.VersionNumber, version.CreatedOn));
+            (_source.TemplateVersionId, _source.TemplateId, "2.1", "Sample", _source.CreatedOn),
+            (version.TemplateVersionId, version.TemplateId, version.VersionNumber, version.TemplateName, version.CreatedOn));
+    }
+
+    [Fact]
+    public async Task Ensuring_again_refreshes_the_template_name_on_an_existing_version()
+    {
+        await Ensure(ExportPolicy.DenyAll);
+        await using (var db = sql.CreateContext())
+        {
+            var version = await db.TemplateVersions.SingleAsync(v => v.TenantId == _source.TenantId);
+            version.TemplateName = null;
+            await db.SaveChangesAsync();
+        }
+
+        await Ensure(ExportPolicy.DenyAll);
+
+        await using (var db = sql.CreateContext())
+        {
+            var version = await db.TemplateVersions.AsNoTracking().SingleAsync(v => v.TenantId == _source.TenantId);
+            Assert.Equal("Sample", version.TemplateName);
+        }
     }
 }
