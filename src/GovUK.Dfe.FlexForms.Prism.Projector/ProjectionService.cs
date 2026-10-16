@@ -442,7 +442,13 @@ public sealed partial class ProjectionService(
         }
 
         await catalogWriter.EnsureAsync(
-            new CatalogueSource(tenantId, template.TemplateId, templateVersionId, template.VersionNumber, template.CreatedOn),
+            new CatalogueSource(
+                tenantId,
+                template.TemplateId,
+                templateVersionId,
+                template.VersionNumber,
+                template.CreatedOn,
+                template.TemplateName),
             catalogue,
             policy,
             cancellationToken);

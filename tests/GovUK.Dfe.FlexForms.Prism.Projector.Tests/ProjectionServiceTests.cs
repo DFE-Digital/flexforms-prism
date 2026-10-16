@@ -39,7 +39,7 @@ public class ProjectionServiceTests
             Arg.Is<IReadOnlyCollection<AnswerFact>>(facts => facts.Count == 1 && facts.First().FieldId == "name" && facts.First().ValueString == "Ada"),
             Arg.Any<CancellationToken>());
         await h.CatalogWriter.Received(1).EnsureAsync(
-            Arg.Is<CatalogueSource>(s => s.TemplateVersionId == h.TemplateVersionId && s.TemplateVersionNumber == "1.0"),
+            Arg.Is<CatalogueSource>(s => s.TemplateVersionId == h.TemplateVersionId && s.TemplateVersionNumber == "1.0" && s.TemplateName == "Sample"),
             Arg.Any<TemplateCatalogue>(), Arg.Any<ExportPolicy>(), Arg.Any<CancellationToken>());
     }
 

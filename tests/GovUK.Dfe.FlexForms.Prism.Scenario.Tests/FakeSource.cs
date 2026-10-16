@@ -24,7 +24,7 @@ internal sealed class FakeSource : ISourceClient
         TenantId = tenantId;
         TemplateId = templateId;
         TemplateVersionId = templateVersionId;
-        templates[templateVersionId] = new PrismTemplateVersionDto(templateVersionId, templateId, "1.0", templateJson, DateTime.UtcNow);
+        templates[templateVersionId] = new PrismTemplateVersionDto(templateVersionId, templateId, "1.0", templateJson, DateTime.UtcNow, "Scenario");
     }
 
     /// <summary>The event the API publishes for the template version the source was created with.</summary>
@@ -36,7 +36,7 @@ internal sealed class FakeSource : ISourceClient
         lock (gate)
         {
             var createdOn = templates.Values.Max(t => t.CreatedOn).AddMinutes(1);
-            var version = new PrismTemplateVersionDto(Guid.NewGuid(), TemplateId, versionNumber, templateJson, createdOn);
+            var version = new PrismTemplateVersionDto(Guid.NewGuid(), TemplateId, versionNumber, templateJson, createdOn, "Scenario");
             templates[version.TemplateVersionId] = version;
             return Published(version);
         }

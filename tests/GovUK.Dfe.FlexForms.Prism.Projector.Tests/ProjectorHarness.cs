@@ -59,7 +59,7 @@ internal sealed class ProjectorHarness
 
         Store.GetExportPolicyAsync(TenantId, TemplateId, Arg.Any<CancellationToken>()).Returns(Policy(1));
         Source.GetTemplateVersionAsync(TenantId, TemplateVersionId, Arg.Any<CancellationToken>())
-            .Returns(new PrismTemplateVersionDto(TemplateVersionId, TemplateId, "1.0", Template, OccurredAt));
+            .Returns(new PrismTemplateVersionDto(TemplateVersionId, TemplateId, "1.0", Template, OccurredAt, "Sample"));
 
         Writer.WriteCurrentAsync(Arg.Any<CurrentProjection>(), Arg.Any<IReadOnlyCollection<AnswerFact>>(), Arg.Any<CancellationToken>())
             .Returns(new WriteResult(WriteOutcome.Applied, Guid.NewGuid()));

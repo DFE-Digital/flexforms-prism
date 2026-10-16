@@ -101,7 +101,7 @@ Base path `v1/internal/prism`. Every call needs an Entra token for the FlexForms
 | `GET tenants` | `PrismTenantDto[]`: the authoritative tenant list, from tenant configuration. |
 | `GET applications/{applicationId}/current` | `PrismApplicationStateDto`: revision, status, deleted flag, template version, latest response with its body, and the submitted revision, submission ID and submitted response ID. |
 | `GET responses/{responseId}` | `PrismResponseDto`: one immutable response version. |
-| `GET template-versions/{templateVersionId}` | `PrismTemplateVersionDto`: the template ID, version number, template JSON and creation time. Used to flatten answers and to catalogue published versions; the creation time orders versions in `v_template_field_changes`. Template versions are immutable, so Prism caches them for as long as the process runs. |
+| `GET template-versions/{templateVersionId}` | `PrismTemplateVersionDto`: the template ID, version number, template display name (`ea.Templates.Name`), template JSON and creation time. Used to flatten answers and to catalogue published versions; the creation time orders versions in `v_template_field_changes`. Template versions are immutable, so Prism caches them for as long as the process runs. |
 | `GET applications?modifiedSince=&page=&pageSize=` | `PrismApplicationPageDto` of `PrismApplicationSummaryDto`, ordered by creation. **Deleted applications are included**, with `IsDeleted = true`. |
 
 Applications are soft-deleted only. If FlexForms ever hard-deletes, it will need a deletion ledger first;
@@ -123,7 +123,7 @@ One row per application that isn't deleted, with what isn't an answer. Join it t
 | `application_reference` | The application reference users see in FlexForms. |
 | `lifecycle` | `Draft` or `Submitted`. Deleted applications never appear. |
 | `template_id`, `template_version_id` | The template version of the latest response. |
-| `template_version_number`, `template_name` | From the catalogued template version. Null until that version is catalogued. |
+| `template_version_number`, `template_name` | From the catalogued template version (`ea.Templates.Name` for the name). Null until that version is catalogued. |
 | `lead_applicant_user_id` | The FlexForms user id of the lead applicant, who created the application. |
 | `lead_applicant_name`, `lead_applicant_email` | The lead applicant's name and email address. Personal data: handle them accordingly. |
 | `created_on` | When the application was created in FlexForms (UTC). |

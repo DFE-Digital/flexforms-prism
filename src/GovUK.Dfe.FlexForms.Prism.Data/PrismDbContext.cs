@@ -129,7 +129,7 @@ public class PrismDbContext(DbContextOptions<PrismDbContext> options) : DbContex
             e.ToTable("template_versions");
             e.HasKey(x => new { x.TenantId, x.TemplateVersionId });
             e.Property(x => x.VersionNumber).HasMaxLength(50);
-            e.Property(x => x.TemplateName).HasMaxLength(500);
+            e.Property(x => x.TemplateName).HasMaxLength(100);
             e.HasIndex(x => new { x.TenantId, x.TemplateId, x.CreatedOn });
         });
 

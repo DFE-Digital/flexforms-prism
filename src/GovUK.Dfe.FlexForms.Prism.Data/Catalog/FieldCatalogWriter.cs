@@ -9,7 +9,14 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Catalog;
 
 /// <summary>Identifies the template version a catalogue belongs to.</summary>
 /// <param name="CreatedOn">When the version was created in FlexForms; orders the versions of a template.</param>
-public sealed record CatalogueSource(Guid TenantId, Guid TemplateId, Guid TemplateVersionId, string? TemplateVersionNumber, DateTime CreatedOn);
+/// <param name="TemplateName">Display name from <c>ea.Templates.Name</c>.</param>
+public sealed record CatalogueSource(
+    Guid TenantId,
+    Guid TemplateId,
+    Guid TemplateVersionId,
+    string? TemplateVersionNumber,
+    DateTime CreatedOn,
+    string? TemplateName = null);
 
 public interface IFieldCatalogWriter
 {
@@ -78,7 +85,7 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
                 TemplateVersionId = source.TemplateVersionId,
                 TemplateId = source.TemplateId,
                 VersionNumber = Truncate(source.TemplateVersionNumber, 50),
-                TemplateName = Truncate(catalogue.TemplateName, 500),
+                TemplateName = Truncate(source.TemplateName, 100),
                 CreatedOn = source.CreatedOn,
                 CataloguedAt = now,
             });
@@ -87,7 +94,7 @@ public sealed class FieldCatalogWriter(PrismDbContext db, TimeProvider clock) : 
         {
             // Versions catalogued before this table existed were backfilled with the catalogue time.
             version.CreatedOn = source.CreatedOn;
-            version.TemplateName = Truncate(catalogue.TemplateName, 500);
+            version.TemplateName = Truncate(source.TemplateName, 100);
         }
 
         foreach (var field in catalogue.Fields)

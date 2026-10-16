@@ -34,7 +34,12 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
     private static readonly TemplateCatalogue Catalogue = TemplateCatalogueBuilder.Build(Template);
 
     private readonly CatalogueSource _source = new(
-        Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "2.1", new DateTime(2026, 9, 1, 10, 0, 0, DateTimeKind.Utc));
+        Guid.NewGuid(),
+        Guid.NewGuid(),
+        Guid.NewGuid(),
+        "2.1",
+        new DateTime(2026, 9, 1, 10, 0, 0, DateTimeKind.Utc),
+        TemplateName: "Transfer application");
 
     private async Task Ensure(ExportPolicy policy)
     {
@@ -111,7 +116,7 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
         await using var db = sql.CreateContext();
         var version = await db.TemplateVersions.AsNoTracking().SingleAsync(v => v.TenantId == _source.TenantId);
         Assert.Equal(
-            (_source.TemplateVersionId, _source.TemplateId, "2.1", "Sample", _source.CreatedOn),
+            (_source.TemplateVersionId, _source.TemplateId, "2.1", "Transfer application", _source.CreatedOn),
             (version.TemplateVersionId, version.TemplateId, version.VersionNumber, version.TemplateName, version.CreatedOn));
     }
 
@@ -131,7 +136,7 @@ public sealed class FieldCatalogWriterTests(SqlServerFixture sql)
         await using (var db = sql.CreateContext())
         {
             var version = await db.TemplateVersions.AsNoTracking().SingleAsync(v => v.TenantId == _source.TenantId);
-            Assert.Equal("Sample", version.TemplateName);
+            Assert.Equal("Transfer application", version.TemplateName);
         }
     }
 }

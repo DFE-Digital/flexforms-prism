@@ -15,8 +15,8 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                 name: "template_name",
                 schema: "prism",
                 table: "template_versions",
-                type: "nvarchar(500)",
-                maxLength: 500,
+                type: "nvarchar(100)",
+                maxLength: 100,
                 nullable: true);
 
             migrationBuilder.CreateTable(

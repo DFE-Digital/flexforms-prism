@@ -830,8 +830,8 @@ namespace GovUK.Dfe.FlexForms.Prism.Data.Migrations
                         .HasColumnName("template_id");
 
                     b.Property<string>("TemplateName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("template_name");
 
                     b.Property<string>("VersionNumber")
