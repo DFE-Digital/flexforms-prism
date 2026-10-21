@@ -48,6 +48,8 @@ public sealed class TenantScopedApiClientSettingsProvider(ApiClientSettings sett
         ClientSecret = settings.ClientSecret,
         Authority = settings.Authority,
         Scope = settings.Scope,
+        UseManagedIdentity = settings.UseManagedIdentity,
+        ManagedIdentityClientId = settings.ManagedIdentityClientId,
         RequestTokenExchange = false,
         AutoRegisterUsers = false,
         HeadersToForward = settings.HeadersToForward,
