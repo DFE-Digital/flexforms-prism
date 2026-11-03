@@ -31,6 +31,15 @@ builder.Services.Configure<LoggerFilterOptions>(options =>
     {
         options.Rules.Remove(defaultRule);
     }
+
+    // With Application Insights in the worker, worker logs already reach it directly. Forwarding them to the host as
+    // well shows every line twice in the log stream and Live Metrics. Locally, without a connection string, the host
+    // is the only place they appear, so forwarding stays on.
+    if (!string.IsNullOrWhiteSpace(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+    {
+        options.Rules.Add(new LoggerFilterRule(
+            "Microsoft.Azure.Functions.Worker.Logging.WorkerLoggerProvider", null, LogLevel.None, null));
+    }
 });
 
 // host.json log levels only apply to the host process, not this worker. App settings (Logging__LogLevel__...) override these.
