@@ -72,3 +72,4 @@ nunit-*.xml
 /.vs
 /src/GovUK.Dfe.FlexForms.Prism.Functions/.azurite
 /src/GovUK.Dfe.FlexForms.Prism.Functions/local.settings.json
+/src/GovUK.Dfe.FlexForms.Prism.Functions/prism.docker.env

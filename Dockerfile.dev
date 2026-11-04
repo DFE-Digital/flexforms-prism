@@ -1,0 +1,49 @@
+# Local development image for DeveloperOnBoarding (same pattern as flexforms-api / flexforms-web).
+# Build context: flexforms-prism repo root.
+#
+# Expected compose wiring (illustrative):
+#   build:
+#     context: ${REPO_PATH}/flexforms-prism
+#     dockerfile: Dockerfile.dev
+#   environment: (non-secrets only — see developer-on-boarding docker-compose)
+#   env_file: ${REPO_PATH}/flexforms-prism/.../prism.docker.env  (git-ignored; onboarding generates from local.settings.json)
+#   ports:
+#     - 7071:8080
+
+FROM mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet-isolated10.0 AS base
+USER root
+WORKDIR /home/site/wwwroot
+EXPOSE 8080
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ENV CI=true
+ARG BUILD_CONFIGURATION=Debug
+WORKDIR /src
+COPY ["Directory.Build.props", "."]
+COPY ["Directory.Packages.props", "."]
+COPY ["nuget.config", "."]
+COPY ["src/GovUK.Dfe.FlexForms.Prism.Functions/GovUK.Dfe.FlexForms.Prism.Functions.csproj", "src/GovUK.Dfe.FlexForms.Prism.Functions/"]
+COPY ["src/GovUK.Dfe.FlexForms.Prism.Projector/GovUK.Dfe.FlexForms.Prism.Projector.csproj", "src/GovUK.Dfe.FlexForms.Prism.Projector/"]
+COPY ["src/GovUK.Dfe.FlexForms.Prism.Flattener/GovUK.Dfe.FlexForms.Prism.Flattener.csproj", "src/GovUK.Dfe.FlexForms.Prism.Flattener/"]
+COPY ["src/GovUK.Dfe.FlexForms.Prism.Data/GovUK.Dfe.FlexForms.Prism.Data.csproj", "src/GovUK.Dfe.FlexForms.Prism.Data/"]
+COPY ["src/GovUK.Dfe.FlexForms.Prism.Source/GovUK.Dfe.FlexForms.Prism.Source.csproj", "src/GovUK.Dfe.FlexForms.Prism.Source/"]
+RUN dotnet restore "./src/GovUK.Dfe.FlexForms.Prism.Functions/GovUK.Dfe.FlexForms.Prism.Functions.csproj" --configfile nuget.config
+COPY . .
+WORKDIR "/src/src/GovUK.Dfe.FlexForms.Prism.Functions"
+RUN dotnet publish "./GovUK.Dfe.FlexForms.Prism.Functions.csproj" -c $BUILD_CONFIGURATION -o /home/site/wwwroot /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /home/site/wwwroot
+COPY --from=build /home/site/wwwroot .
+
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
+    FUNCTIONS_WORKER_RUNTIME=dotnet-isolated \
+    ASPNETCORE_URLS=http://+:8080 \
+    WEBSITE_HOSTNAME=localhost:8080
+
+COPY script/dev-prism-docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh \
+    && chmod +x /app/docker-entrypoint.sh
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
