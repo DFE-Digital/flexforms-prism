@@ -1,0 +1,91 @@
+name: Knowledge base check
+
+# Fails a pull request that changes production code without updating the knowledge base
+# (AGENTS.md / .ai/). Add the skip label when a change genuinely has no knowledge impact.
+
+on:
+  workflow_call:
+    inputs:
+      code-paths:
+        description: "Regex of changed paths that count as production code"
+        type: string
+        default: '^src/'
+      ignored-paths:
+        description: "Regex of paths under code-paths that do not need a docs update (tests, benchmarks)"
+        type: string
+        default: ''
+      doc-paths:
+        description: "Regex of paths that count as a knowledge base update"
+        type: string
+        default: '^(\.ai/|AGENTS\.md$|CLAUDE\.md$)'
+      skip-label:
+        description: "Pull request label that skips the check"
+        type: string
+        default: 'no-docs'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    name: Knowledge base updated
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check AGENTS.md / .ai/ were updated
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          CODE_PATHS: ${{ inputs.code-paths }}
+          IGNORED_PATHS: ${{ inputs.ignored-paths }}
+          DOC_PATHS: ${{ inputs.doc-paths }}
+          SKIP_LABEL: ${{ inputs.skip-label }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$PR" ]]; then
+            echo "Not a pull request - nothing to check."
+            exit 0
+          fi
+
+          # Labels are read live (not from the event payload) so re-running the job after adding the label works.
+          labels=$(gh api "repos/$REPO/issues/$PR/labels" --jq '.[].name')
+          if grep -qxF "$SKIP_LABEL" <<<"$labels"; then
+            echo "::notice ::'$SKIP_LABEL' label present - knowledge base check skipped."
+            exit 0
+          fi
+
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
+
+          code=$(grep -E "$CODE_PATHS" <<<"$files" || true)
+          if [[ -n "$IGNORED_PATHS" && -n "$code" ]]; then
+            code=$(grep -Ev "$IGNORED_PATHS" <<<"$code" || true)
+          fi
+          docs=$(grep -E "$DOC_PATHS" <<<"$files" || true)
+
+          if [[ -z "$code" ]]; then
+            echo "No production code changed - nothing to check."
+            exit 0
+          fi
+
+          if [[ -n "$docs" ]]; then
+            echo "Knowledge base files updated in this PR:"
+            echo "$docs"
+            exit 0
+          fi
+
+          {
+            echo "### Knowledge base not updated"
+            echo "This PR changes production code but none of: \`$DOC_PATHS\`."
+            echo "Update the affected files (see **Definition of done** in \`AGENTS.md\`), or add the \`$SKIP_LABEL\` label if the change has no knowledge impact, then re-run this job."
+            echo
+            echo "Code files changed:"
+            echo '```'
+            head -n 50 <<<"$code"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::error ::Production code changed without an AGENTS.md / .ai/ update. Update the knowledge base, or add the '$SKIP_LABEL' label if there is no knowledge impact, then re-run."
+          exit 1
