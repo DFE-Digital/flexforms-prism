@@ -17,8 +17,21 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
+  knowledge-check:
+    name: Knowledge base check
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/knowledge-check.yml
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      code-paths: '^src/'
+      doc-paths: '^(\.ai/|docs/|AGENTS\.md$|CLAUDE\.md$|README\.md$)'
+
   build-test:
     name: Build and test
+    needs: [ knowledge-check ]
+    if: ${{ !cancelled() && needs.knowledge-check.result != 'failure' }}
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -74,7 +87,7 @@ jobs:
   publish:
     name: Publish Function package
     needs: build-test
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: ${{ !cancelled() && needs.build-test.result == 'success' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-24.04
     defaults:
       run:
