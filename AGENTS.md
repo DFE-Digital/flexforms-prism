@@ -31,6 +31,8 @@ Web → API (OLTP + outbox) → Service Bus topic `flexforms-prism` → this Fun
 | [`docs/querying-prism.md`](docs/querying-prism.md) | Cross-version reporting |
 | [`docs/runbook.md`](docs/runbook.md) | Ops |
 | [`docs/azure-setup.md`](docs/azure-setup.md) | Azure resources |
+| [`.ai/ecosystem.md`](.ai/ecosystem.md) | Whole-platform map (same file in all six repos) |
+| [`.ai/code-map.md`](.ai/code-map.md) | Functions, projection logic, tables, config |
 | [`.ai/architecture.md`](.ai/architecture.md) | Code map |
 | [`.ai/known-pitfalls.md`](.ai/known-pitfalls.md) | Footguns |
 | [`.ai/history-lessons.md`](.ai/history-lessons.md) | Lessons from past design work |

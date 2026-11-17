@@ -9,3 +9,5 @@
 7. Including excluded test tenants in warehouse extracts.
 8. README vs csproj: sibling API project reference may be outdated.
 9. `v_applications.template_name` comes from EA `Templates.Name` via API DTO, not the JSON `templateName` after that change.
+10. **Message type URNs are a contract.** `ProjectionMessages` matches `urn:message:{namespace}:{type}` of the CoreLibs event records. Moving `ApplicationProjectionRequestedEvent` / `TemplateVersionPublishedEvent` to another namespace or renaming them makes template events read as application events (or fail as `invalid_message`). Coordinate with CoreLibs and the API.
+11. **Every HTTP function authenticates through `AdminAuthenticator`** before doing any work. Follow the existing control-plane functions when adding one.
